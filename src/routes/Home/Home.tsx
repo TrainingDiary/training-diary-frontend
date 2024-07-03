@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import Button from '../../components/Button/Button';
 
 const Home: React.FC = () => {
-  return <div>트레이닝 다이어리</div>;
+  const [count, setCount] = useState(0);
+
+  const handleClick = () => {
+    setCount(count + 1);
+  };
+
+  return (
+    <div>
+      {' '}
+      <p>You clicked {count} times</p>
+      <Button text="Click me" onClick={handleClick} />
+    </div>
+  );
 };
 
 export default Home;
