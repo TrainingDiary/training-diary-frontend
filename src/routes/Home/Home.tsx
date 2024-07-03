@@ -12,7 +12,7 @@ const Home: React.FC = () => {
   return (
     <div>
       {' '}
-      <p>You clicked {count} times! can I deploy? third more</p>
+      <p>You clicked {count} times! can I deploy? Last test</p>
       <Button text="Click me" onClick={handleClick} />
     </div>
   );
