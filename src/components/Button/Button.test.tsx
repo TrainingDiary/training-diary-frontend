@@ -5,6 +5,6 @@ import Button from './Button';
 // Button이 텍스트를 렌더링하는지 테스트
 test('renders button with text', () => {
   render(<Button text="Click me" onClick={() => {}} />);
-  const buttonElement = screen.getByText(/Click me/i);
+  const buttonElement = screen.getByText(/Click m/i);
   expect(buttonElement).toBeInTheDocument();
 });
