@@ -1,19 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import Button from '../../components/Button/Button';
 
 const Home: React.FC = () => {
-  const [count, setCount] = useState(0);
-
-  const handleClick = () => {
-    setCount(count + 1);
-  };
-
   return (
     <div>
-      {' '}
-      <p>You clicked {count} times! 🧚</p>
-      <Button text="Click me" onClick={handleClick} />
+      {/* button 사용 예시 props = {size(small, medium, large) / variant(primary or null)}, children = text ※theme 참고※ */}
+      <Button size="small">중복확인</Button>
+      <Button size="large" variant="primary">
+        로그인
+      </Button>
     </div>
   );
 };
