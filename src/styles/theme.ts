@@ -11,7 +11,7 @@ const theme = {
     main700: '#4DC19C',
     main800: '#37B38B',
     main900: '#2FA782',
-    back: '#181818',
+    black: '#181818',
     white: '#FFFFFF',
     gray100: '#F8F9FA',
     gray200: '#E9ECEF',

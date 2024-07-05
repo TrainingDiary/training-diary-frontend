@@ -6,8 +6,8 @@ import { ThemeProvider } from 'styled-components';
 import Button from '../../components/Button/Button';
 import theme from '../../styles/theme';
 
-describe('Button Component', () => {
-  test('renders correctly with primary variant', () => {
+describe('버튼이 렌더링 될 때', () => {
+  test('primary 형으로 올바르게 메인 컬러의 버튼을 보여준다.', () => {
     render(
       <ThemeProvider theme={theme}>
         <Button size="large" variant="primary">
@@ -22,7 +22,7 @@ describe('Button Component', () => {
     expect(button).toHaveStyleRule('color', theme.colors.white);
   });
 
-  test('renders correctly with secondary variant', () => {
+  test('variant props가 없다면 회색 버튼을 보여준다.', () => {
     render(
       <ThemeProvider theme={theme}>
         <Button size="large">회원 가입</Button>
@@ -35,7 +35,7 @@ describe('Button Component', () => {
     expect(button).toHaveStyleRule('color', theme.colors.gray600);
   });
 
-  test('renders correctly with different sizes', () => {
+  test('size props에 따라 다른 크기의 버튼을 보여준다.', () => {
     render(
       <ThemeProvider theme={theme}>
         <Button size="small" variant="primary">
@@ -57,7 +57,7 @@ describe('Button Component', () => {
     expect(largeButton).toHaveStyleRule('max-width', theme.size.large);
   });
 
-  test('applies active styles correctly', () => {
+  test('active 상태에 버튼의 올바른 스타일을 보여준다.', () => {
     render(
       <ThemeProvider theme={theme}>
         <Button size="large" variant="primary">
@@ -75,7 +75,7 @@ describe('Button Component', () => {
     });
   });
 
-  test('handles click events correctly', () => {
+  test('버튼의 클릭 이벤트가 올바르게 작동한다.', () => {
     const handleClick = jest.fn();
 
     render(

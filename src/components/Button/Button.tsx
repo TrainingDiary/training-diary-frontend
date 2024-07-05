@@ -32,7 +32,7 @@ const ButtonWrapper = styled.button<ButtonProps>`
 interface ButtonProps {
   children: string;
   size: 'small' | 'medium' | 'large';
-  variant?: string;
+  variant?: 'primary';
   onClick?: () => void;
 }
 
