@@ -1,4 +1,3 @@
-// global styles
 import { createGlobalStyle } from 'styled-components';
 import reset from 'styled-reset';
 
@@ -30,4 +29,5 @@ button{
     }
   }
 `;
+
 export default GlobalStyles;
