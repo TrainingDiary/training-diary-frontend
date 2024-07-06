@@ -22,7 +22,14 @@
 
     /* Testing */
     "types": ["@testing-library/jest-dom", "jest"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+
+    /* Alias */
+    "baseUrl": "./",
+    "paths": {
+      "@icons/*": ["src/assets/icons/*"],
+      "@components/*": ["src/components/*"]
+    }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
