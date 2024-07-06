@@ -111,9 +111,7 @@ const Login: React.FC = () => {
         Don't have an account? <Link to={'/'}>Sign up</Link>
       </AuthSwitcher>
 
-      {error && (
-        <AuthError text={error} $isVisible={!!error} onClose={onCloseError} />
-      )}
+      {error && <AuthError text={error} onClose={onCloseError} />}
     </AuthWrapper>
   );
 };

@@ -35,7 +35,6 @@ const CloseButton = styled.img`
 
 interface AuthErrorProps {
   text: string;
-  $isVisible: boolean;
   onClose: () => void;
 }
 
