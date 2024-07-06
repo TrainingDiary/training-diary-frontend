@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Button from '../../components/Button/Button';
+import Button from '@components/Button/Button';
 
 const Home: React.FC = () => {
   return (

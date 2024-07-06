@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import hidePasswordIcon from '../../../assets/icons/hidePassword.svg';
-import showPasswordIcon from '../../../assets/icons/showPassword.svg';
+import hidePasswordIcon from '@icons/hidePassword.svg';
+import showPasswordIcon from '@icons/showPassword.svg';
 
 const Wrapper = styled.div`
   display: flex;

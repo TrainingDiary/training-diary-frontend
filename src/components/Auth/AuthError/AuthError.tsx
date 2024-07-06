@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import errorIcon from '../../../assets/icons/error.svg';
-import closeIcon from '../../../assets/icons/close.svg';
+import errorIcon from '@icons/error.svg';
+import closeIcon from '@icons/close.svg';
 
 const Wrapper = styled.div`
   display: flex;

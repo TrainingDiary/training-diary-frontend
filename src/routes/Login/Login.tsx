@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import Button from '../../components/Button/Button';
-import AuthSwitcher from '../../components/Auth/AuthSwitcher/AuthSwitcher';
-import AuthTitle from '../../components/Auth/AuthTitle/AuthTitle';
-import SocialLoginBox from '../../components/Auth/SocialLoginBox/SocialLoginBox';
-import AuthInputBox from '../../components/Auth/AuthInputBox/AuthInputBox';
-import AuthError from '../../components/Auth/AuthError/AuthError';
-import { AuthWrapper } from '../../components/Auth/styledComponents/AuthWrapper';
-import { AuthContainer } from '../../components/Auth/styledComponents/AuthContainer';
-import { AuthForm } from '../../components/Auth/styledComponents/AuthForm';
-import emailIcon from '../../assets/icons/email.svg';
-import passwordIcon from '../../assets/icons/password.svg';
+import Button from '@components/Button/Button';
+import AuthSwitcher from '@components/Auth/AuthSwitcher/AuthSwitcher';
+import AuthTitle from '@components/Auth/AuthTitle/AuthTitle';
+import SocialLoginBox from '@components/Auth/SocialLoginBox/SocialLoginBox';
+import AuthInputBox from '@components/Auth/AuthInputBox/AuthInputBox';
+import AuthError from '@components/Auth/AuthError/AuthError';
+import { AuthWrapper } from '@components/Auth/styledComponents/AuthWrapper';
+import { AuthContainer } from '@components/Auth/styledComponents/AuthContainer';
+import { AuthForm } from '@components/Auth/styledComponents/AuthForm';
+import emailIcon from '@icons/email.svg';
+import passwordIcon from '@icons/password.svg';
 
 interface FormState {
   email: string;
