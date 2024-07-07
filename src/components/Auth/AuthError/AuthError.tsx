@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+import { fadeInStyles, fadeOutStyles } from 'src/styles/animations/fadeInOut';
 import errorIcon from '@icons/error.svg';
 import closeIcon from '@icons/close.svg';
 
-const Wrapper = styled.div`
+interface WrapperProps {
+  $isFadingIn: boolean;
+}
+
+const Wrapper = styled.div<WrapperProps>`
   display: flex;
   align-items: center;
   padding: 12px 20px;
@@ -16,6 +21,8 @@ const Wrapper = styled.div`
   bottom: 100px;
   left: 20px;
   z-index: 9999;
+
+  ${({ $isFadingIn }) => ($isFadingIn ? fadeInStyles : fadeOutStyles)};
 `;
 
 const Icon = styled.img`
@@ -39,11 +46,26 @@ interface AuthErrorProps {
 }
 
 const AuthError: React.FC<AuthErrorProps> = ({ text, onClose }) => {
+  const [isFadingIn, setIsFadingIn] = useState(true);
+
+  useEffect(() => {
+    if (!isFadingIn) {
+      const timer = setTimeout(() => onClose(), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isFadingIn]);
+
   return (
-    <Wrapper>
+    <Wrapper $isFadingIn={isFadingIn}>
       <Icon src={errorIcon} alt="error icon" />
       <Text>{text}</Text>
-      <CloseButton src={closeIcon} alt="close button" onClick={onClose} />
+      <CloseButton
+        src={closeIcon}
+        alt="close button"
+        onClick={() => {
+          setIsFadingIn(false);
+        }}
+      />
     </Wrapper>
   );
 };
