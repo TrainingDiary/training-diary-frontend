@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import Button from '@components/Button/Button';
-import AuthSwitcher from '@components/Auth/AuthSwitcher/AuthSwitcher';
-import AuthTitle from '@components/Auth/AuthTitle/AuthTitle';
-import SocialLoginBox from '@components/Auth/SocialLoginBox/SocialLoginBox';
+import AuthSwitcher from '@components/Auth/AuthSwitcher';
+import AuthTitle from '@components/Auth/AuthTitle';
+import SocialLoginBox from '@components/Auth/SocialLoginBox';
 import AuthInputBox from '@components/Auth/AuthInputBox/AuthInputBox';
 import AuthError from '@components/Auth/AuthError/AuthError';
 import { AuthWrapper } from '@components/Auth/styledComponents/AuthWrapper';
