@@ -2,8 +2,12 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ThemeProvider } from 'styled-components';
 
-import AuthError from './AuthError';
 import theme from '../../../styles/theme';
+import AuthError from './AuthError';
+
+const renderWithTheme = (component: React.ReactElement) => {
+  return render(<ThemeProvider theme={theme}>{component}</ThemeProvider>);
+};
 
 describe('AuthError가 렌더링 될 떄', () => {
   const mockOnClose = jest.fn();
@@ -11,10 +15,6 @@ describe('AuthError가 렌더링 될 떄', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-
-  const renderWithTheme = (component: React.ReactElement) => {
-    return render(<ThemeProvider theme={theme}>{component}</ThemeProvider>);
-  };
 
   test('에러메세지와 에러아이콘, 닫기버튼을 보여준다.', () => {
     renderWithTheme(
