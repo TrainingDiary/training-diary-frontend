@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const AuthWrapper = styled.div`
   display: flex;
-  height: 100vh;
+  height: 100dvh;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
