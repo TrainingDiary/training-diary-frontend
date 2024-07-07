@@ -8,7 +8,9 @@ const Switcher = styled.span`
     font-family: 'NanumSquareExtraBold';
     text-decoration: none;
 
-    &:visited {
+    &:visited,
+    &:hover,
+    &:active {
       color: ${({ theme }) => theme.colors.gray900};
     }
   }
