@@ -7,6 +7,8 @@ export default {
   moduleNameMapper: {
     '^.+\\.svg$': 'jest-transformer-svg',
     '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
+    'src/styles/animations/fadeInOut':
+      '<rootDir>/src/styles/animations/fadeInOut',
     '^@icons/(.*)$': '<rootDir>/src/assets/icons/$1',
     '^@components/(.*)$': '<rootDir>/src/components/$1',
   },
