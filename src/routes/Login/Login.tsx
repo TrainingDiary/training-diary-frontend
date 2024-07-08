@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import Button from '@components/Button/Button';
+import Button from '@components/Common/Button/Button';
 import Alert from '@components/Common/Alert/Alert';
 import AuthSwitcher from '@components/Auth/AuthSwitcher';
 import AuthTitle from '@components/Auth/AuthTitle';
