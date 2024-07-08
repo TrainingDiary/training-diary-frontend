@@ -22,7 +22,7 @@ const Wrapper = styled.div<WrapperProps>`
   background-color: ${({ theme, $type }) =>
     $type === 'success' ? theme.colors.blue500 : theme.colors.red500};
   box-shadow: 0 4px 4px ${({ theme }) => hexToRgba(theme.colors.gray800, 0.4)};
-  position: absolute;
+  position: fixed;
   bottom: 100px;
   left: 20px;
   z-index: 9999;
