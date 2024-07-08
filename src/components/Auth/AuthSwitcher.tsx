@@ -8,6 +8,7 @@ const Switcher = styled.span`
     font-family: 'NanumSquareExtraBold';
     text-decoration: none;
 
+    &:link,
     &:visited,
     &:hover,
     &:active {
