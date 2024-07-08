@@ -13,32 +13,48 @@ const ButtonWrapper = styled.button<ButtonProps>`
   cursor: pointer;
   width: 100%;
 
-  color: ${({ variant, theme }) =>
-    variant === 'primary' ? theme.colors.white : theme.colors.gray600};
-  max-width: ${({ size, theme }) => theme.size[size]};
-  background-color: ${({ variant, theme }) =>
-    variant === 'primary' ? theme.colors.main500 : theme.colors.gray100};
-  border: ${({ variant, theme }) =>
-    variant === 'primary' ? 'none' : `${theme.colors.gray300} solid 1px`};
+  color: ${({ $variant, theme }) =>
+    $variant === 'primary' ? theme.colors.white : theme.colors.gray600};
+  max-width: ${({ $size, theme }) => theme.size[$size]};
+  background-color: ${({ $variant, theme }) =>
+    $variant === 'primary' ? theme.colors.main500 : theme.colors.gray100};
+  border: ${({ $variant, theme }) =>
+    $variant === 'primary' ? 'none' : `${theme.colors.gray300} solid 1px`};
 
   &:active {
-    background-color: ${({ variant, theme }) =>
-      variant === 'primary' ? theme.colors.main700 : theme.colors.gray400};
+    background-color: ${({ $variant, theme }) =>
+      $variant === 'primary' ? theme.colors.main700 : theme.colors.gray400};
     color: ${(props) => props.theme.colors.white};
+  }
+  &:hover {
+    background-color: ${({ $variant, theme }) =>
+      $variant === 'primary' ? theme.colors.main700 : theme.colors.gray400};
   }
 `;
 
 // ButtonProps
 interface ButtonProps {
   children: string;
-  size: 'small' | 'medium' | 'large';
-  variant?: 'primary';
+  $size: 'small' | 'medium' | 'large';
+  $variant?: 'primary';
   onClick?: () => void;
+  type?: 'submit';
 }
 
-const Button: React.FC<ButtonProps> = ({ children, size, variant, onClick }) => {
+const Button: React.FC<ButtonProps> = ({
+  children,
+  $size,
+  $variant,
+  onClick,
+  type,
+}) => {
   return (
-    <ButtonWrapper size={size} variant={variant} onClick={onClick}>
+    <ButtonWrapper
+      $size={$size}
+      $variant={$variant}
+      onClick={onClick}
+      type={type}
+    >
       {children}
     </ButtonWrapper>
   );

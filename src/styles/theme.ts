@@ -1,5 +1,3 @@
-// theme
-
 const theme = {
   colors: {
     main100: '#ECF9F5',
@@ -44,7 +42,7 @@ const theme = {
   size: {
     small: '80px',
     medium: '100px',
-    large: 'calc(100% - 40px)',
+    large: '100%',
   },
 };
 

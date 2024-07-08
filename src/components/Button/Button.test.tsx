@@ -3,14 +3,14 @@ import 'jest-styled-components';
 import '@testing-library/jest-dom';
 import { ThemeProvider } from 'styled-components';
 
-import Button from '../../components/Button/Button';
+import Button from '@components/Button/Button';
 import theme from '../../styles/theme';
 
 describe('버튼이 렌더링 될 때', () => {
   test('primary 형으로 올바르게 메인 컬러의 버튼을 보여준다.', () => {
     render(
       <ThemeProvider theme={theme}>
-        <Button size="large" variant="primary">
+        <Button $size="large" $variant="primary">
           로그인
         </Button>
       </ThemeProvider>
@@ -25,7 +25,7 @@ describe('버튼이 렌더링 될 때', () => {
   test('variant props가 없다면 회색 버튼을 보여준다.', () => {
     render(
       <ThemeProvider theme={theme}>
-        <Button size="large">회원 가입</Button>
+        <Button $size="large">회원 가입</Button>
       </ThemeProvider>
     );
 
@@ -38,11 +38,11 @@ describe('버튼이 렌더링 될 때', () => {
   test('size props에 따라 다른 크기의 버튼을 보여준다.', () => {
     render(
       <ThemeProvider theme={theme}>
-        <Button size="small" variant="primary">
+        <Button $size="small" $variant="primary">
           중복확인
         </Button>
-        <Button size="medium">중간 버튼</Button>
-        <Button size="large" variant="primary">
+        <Button $size="medium">중간 버튼</Button>
+        <Button $size="large" $variant="primary">
           이메일 인증
         </Button>
       </ThemeProvider>
@@ -60,7 +60,7 @@ describe('버튼이 렌더링 될 때', () => {
   test('active 상태에 버튼의 올바른 스타일을 보여준다.', () => {
     render(
       <ThemeProvider theme={theme}>
-        <Button size="large" variant="primary">
+        <Button $size="large" $variant="primary">
           활성화 상태
         </Button>
       </ThemeProvider>
@@ -80,7 +80,7 @@ describe('버튼이 렌더링 될 때', () => {
 
     render(
       <ThemeProvider theme={theme}>
-        <Button size="large" variant="primary" onClick={handleClick}>
+        <Button $size="large" $variant="primary" onClick={handleClick}>
           클릭 테스트
         </Button>
       </ThemeProvider>
