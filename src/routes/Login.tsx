@@ -27,7 +27,7 @@ const Login: React.FC = () => {
     password: '',
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [errorAlert, setErrorAlert] = useState<string>('');
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -44,17 +44,17 @@ const Login: React.FC = () => {
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError('');
+    setErrorAlert('');
 
     const { email, password } = formState;
 
     if (isLoading) return;
     if (!email) {
-      setError('이메일을 입력해주세요.');
+      setErrorAlert('이메일을 입력해주세요.');
       return;
     }
     if (!password) {
-      setError('비밀번호을 입력해주세요.');
+      setErrorAlert('비밀번호을 입력해주세요.');
       return;
     }
 
@@ -65,13 +65,13 @@ const Login: React.FC = () => {
 
       navigate('/');
     } catch (error) {
-      setError('이메일과 비밀번호를 확인해주세요.');
+      setErrorAlert('이메일과 비밀번호를 확인해주세요.');
     } finally {
       setLoading(false);
     }
   };
 
-  const onCloseError = () => setError('');
+  const onCloseErrorAlert = () => setErrorAlert('');
 
   return (
     <AuthWrapper>
@@ -93,7 +93,7 @@ const Login: React.FC = () => {
             iconSrc={passwordIcon}
             placeholder="Enter password"
             showPassword={showPassword}
-            type={'password'}
+            type="password"
             value={formState.password}
             onChange={onChange}
             onToggleShowPassword={onToggleShowPassword}
@@ -108,10 +108,12 @@ const Login: React.FC = () => {
       </AuthContainer>
 
       <AuthSwitcher>
-        Don't have an account? <Link to={'/'}>Sign up</Link>
+        Don't have an account? <Link to={'/signup'}>Sign up</Link>
       </AuthSwitcher>
 
-      {error && <Alert $type="error" text={error} onClose={onCloseError} />}
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
     </AuthWrapper>
   );
 };
