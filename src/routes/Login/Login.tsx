@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import Button from '@components/Button/Button';
+import Alert from '@components/Common/Alert/Alert';
 import AuthSwitcher from '@components/Auth/AuthSwitcher';
 import AuthTitle from '@components/Auth/AuthTitle';
 import SocialLoginBox from '@components/Auth/SocialLoginBox';
 import AuthInputBox from '@components/Auth/AuthInputBox/AuthInputBox';
-import AuthError from '@components/Auth/AuthError/AuthError';
 import { AuthWrapper } from '@components/Auth/styledComponents/AuthWrapper';
 import { AuthContainer } from '@components/Auth/styledComponents/AuthContainer';
 import { AuthForm } from '@components/Auth/styledComponents/AuthForm';
@@ -111,7 +111,7 @@ const Login: React.FC = () => {
         Don't have an account? <Link to={'/'}>Sign up</Link>
       </AuthSwitcher>
 
-      {error && <AuthError text={error} onClose={onCloseError} />}
+      {error && <Alert $type="error" text={error} onClose={onCloseError} />}
     </AuthWrapper>
   );
 };

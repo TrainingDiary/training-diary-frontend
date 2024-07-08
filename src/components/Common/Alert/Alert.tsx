@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { fadeInStyles, fadeOutStyles } from 'src/styles/animations/fadeInOut';
+import { hexToRgba } from 'src/utils/hexToRgba';
 import errorIcon from '@icons/error.svg';
+import successIcon from '@icons/success.svg';
 
 interface WrapperProps {
   $isFadingIn: boolean;
+  $type: 'success' | 'error';
 }
 
 const Wrapper = styled.div<WrapperProps>`
@@ -15,7 +18,9 @@ const Wrapper = styled.div<WrapperProps>`
   width: calc(100% - 40px);
   border: none;
   border-radius: 8px;
-  background-color: ${({ theme }) => theme.colors.red500};
+  background-color: ${({ theme, $type }) =>
+    $type === 'success' ? theme.colors.main900 : theme.colors.red500};
+  box-shadow: 0 4px 4px ${({ theme }) => hexToRgba(theme.colors.gray800, 0.4)};
   position: absolute;
   bottom: 100px;
   left: 20px;
@@ -35,12 +40,13 @@ const Text = styled.span`
   font-family: 'NanumSquareBold';
 `;
 
-interface AuthErrorProps {
+interface AlertProps {
+  $type: 'success' | 'error';
   text: string;
   onClose: () => void;
 }
 
-const AuthError: React.FC<AuthErrorProps> = ({ text, onClose }) => {
+const Alert: React.FC<AlertProps> = ({ $type, text, onClose }) => {
   const [isFadingIn, setIsFadingIn] = useState(true);
 
   useEffect(() => {
@@ -54,11 +60,14 @@ const AuthError: React.FC<AuthErrorProps> = ({ text, onClose }) => {
   }, [isFadingIn, text]);
 
   return (
-    <Wrapper $isFadingIn={isFadingIn}>
-      <Icon src={errorIcon} alt="error icon" />
+    <Wrapper $isFadingIn={isFadingIn} $type={$type}>
+      <Icon
+        src={$type === 'success' ? successIcon : errorIcon}
+        alt={`${$type} icon`}
+      />
       <Text>{text}</Text>
     </Wrapper>
   );
 };
 
-export default AuthError;
+export default Alert;
