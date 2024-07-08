@@ -19,7 +19,7 @@ const Wrapper = styled.div<WrapperProps>`
   border: none;
   border-radius: 8px;
   background-color: ${({ theme, $type }) =>
-    $type === 'success' ? theme.colors.main900 : theme.colors.red500};
+    $type === 'success' ? theme.colors.blue500 : theme.colors.red500};
   box-shadow: 0 4px 4px ${({ theme }) => hexToRgba(theme.colors.gray800, 0.4)};
   position: absolute;
   bottom: 100px;
