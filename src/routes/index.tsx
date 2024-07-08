@@ -1,8 +1,8 @@
 // 라우트 설정 파일
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import Home from './Home/Home';
-import Login from './Login/Login';
+import Home from './Home';
+import Login from './Login';
 
 const router = createBrowserRouter([
   {
