@@ -26,10 +26,6 @@ const ButtonWrapper = styled.button<ButtonProps>`
       $variant === 'primary' ? theme.colors.main700 : theme.colors.gray400};
     color: ${(props) => props.theme.colors.white};
   }
-  &:hover {
-    background-color: ${({ $variant, theme }) =>
-      $variant === 'primary' ? theme.colors.main700 : theme.colors.gray400};
-  }
 `;
 
 // ButtonProps
