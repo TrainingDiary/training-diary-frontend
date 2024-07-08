@@ -65,6 +65,7 @@ interface InputBoxProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   showPassword?: boolean;
   onToggleShowPassword?: () => void;
+  showIcon?: boolean;
 }
 
 const AuthInputBox: React.FC<InputBoxProps> = ({
@@ -76,6 +77,7 @@ const AuthInputBox: React.FC<InputBoxProps> = ({
   onChange,
   showPassword,
   onToggleShowPassword,
+  showIcon,
 }) => {
   return (
     <Wrapper>
@@ -90,7 +92,7 @@ const AuthInputBox: React.FC<InputBoxProps> = ({
           value={value}
           onChange={onChange}
         />
-        {type === 'password' && (
+        {type === 'password' && showIcon && (
           <ShowPasswordIcon
             src={showPassword ? showPasswordIcon : hidePasswordIcon}
             onClick={onToggleShowPassword}

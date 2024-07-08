@@ -64,6 +64,7 @@ describe('AuthInputBox가 렌더링 될 때', () => {
           onChange={mockOnChange}
           showPassword={false}
           onToggleShowPassword={mockOnToggleShowPassword}
+          showIcon={true}
         />
       );
 
@@ -84,6 +85,7 @@ describe('AuthInputBox가 렌더링 될 때', () => {
           onChange={mockOnChange}
           showPassword={true}
           onToggleShowPassword={mockOnToggleShowPassword}
+          showIcon={true}
         />
       );
 
@@ -101,6 +103,7 @@ describe('AuthInputBox가 렌더링 될 때', () => {
           onChange={mockOnChange}
           showPassword={true}
           onToggleShowPassword={mockOnToggleShowPassword}
+          showIcon={true}
         />
       );
 
