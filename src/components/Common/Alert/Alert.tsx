@@ -16,6 +16,7 @@ const Wrapper = styled.div<WrapperProps>`
   align-items: center;
   padding: 12px 20px;
   width: calc(100% - 40px);
+  max-width: 727px;
   border: none;
   border-radius: 8px;
   background-color: ${({ theme, $type }) =>
