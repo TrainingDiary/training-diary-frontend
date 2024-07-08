@@ -82,7 +82,7 @@ const Login: React.FC = () => {
           <AuthInputBox
             label="이메일"
             iconSrc={emailIcon}
-            placeholder="Enter email"
+            placeholder="이메일을 입력해주세요."
             type="email"
             value={formState.email}
             onChange={onChange}
@@ -91,12 +91,13 @@ const Login: React.FC = () => {
           <AuthInputBox
             label="비밀번호"
             iconSrc={passwordIcon}
-            placeholder="Enter password"
+            placeholder="비밀번호를 입력해주세요."
             showPassword={showPassword}
             type="password"
             value={formState.password}
             onChange={onChange}
             onToggleShowPassword={onToggleShowPassword}
+            showIcon={true}
           />
 
           <Button $size="large" $variant="primary" type="submit">
