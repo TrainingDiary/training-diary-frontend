@@ -19,8 +19,10 @@ const Label = styled.label`
   display: flex;
   align-items: center;
   gap: 5px;
+  width: 155px;
   color: ${({ theme }) => theme.colors.gray500};
   font-size: 1.6rem;
+  transition: color 0.5s;
   cursor: pointer;
 `;
 
