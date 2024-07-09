@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+// Wrapper 전체 wrap 스타일 정의
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 // TabWrapper 컴포넌트 스타일 정의
 const TabWrapper = styled.div`
   display: flex;
+  width: 100%;
   max-width: calc(100% - 40px);
   margin: 0 auto;
   border-bottom: 1px solid #ccc;
@@ -40,6 +47,7 @@ const Tab = styled.button<{ $isActive: boolean }>`
 
 // TabPanel 컴포넌트 스타일 정의
 const TabPanel = styled.div`
+  width: 100%;
   max-width: calc(100% - 40px);
   margin: 20px auto 0;
   padding: 10px;
@@ -65,7 +73,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <div>
+    <Wrapper>
       <TabWrapper>
         {tabs.map((tab, index) => (
           <Tab key={index} $isActive={activeIndex === index} onClick={() => setActiveIndex(index)}>
@@ -74,7 +82,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs }) => {
         ))}
       </TabWrapper>
       <TabPanel>{tabs[activeIndex].content}</TabPanel>
-    </div>
+    </Wrapper>
   );
 };
 
