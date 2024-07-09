@@ -36,7 +36,7 @@ const Signup: React.FC = () => {
     setValue,
     watch,
   } = useForm<FormState>({
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues: {
       role: 'TRAINEE',
     },
