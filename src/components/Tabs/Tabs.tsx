@@ -1,27 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-/*
- *const tabs = [
-    {
-      label: '대시보드',
-      content: <div>Tab 1 Content</div>,
-    },
-    {
-      label: '운동 기록',
-      content: <div>Tab 2 Content</div>,
-    },
-    {
-      label: '식단 관리',
-      content: <div>Tab 3 Content</div>,
-    },
-  ];
- *<Tabs tabs={tabs} />
-*/
-
 // TabWrapper 컴포넌트 스타일 정의
 const TabWrapper = styled.div`
   display: flex;
+  max-width: calc(100% - 40px);
+  margin: 0 auto;
   border-bottom: 1px solid #ccc;
   padding: 5px;
   background-color: ${(props) => props.theme.colors.gray100};
@@ -31,15 +15,15 @@ const TabWrapper = styled.div`
 `;
 
 // Tab 컴포넌트 스타일 정의
-const Tab = styled.button<{ isActive: boolean }>`
+const Tab = styled.button<{ $isActive: boolean }>`
   flex: 1;
   padding: 10px 0;
   border: none;
-  color: ${({ isActive, theme }) => (isActive ? theme.colors.gray900 : theme.colors.gray700)};
-  background: ${({ isActive, theme }) => (isActive ? theme.colors.white : 'transparent')};
-  font-family: ${({ isActive }) => (isActive ? "'NanumSquareBold' !important" : 'NanumSquare')};
-  box-shadow: ${({ isActive, theme }) =>
-    isActive ? `0 2px 10px 1px ${theme.colors.gray400}` : 'none'};
+  color: ${({ $isActive, theme }) => ($isActive ? theme.colors.gray900 : theme.colors.gray700)};
+  background: ${({ $isActive, theme }) => ($isActive ? theme.colors.white : 'transparent')};
+  font-family: ${({ $isActive }) => ($isActive ? "'NanumSquareBold' !important" : 'NanumSquare')};
+  box-shadow: ${({ $isActive, theme }) =>
+    $isActive ? `0 2px 10px 1px ${theme.colors.gray400}` : 'none'};
   font-size: 1.2rem;
   border-radius: 100px;
   cursor: pointer;
@@ -49,17 +33,21 @@ const Tab = styled.button<{ isActive: boolean }>`
     outline: none;
   }
   &:hover {
-    background: ${({ isActive, theme }) => (isActive ? theme.colors.white : theme.colors.gray200)};
+    background: ${({ $isActive, theme }) =>
+      $isActive ? theme.colors.white : theme.colors.gray200};
   }
 `;
 
 // TabPanel 컴포넌트 스타일 정의
 const TabPanel = styled.div`
-  margin-top: 20px;
+  max-width: calc(100% - 40px);
+  margin: 20px auto 0;
   padding: 10px;
   background: #fff;
   border: 1px solid #ccc;
-  border-top: none;
+
+  // todo : 없앨 것
+  padding: 50% 0;
 `;
 
 // TabItem 타입 정의
@@ -80,7 +68,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs }) => {
     <div>
       <TabWrapper>
         {tabs.map((tab, index) => (
-          <Tab key={index} isActive={activeIndex === index} onClick={() => setActiveIndex(index)}>
+          <Tab key={index} $isActive={activeIndex === index} onClick={() => setActiveIndex(index)}>
             {tab.label}
           </Tab>
         ))}

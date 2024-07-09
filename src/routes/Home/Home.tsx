@@ -1,15 +1,26 @@
 import React from 'react';
 
-import Button from '@components/Button/Button';
+import Tabs from '@components/Tabs/Tabs';
 
 const Home: React.FC = () => {
+  const tabs = [
+    {
+      label: '대시보드',
+      content: <div>Tab 1 Content</div>,
+    },
+    {
+      label: '운동 기록',
+      content: <div>Tab 2 Content</div>,
+    },
+    {
+      label: '식단 관리',
+      content: <div>Tab 3 Content</div>,
+    },
+  ];
+
   return (
     <div>
-      {/* button 사용 예시 props = {size(small, medium, large) / $variant(primary or null)}, children = text ※theme 참고※ */}
-      <Button $size="small">중복확인</Button>
-      <Button $size="large" $variant="primary">
-        로그인
-      </Button>
+      <Tabs tabs={tabs} />
     </div>
   );
 };
