@@ -34,7 +34,7 @@ h1 {
   background-color: ${(props) => props.theme.colors.white};
   height: 100%;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 // 브라우저 기본 스크롤 스타일 제거
