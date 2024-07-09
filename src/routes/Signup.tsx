@@ -32,7 +32,7 @@ const Signup: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     setValue,
     watch,
   } = useForm<FormState>({
@@ -202,7 +202,7 @@ const Signup: React.FC = () => {
             $size="large"
             $variant="primary"
             type="submit"
-            disabled={!isCodeVerified}
+            disabled={!isCodeVerified || !isValid}
           >
             {isLoading ? '회원가입 중...' : '회원가입'}
           </Button>
