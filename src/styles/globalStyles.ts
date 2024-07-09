@@ -48,7 +48,7 @@ h1 {
 }
 
 // view width 767px 이상이 되면 max-width = 450px로 고정 / 그 이하는 추후 작업하며 조절 예정
-  @media (min-width: 767px) {
+@media ${({ theme }) => theme.media.desktop} {
     #root {
       max-width: 450px;
     }
