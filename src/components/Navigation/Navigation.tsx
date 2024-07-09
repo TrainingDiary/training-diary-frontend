@@ -1,7 +1,12 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
+import homeIcon from '@icons/home.svg';
+import activeHomeIcon from '@icons/activeHome.svg';
+import appointmentIcon from '@icons/appointment.svg';
+import activeAppointmentIcon from '@icons/activeAppointment.svg';
+import logOutIcon from '@icons/logout.svg';
 
 // 하단에 고정된 네비게이션 바 스타일 정의
 const Nav = styled.nav`
@@ -10,7 +15,8 @@ const Nav = styled.nav`
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 5px 20px;
+  gap: 30px;
+  padding: 5px 0;
   background-color: ${(props) => props.theme.colors.white};
   box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
   justify-content: space-between;
@@ -18,7 +24,7 @@ const Nav = styled.nav`
 `;
 
 // 네비게이션 링크 스타일 정의
-const NavItem = styled.div`
+const NavItem = styled.div<{ $isActive?: boolean }>`
   color: ${({ theme }) => theme.colors.white};
   font-size: 1.6rem;
   text-decoration: none;
@@ -26,91 +32,96 @@ const NavItem = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
   transition: background-color 0.3s;
-
-  &.active {
-    background-color: ${({ theme }) => theme.colors.main700};
-  }
-
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.main600};
-  }
 
   a {
     display: flex;
     flex-direction: column;
     align-items: center;
+    font-size: 1rem;
+    width: 100%;
     text-decoration: none;
-    color: ${(props) => props.theme.colors.gray900};
+    color: ${({ $isActive, theme }) => ($isActive ? theme.colors.main700 : theme.colors.gray500)};
     span {
-      padding: 8px;
-      background-color: ${(props) => props.theme.colors.main100};
+      background-color: ${({ $isActive, theme }) =>
+        $isActive ? theme.colors.main100 : 'transparent'};
       border-radius: 5px;
-    }
-    svg {
+      padding: 8px;
+      border-radius: 5px;
+      line-height: 1;
     }
   }
 `;
 
+const LogOutNav = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1rem;
+  width: 100%;
+  text-decoration: none;
+  color: ${(props) => props.theme.colors.gray500};
+  span {
+    border-radius: 5px;
+    padding: 8px;
+    border-radius: 5px;
+    line-height: 1;
+  }
+`;
+
+const HomeBtn = styled.img``;
+const AppointmentIconBtn = styled.img``;
+const LogOutBtn = styled.img``;
+
 const Navigation: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // 로그인 상태 관리
+
+  const handleLogout = () => {
+    // TODO : 로그아웃 로직 구현
+    setIsLoggedIn(false);
+    navigate('login');
+  };
+
   return (
-    <Nav>
-      <NavItem>
-        <Link to={'/'}>
-          <span>
-            <svg
-              width="16"
-              height="17"
-              viewBox="0 0 16 17"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8.91115 0.427859C8.60454 0.152389 8.20692 0 7.79475 0C7.38257 0 6.98495 0.152389 6.67835 0.427859L0.553467 5.93134C0.379322 6.08795 0.240056 6.27942 0.144706 6.49333C0.0493555 6.70725 5.36293e-05 6.93882 0 7.17302V15.0296C0 15.4726 0.17599 15.8975 0.489255 16.2107C0.80252 16.524 1.2274 16.7 1.67042 16.7H3.89765C4.34068 16.7 4.76555 16.524 5.07882 16.2107C5.39208 15.8975 5.56807 15.4726 5.56807 15.0296V10.5751C5.56807 10.4274 5.62674 10.2858 5.73116 10.1814C5.83558 10.077 5.97721 10.0183 6.12488 10.0183H9.46573C9.6134 10.0183 9.75503 10.077 9.85945 10.1814C9.96387 10.2858 10.0225 10.4274 10.0225 10.5751V15.0296C10.0225 15.4726 10.1985 15.8975 10.5118 16.2107C10.8251 16.524 11.2499 16.7 11.693 16.7H13.9202C14.3632 16.7 14.7881 16.524 15.1014 16.2107C15.4146 15.8975 15.5906 15.4726 15.5906 15.0296V7.17302C15.5906 6.93882 15.5413 6.70725 15.4459 6.49333C15.3506 6.27942 15.2113 6.08795 15.0371 5.93134L8.91226 0.427859H8.91115Z"
-                fill="#4DC19C"
+    <>
+      <Nav>
+        <NavItem $isActive={location.pathname === '/'}>
+          <Link to={''}>
+            <span>
+              <HomeBtn
+                src={location.pathname === '/' ? activeHomeIcon : homeIcon}
+                alt="home link button"
               />
-            </svg>
-          </span>
-          Home
-        </Link>
-      </NavItem>
-      <NavItem>
-        <Link to={'/appointment'}>
-          <svg
-            width="17"
-            height="18"
-            viewBox="0 0 17 18"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M16.25 14.7857C16.25 15.6382 15.949 16.4558 15.4132 17.0586C14.8773 17.6614 14.1506 18 13.3929 18H3.10714C2.34938 18 1.62266 17.6614 1.08684 17.0586C0.55102 16.4558 0.25 15.6382 0.25 14.7857V3.21429C0.25 2.3618 0.55102 1.54424 1.08684 0.941442C1.62266 0.338647 2.34938 0 3.10714 0H13.3929C14.1506 0 14.8773 0.338647 15.4132 0.941442C15.949 1.54424 16.25 2.3618 16.25 3.21429V14.7857ZM12.8214 4.5C12.8215 4.34954 12.7746 4.20383 12.689 4.08824C12.6034 3.97265 12.4844 3.89451 12.3529 3.86743L12.25 3.85714H4.25L4.14714 3.86743C4.01539 3.89427 3.8962 3.9723 3.81037 4.08791C3.72454 4.20352 3.67752 4.34937 3.67752 4.5C3.67752 4.65063 3.72454 4.79648 3.81037 4.91209C3.8962 5.0277 4.01539 5.10573 4.14714 5.13257L4.25 5.14286H12.25L12.3529 5.13257C12.4844 5.10549 12.6034 5.02735 12.689 4.91176C12.7746 4.79617 12.8215 4.65046 12.8214 4.5ZM12.8214 9C12.8215 8.84954 12.7746 8.70383 12.689 8.58824C12.6034 8.47265 12.4844 8.39451 12.3529 8.36743L12.25 8.35714H4.25L4.14714 8.36743C4.01539 8.39427 3.8962 8.4723 3.81037 8.58791C3.72454 8.70352 3.67752 8.84937 3.67752 9C3.67752 9.15063 3.72454 9.29648 3.81037 9.41209C3.8962 9.5277 4.01539 9.60573 4.14714 9.63257L4.25 9.64286H12.25L12.3529 9.63257C12.4844 9.60549 12.6034 9.52735 12.689 9.41176C12.7746 9.29617 12.8215 9.15046 12.8214 9ZM12.8214 13.5C12.8215 13.3495 12.7746 13.2038 12.689 13.0882C12.6034 12.9727 12.4844 12.8945 12.3529 12.8674L12.25 12.8571H4.25L4.14714 12.8674C4.01539 12.8943 3.8962 12.9723 3.81037 13.0879C3.72454 13.2035 3.67752 13.3494 3.67752 13.5C3.67752 13.6506 3.72454 13.7965 3.81037 13.9121C3.8962 14.0277 4.01539 14.1057 4.14714 14.1326L4.25 14.1429H12.25L12.3529 14.1326C12.4844 14.1055 12.6034 14.0273 12.689 13.9118C12.7746 13.7962 12.8215 13.6505 12.8214 13.5Z"
-              fill="#ADB5BD"
-            />
-          </svg>
-          Appointment
-        </Link>
-      </NavItem>
-      <NavItem>
-        <Link to={'/'}>
-          <svg
-            width="15"
-            height="17"
-            viewBox="0 0 15 17"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M4.35408 1.22283C5.13704 0.439865 6.19897 0 7.30625 0C8.20023 0 9.06464 0.28672 9.77655 0.809234L3.94048 6.6453C3.41797 5.93339 3.13125 5.06898 3.13125 4.175C3.13125 3.06772 3.57112 2.00579 4.35408 1.22283ZM4.62486 7.37514C5.3734 8.00239 6.32191 8.35 7.30625 8.35C8.41353 8.35 9.47546 7.91014 10.2584 7.12717C11.0414 6.34421 11.4813 5.28228 11.4813 4.175C11.4813 3.19066 11.1336 2.24215 10.5064 1.49361L4.62486 7.37514ZM1.29532 9.55023C1.54961 9.44583 1.82201 9.39265 2.09689 9.39375H12.525C13.0786 9.39375 13.6096 9.61368 14.0011 10.0052C14.3926 10.3966 14.6125 10.9276 14.6125 11.4813C14.6125 13.2462 13.7431 14.5781 12.3841 15.4444C11.046 16.2971 9.24241 16.7 7.30625 16.7C5.37009 16.7 3.56649 16.2971 2.22841 15.4444C0.869444 14.577 0 13.2462 0 11.4813C0.000135178 11.2064 0.054534 10.9342 0.160076 10.6804C0.265619 10.4266 0.420228 10.1961 0.615039 10.0021C0.80985 9.8082 1.04103 9.65463 1.29532 9.55023Z"
-              fill="#ADB5BD"
-            />
-          </svg>
-          Logout
-        </Link>
-      </NavItem>
-    </Nav>
+            </span>
+            Home
+          </Link>
+        </NavItem>
+        <NavItem $isActive={location.pathname === '/appointment'}>
+          <Link to={'appointment'}>
+            <span>
+              <AppointmentIconBtn
+                src={location.pathname === '/appointment' ? activeAppointmentIcon : appointmentIcon}
+                alt="appointment link button"
+              />
+            </span>
+            Appointment
+          </Link>
+        </NavItem>
+        <NavItem>
+          {isLoggedIn && (
+            <LogOutNav onClick={handleLogout}>
+              <span>
+                <LogOutBtn src={logOutIcon} alt="logout button" />
+              </span>
+              Logout
+            </LogOutNav>
+          )}
+        </NavItem>
+      </Nav>
+    </>
   );
 };
 
