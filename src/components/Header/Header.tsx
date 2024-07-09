@@ -52,6 +52,11 @@ const Header: React.FC = () => {
     }
   };
 
+  const handleLogout = () => {
+    // 로그아웃 처리 로직
+    console.log('Logged out');
+  };
+
   return (
     <>
       <HeaderWrapper>
@@ -72,7 +77,7 @@ const Header: React.FC = () => {
           </Icon>
         </IconWrapper>
       </HeaderWrapper>
-      <Drawer $isOpen={isDrawerOpen} onClose={toggleDrawer} />
+      <Drawer $isOpen={isDrawerOpen} onClose={toggleDrawer} onLogout={handleLogout} />
     </>
   );
 };
