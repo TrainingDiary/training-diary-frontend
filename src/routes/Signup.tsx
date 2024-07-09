@@ -75,6 +75,11 @@ const Signup: React.FC = () => {
   };
 
   const onEmailVerify = () => {
+    if (!watch('code')) {
+      setErrorAlert('인증코드는 필수 항목입니다.');
+      return;
+    }
+
     if (errors.code?.message) {
       setErrorAlert(errors.code.message);
       return;
