@@ -33,12 +33,25 @@ const DrawerItem = styled(Link)`
   }
 `;
 
+const DrawerItemDiv = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  color: ${({ theme }) => theme.colors.gray900};
+  text-decoration: none;
+  cursor: pointer;
+  img {
+    margin-right: 10px;
+  }
+`;
+
 interface DrawerProps {
   $isOpen: boolean;
   onClose: () => void;
+  onLogout: () => void; // 추가: 로그아웃을 처리하는 함수
 }
 
-const Drawer: React.FC<DrawerProps> = ({ $isOpen, onClose }) => {
+const Drawer: React.FC<DrawerProps> = ({ $isOpen, onClose, onLogout }) => {
   return (
     <DrawerWrapper $isOpen={$isOpen}>
       <DrawerItem to="/" onClick={onClose}>
@@ -49,10 +62,15 @@ const Drawer: React.FC<DrawerProps> = ({ $isOpen, onClose }) => {
         <img src={appointmentIcon} alt="Appointment" />
         Appointment
       </DrawerItem>
-      <DrawerItem as="div" onClick={onClose}>
+      <DrawerItemDiv
+        onClick={() => {
+          onClose();
+          onLogout();
+        }}
+      >
         <img src={logOutIcon} alt="Logout" />
         Logout
-      </DrawerItem>
+      </DrawerItemDiv>
     </DrawerWrapper>
   );
 };
