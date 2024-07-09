@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import Button from '@components/Button/Button';
+import Button from '@components/Common/Button/Button';
+import Alert from '@components/Common/Alert/Alert';
 import AuthSwitcher from '@components/Auth/AuthSwitcher';
 import AuthTitle from '@components/Auth/AuthTitle';
 import SocialLoginBox from '@components/Auth/SocialLoginBox';
 import AuthInputBox from '@components/Auth/AuthInputBox/AuthInputBox';
-import AuthError from '@components/Auth/AuthError/AuthError';
 import { AuthWrapper } from '@components/Auth/styledComponents/AuthWrapper';
 import { AuthContainer } from '@components/Auth/styledComponents/AuthContainer';
 import { AuthForm } from '@components/Auth/styledComponents/AuthForm';
@@ -27,7 +27,7 @@ const Login: React.FC = () => {
     password: '',
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [errorAlert, setErrorAlert] = useState<string>('');
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -44,17 +44,17 @@ const Login: React.FC = () => {
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError('');
+    setErrorAlert('');
 
     const { email, password } = formState;
 
     if (isLoading) return;
     if (!email) {
-      setError('이메일을 입력해주세요.');
+      setErrorAlert('이메일을 입력해주세요.');
       return;
     }
     if (!password) {
-      setError('비밀번호을 입력해주세요.');
+      setErrorAlert('비밀번호을 입력해주세요.');
       return;
     }
 
@@ -65,13 +65,13 @@ const Login: React.FC = () => {
 
       navigate('/');
     } catch (error) {
-      setError('이메일과 비밀번호를 확인해주세요.');
+      setErrorAlert('이메일과 비밀번호를 확인해주세요.');
     } finally {
       setLoading(false);
     }
   };
 
-  const onCloseError = () => setError('');
+  const onCloseErrorAlert = () => setErrorAlert('');
 
   return (
     <AuthWrapper>
@@ -82,7 +82,7 @@ const Login: React.FC = () => {
           <AuthInputBox
             label="이메일"
             iconSrc={emailIcon}
-            placeholder="Enter email"
+            placeholder="이메일을 입력해주세요."
             type="email"
             value={formState.email}
             onChange={onChange}
@@ -91,12 +91,13 @@ const Login: React.FC = () => {
           <AuthInputBox
             label="비밀번호"
             iconSrc={passwordIcon}
-            placeholder="Enter password"
+            placeholder="비밀번호를 입력해주세요."
             showPassword={showPassword}
-            type={'password'}
+            type="password"
             value={formState.password}
             onChange={onChange}
             onToggleShowPassword={onToggleShowPassword}
+            showIcon={true}
           />
 
           <Button $size="large" $variant="primary" type="submit">
@@ -108,10 +109,12 @@ const Login: React.FC = () => {
       </AuthContainer>
 
       <AuthSwitcher>
-        Don't have an account? <Link to={'/'}>Sign up</Link>
+        Don't have an account? <Link to={'/signup'}>Sign up</Link>
       </AuthSwitcher>
 
-      {error && <AuthError text={error} onClose={onCloseError} />}
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
     </AuthWrapper>
   );
 };

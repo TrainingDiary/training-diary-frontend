@@ -3,8 +3,8 @@ import 'jest-styled-components';
 import '@testing-library/jest-dom';
 import { ThemeProvider } from 'styled-components';
 
-import Button from '@components/Button/Button';
-import theme from '../../styles/theme';
+import Button from '@components/Common/Button/Button';
+import theme from '../../../styles/theme';
 
 describe('버튼이 렌더링 될 때', () => {
   test('primary 형으로 올바르게 메인 컬러의 버튼을 보여준다.', () => {

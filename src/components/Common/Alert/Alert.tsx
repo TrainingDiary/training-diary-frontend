@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { fadeInStyles, fadeOutStyles } from 'src/styles/animations/fadeInOut';
+import { hexToRgba } from 'src/utils/hexToRgba';
 import errorIcon from '@icons/error.svg';
-import closeIcon from '@icons/close.svg';
+import successIcon from '@icons/success.svg';
 
 interface WrapperProps {
   $isFadingIn: boolean;
+  $type: 'success' | 'error';
 }
 
 const Wrapper = styled.div<WrapperProps>`
@@ -14,10 +16,13 @@ const Wrapper = styled.div<WrapperProps>`
   align-items: center;
   padding: 12px 20px;
   width: calc(100% - 40px);
+  max-width: 727px;
   border: none;
   border-radius: 8px;
-  background-color: ${({ theme }) => theme.colors.red500};
-  position: absolute;
+  background-color: ${({ theme, $type }) =>
+    $type === 'success' ? theme.colors.blue500 : theme.colors.red500};
+  box-shadow: 0 4px 4px ${({ theme }) => hexToRgba(theme.colors.gray800, 0.4)};
+  position: fixed;
   bottom: 100px;
   left: 20px;
   z-index: 9999;
@@ -36,38 +41,34 @@ const Text = styled.span`
   font-family: 'NanumSquareBold';
 `;
 
-const CloseButton = styled.img`
-  cursor: pointer;
-`;
-
-interface AuthErrorProps {
+interface AlertProps {
+  $type: 'success' | 'error';
   text: string;
   onClose: () => void;
 }
 
-const AuthError: React.FC<AuthErrorProps> = ({ text, onClose }) => {
+const Alert: React.FC<AlertProps> = ({ $type, text, onClose }) => {
   const [isFadingIn, setIsFadingIn] = useState(true);
 
   useEffect(() => {
-    if (!isFadingIn) {
+    if (isFadingIn) {
+      const timer = setTimeout(() => setIsFadingIn(false), 2000);
+      return () => clearTimeout(timer);
+    } else {
       const timer = setTimeout(() => onClose(), 500);
       return () => clearTimeout(timer);
     }
-  }, [isFadingIn]);
+  }, [isFadingIn, text]);
 
   return (
-    <Wrapper $isFadingIn={isFadingIn}>
-      <Icon src={errorIcon} alt="error icon" />
-      <Text>{text}</Text>
-      <CloseButton
-        src={closeIcon}
-        alt="close button"
-        onClick={() => {
-          setIsFadingIn(false);
-        }}
+    <Wrapper $isFadingIn={isFadingIn} $type={$type}>
+      <Icon
+        src={$type === 'success' ? successIcon : errorIcon}
+        alt={`${$type} icon`}
       />
+      <Text>{text}</Text>
     </Wrapper>
   );
 };
 
-export default AuthError;
+export default Alert;

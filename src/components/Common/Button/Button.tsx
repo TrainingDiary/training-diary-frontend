@@ -1,4 +1,5 @@
 import React from 'react';
+import { hexToRgba } from 'src/utils/hexToRgba';
 import styled from 'styled-components';
 
 // ButtonWrapper 컴포넌트 스타일 정의
@@ -20,15 +21,14 @@ const ButtonWrapper = styled.button<ButtonProps>`
     $variant === 'primary' ? theme.colors.main500 : theme.colors.gray100};
   border: ${({ $variant, theme }) =>
     $variant === 'primary' ? 'none' : `${theme.colors.gray300} solid 1px`};
+  ${({ $variant, theme }) =>
+    $variant !== 'primary' &&
+    `box-shadow: 0 2px 2px ${hexToRgba(theme.colors.gray900, 0.06)};`}
 
   &:active {
     background-color: ${({ $variant, theme }) =>
       $variant === 'primary' ? theme.colors.main700 : theme.colors.gray400};
     color: ${(props) => props.theme.colors.white};
-  }
-  &:hover {
-    background-color: ${({ $variant, theme }) =>
-      $variant === 'primary' ? theme.colors.main700 : theme.colors.gray400};
   }
 `;
 
@@ -38,7 +38,7 @@ interface ButtonProps {
   $size: 'small' | 'medium' | 'large';
   $variant?: 'primary';
   onClick?: () => void;
-  type?: 'submit';
+  type?: 'submit' | 'button';
 }
 
 const Button: React.FC<ButtonProps> = ({
