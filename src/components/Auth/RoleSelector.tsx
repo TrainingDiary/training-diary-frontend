@@ -27,7 +27,7 @@ const Label = styled.label`
 `;
 
 interface RoleSelectorProps {
-  role: 'trainee' | 'trainer';
+  role: 'TRAINEE' | 'TRAINER';
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -36,14 +36,14 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ role, onChange }) => {
     <Wrapper>
       <HiddenRadio
         type="radio"
-        id="trainee"
+        id="TRAINEE"
         name="role"
-        value="trainee"
-        checked={role === 'trainee'}
+        value="TRAINEE"
+        checked={role === 'TRAINEE'}
         onChange={onChange}
       />
 
-      <Label htmlFor="trainee">
+      <Label htmlFor="TRAINEE">
         <svg
           width="24"
           height="24"
@@ -69,14 +69,14 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ role, onChange }) => {
 
       <HiddenRadio
         type="radio"
-        id="trainer"
+        id="TRAINER"
         name="role"
-        value="trainer"
-        checked={role === 'trainer'}
+        value="TRAINER"
+        checked={role === 'TRAINER'}
         onChange={onChange}
       />
 
-      <Label htmlFor="trainer">
+      <Label htmlFor="TRAINER">
         <svg
           width="24"
           height="24"
