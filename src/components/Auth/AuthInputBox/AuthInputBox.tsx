@@ -74,71 +74,95 @@ const ShowPasswordIcon = styled.span`
   cursor: pointer;
 `;
 
-interface InputBoxProps {
+const ErrorMessage = styled.span`
+  font-size: 1.2rem;
+  color: ${({ theme }) => theme.colors.red400};
+  line-height: 2;
+`;
+
+const ResendVerificationCode = styled.span`
+  display: inline-block;
+  align-self: flex-start;
+  flex-shrink: 0;
+  font-size: 1.2rem;
+  color: ${({ theme }) => theme.colors.gray700};
+  line-height: 2;
+  cursor: pointer;
+`;
+
+interface InputBoxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   iconSrc: string;
   placeholder: string;
   type: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   id?: string;
   showPassword?: boolean;
   onToggleShowPassword?: () => void;
   showIcon?: boolean;
   disabled?: boolean;
   onClick?: () => void;
+  error?: string;
 }
 
-const AuthInputBox: React.FC<InputBoxProps> = ({
-  label,
-  iconSrc,
-  placeholder,
-  type,
-  value,
-  onChange,
-  id,
-  showPassword,
-  onToggleShowPassword,
-  showIcon,
-  disabled,
-  onClick,
-}) => {
-  return (
-    <Wrapper>
-      <Label htmlFor={id ? id : type}>{label}</Label>
-      <InputContainer>
-        <InputWrapper disabled={disabled}>
-          <Icon src={iconSrc} alt={`${label} icon`} />
-          <Input
-            name={id ? id : type}
-            id={id ? id : type}
-            type={type === 'password' && showPassword ? 'text' : type}
-            placeholder={placeholder}
-            value={value}
-            onChange={onChange}
-            disabled={disabled}
-          />
-          {type === 'password' && showIcon && (
-            <ShowPasswordIcon onClick={onToggleShowPassword}>
-              <img
-                src={showPassword ? showPasswordIcon : hidePasswordIcon}
-                alt={
-                  showPassword
-                    ? '비밀번호 보기 아이콘'
-                    : '비밀번호 숨기기 아이콘'
-                }
-              />
-            </ShowPasswordIcon>
+const AuthInputBox = React.forwardRef<HTMLInputElement, InputBoxProps>(
+  (
+    {
+      label,
+      iconSrc,
+      placeholder,
+      type,
+      id,
+      showPassword,
+      onToggleShowPassword,
+      showIcon,
+      disabled,
+      onClick,
+      error,
+      ...rest
+    },
+    ref
+  ) => {
+    return (
+      <Wrapper>
+        <Label htmlFor={id ? id : type}>{label}</Label>
+        <InputContainer>
+          <InputWrapper disabled={disabled}>
+            <Icon src={iconSrc} alt={`${label} icon`} />
+            <Input
+              ref={ref}
+              name={id ? id : type}
+              id={id ? id : type}
+              type={type === 'password' && showPassword ? 'text' : type}
+              placeholder={placeholder}
+              disabled={disabled}
+              {...rest}
+            />
+            {type === 'password' && showIcon && (
+              <ShowPasswordIcon onClick={onToggleShowPassword}>
+                <img
+                  src={showPassword ? showPasswordIcon : hidePasswordIcon}
+                  alt={
+                    showPassword
+                      ? '비밀번호 보기 아이콘'
+                      : '비밀번호 숨기기 아이콘'
+                  }
+                />
+              </ShowPasswordIcon>
+            )}
+          </InputWrapper>
+          {id === 'code' && !disabled && (
+            <Button $size="small" type="button" onClick={onClick}>
+              인증
+            </Button>
           )}
-        </InputWrapper>
+        </InputContainer>
+        <ErrorMessage>{error}</ErrorMessage>
         {id === 'code' && !disabled && (
-          <Button $size="small" type="button" onClick={onClick}>
-            인증
-          </Button>
+          <ResendVerificationCode>인증 번호 다시 보내기</ResendVerificationCode>
         )}
-      </InputContainer>
-    </Wrapper>
-  );
-};
+      </Wrapper>
+    );
+  }
+);
 
 export default AuthInputBox;
