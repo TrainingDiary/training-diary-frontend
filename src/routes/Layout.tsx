@@ -6,11 +6,11 @@ import { Outlet } from 'react-router-dom';
 
 const Layout: React.FC = () => {
   return (
-    <>
+    <React.Fragment>
       <Header />
       <Navigation />
       <Outlet />
-    </>
+    </React.Fragment>
   );
 };
 

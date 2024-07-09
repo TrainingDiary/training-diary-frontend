@@ -33,7 +33,9 @@ const IconWrapper = styled.div`
   align-items: center;
   gap: 30px;
 `;
-const Icon = styled.div``;
+const Icon = styled.div`
+  cursor: pointer;
+`;
 
 const Header: React.FC = () => {
   const location = useLocation();
@@ -58,7 +60,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <>
+    <React.Fragment>
       <HeaderWrapper>
         <IconWrapper>
           <Icon onClick={handleBackClick}>
@@ -78,7 +80,7 @@ const Header: React.FC = () => {
         </IconWrapper>
       </HeaderWrapper>
       <Drawer $isOpen={isDrawerOpen} onClose={toggleDrawer} onLogout={handleLogout} />
-    </>
+    </React.Fragment>
   );
 };
 

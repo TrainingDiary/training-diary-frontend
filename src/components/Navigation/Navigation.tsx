@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-
 import styled from 'styled-components';
+
 import homeIcon from '@icons/home.svg';
 import activeHomeIcon from '@icons/activeHome.svg';
 import appointmentIcon from '@icons/appointment.svg';
 import activeAppointmentIcon from '@icons/activeAppointment.svg';
 import logOutIcon from '@icons/logout.svg';
+import { hexToRgba } from 'src/utils/hexToRgba';
 
 // 하단에 고정된 네비게이션 바 스타일 정의
 const Nav = styled.nav`
@@ -19,7 +20,7 @@ const Nav = styled.nav`
   gap: 30px;
   padding: 5px 0;
   background-color: ${(props) => props.theme.colors.white};
-  box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -2px 20px ${(props) => hexToRgba(props.theme.colors.black, 0.1)};
   justify-content: space-between;
   border-radius: 20px 20px 0 0;
 `;
@@ -87,7 +88,7 @@ const Navigation: React.FC = () => {
   };
 
   return (
-    <>
+    <React.Fragment>
       <Nav>
         <NavItem $isActive={location.pathname === '/'}>
           <Link to={''}>
@@ -122,7 +123,7 @@ const Navigation: React.FC = () => {
           )}
         </NavItem>
       </Nav>
-    </>
+    </React.Fragment>
   );
 };
 
