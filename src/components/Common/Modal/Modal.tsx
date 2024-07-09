@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import Button from '../Button/Button';
@@ -6,14 +6,14 @@ import closeIcon from '@icons/closeBtn.svg';
 import { hexToRgba } from 'src/utils/hexToRgba';
 
 // 스타일 정의
-const ModalWrapper = styled.div`
+const ModalWrapper = styled.div<{ $isOpen: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: ${(props) => hexToRgba(props.theme.colors.black, 0.5)};
-  display: flex;
+  display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
   justify-content: center;
   align-items: center;
   z-index: 1000;
@@ -87,31 +87,31 @@ interface ModalProps {
   title: string;
   children?: string;
   type: 'input' | 'confirm';
+  isOpen: boolean;
+  onClose: () => void;
+  onSave?: (value?: string) => void;
 }
 
-// <Modal title="모달제목" type="input or confirm"> children == input(placeholder) == confirm(content)</Modal>
+const Modal: React.FC<ModalProps> = ({ title, type, children, isOpen, onClose, onSave }) => {
+  const [inputValue, setInputValue] = useState('');
 
-const Modal: React.FC<ModalProps> = ({ title, type, children }) => {
-  const [inputValue, setInputValue] = React.useState('');
-  const [, setModalOpen] = useState(false);
-  const [, setSavedValue] = useState('');
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-  };
-
-  const handleSave = (value?: string) => {
-    if (value) {
-      setSavedValue(value);
+  useEffect(() => {
+    if (!isOpen) {
+      setInputValue('');
     }
-    setModalOpen(false);
-    alert(`Saved Value: ${value}`);
+  }, [isOpen]);
+
+  const handleSave = () => {
+    if (onSave) {
+      onSave(inputValue);
+    }
+    onClose();
   };
 
   return (
-    <ModalWrapper>
+    <ModalWrapper $isOpen={isOpen} role="dialog" aria-hidden={!isOpen}>
       <ModalContent>
-        <CloseButton onClick={handleCloseModal}>
+        <CloseButton onClick={onClose}>
           <img src={closeIcon} alt="Close Icon" />
         </CloseButton>
         <Title>{title}</Title>
@@ -128,10 +128,10 @@ const Modal: React.FC<ModalProps> = ({ title, type, children }) => {
         )}
         {type === 'confirm' && <ModalConfirmContent>{children}</ModalConfirmContent>}
         <ButtonGroup>
-          <Button $size={'small'} onClick={handleCloseModal}>
+          <Button $size={'small'} onClick={onClose}>
             취소
           </Button>
-          <Button $variant={'primary'} $size={'small'} onClick={() => handleSave(inputValue)}>
+          <Button $variant={'primary'} $size={'small'} onClick={handleSave}>
             저장
           </Button>
         </ButtonGroup>
