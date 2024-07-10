@@ -4,7 +4,7 @@ import Home from './Home';
 import Login from './Login';
 import Signup from './Signup';
 import Layout from './Layout';
-import Appointment from './Appointment';
+import Appointment from './Appointment/Appointment';
 
 const router = createBrowserRouter([
   {
