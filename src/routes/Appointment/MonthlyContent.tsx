@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { Fragment } from 'react';
+
+import MonthlyCalendar from '@components/Appointment/Calendar/MonthlyCalendar';
 
 const MonthlyContent: React.FC = () => {
-  return <div>월별 콘텐츠</div>;
+  return (
+    <Fragment>
+      <MonthlyCalendar />
+    </Fragment>
+  );
 };
 
 export default MonthlyContent;
