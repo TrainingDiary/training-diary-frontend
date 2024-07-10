@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ThemeProvider } from 'styled-components';
 
@@ -37,20 +37,18 @@ describe('Tabs 컴포넌트 테스트', () => {
     });
   });
 
-  test('탭 클릭 시 활성화 스타일이 올바르게 적용되어야 한다.', async () => {
+  test('탭 클릭 시 활성화 스타일이 올바르게 적용되어야 한다.', () => {
     renderWithTheme(<Tabs tabs={tabs} />);
 
-    tabs.forEach(async (tab) => {
+    tabs.forEach((tab) => {
       const tabButton = screen.getByText(tab.label);
       fireEvent.click(tabButton);
 
-      await waitFor(() => {
-        screen.getByText(tab.content.props.children);
-      });
+      screen.getByText(tab.content.props.children);
     });
   });
 
-  test('탭 클릭 시 비활성화 스타일이 올바르게 적용되어야 한다.', async () => {
+  test('탭 클릭 시 비활성화 스타일이 올바르게 적용되어야 한다.', () => {
     renderWithTheme(<Tabs tabs={tabs} />);
 
     // 첫 번째 탭을 클릭하여 활성화
@@ -61,8 +59,6 @@ describe('Tabs 컴포넌트 테스트', () => {
     const secondTabButton = screen.getByText('탭 2');
     fireEvent.click(secondTabButton);
 
-    await waitFor(() => {
-      screen.getByText('탭 2 내용');
-    });
+    screen.getByText('탭 2 내용');
   });
 });
