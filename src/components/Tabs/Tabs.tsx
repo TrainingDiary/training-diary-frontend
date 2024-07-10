@@ -53,12 +53,6 @@ const TabPanel = styled.div`
   width: 100%;
   max-width: calc(100% - 40px);
   margin: 20px auto 0;
-  padding: 10px;
-  background: #fff;
-  border: 1px solid #ccc;
-
-  // todo : 없앨 것
-  padding: 50% 0;
 `;
 
 // TabItem 타입 정의
