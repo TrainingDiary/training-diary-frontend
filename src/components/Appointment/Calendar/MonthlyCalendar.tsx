@@ -1,6 +1,5 @@
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
 import { DayCellMountArg, DayHeaderContentArg } from '@fullcalendar/core';
 import styled from 'styled-components';
 import { format } from 'date-fns';
@@ -106,7 +105,7 @@ const MonthlyCalendar: React.FC = () => {
   return (
     <FullCalendarWrapper>
       <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin]}
+        plugins={[dayGridPlugin]}
         headerToolbar={{
           left: 'prev',
           center: 'title',
