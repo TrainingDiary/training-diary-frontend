@@ -12,6 +12,7 @@ const ButtonWrapper = styled.button<ButtonProps>`
   font-size: 1.6rem;
   cursor: pointer;
   width: 100%;
+  white-space: nowrap;
 
   color: ${({ $variant, theme }) =>
     $variant === 'primary' ? theme.colors.white : theme.colors.gray600};
