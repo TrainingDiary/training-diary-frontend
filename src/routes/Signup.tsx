@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 
 import Button from '@components/Common/Button/Button';
 import Alert from '@components/Common/Alert/Alert';
@@ -10,10 +11,11 @@ import AuthInputBox from '@components/Auth/AuthInputBox/AuthInputBox';
 import { AuthWrapper } from '@components/Auth/styledComponents/AuthWrapper';
 import { AuthContainer } from '@components/Auth/styledComponents/AuthContainer';
 import { AuthForm } from '@components/Auth/styledComponents/AuthForm';
+import RoleSelector from '@components/Auth/RoleSelector';
+import { codePattern, emailPattern, passwordPattern } from 'src/utils/regExp';
 import emailIcon from '@icons/email.svg';
 import passwordIcon from '@icons/password.svg';
 import nameIcon from '@icons/name.svg';
-import RoleSelector from '@components/Auth/RoleSelector';
 
 interface FormState {
   email: string;
@@ -21,44 +23,32 @@ interface FormState {
   name: string;
   password: string;
   confirmPassword: string;
-  role: 'trainee' | 'trainer';
+  role: 'TRAINEE' | 'TRAINER';
 }
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
 
-  const [isLoading, setLoading] = useState<boolean>(false);
-  const [formState, setFormState] = useState<FormState>({
-    email: '',
-    code: '',
-    name: '',
-    password: '',
-    confirmPassword: '',
-    role: 'trainee',
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    setValue,
+    watch,
+  } = useForm<FormState>({
+    mode: 'onChange',
+    defaultValues: {
+      role: 'TRAINEE',
+    },
   });
+
+  const [isLoading, setLoading] = useState<boolean>(false);
   const [showEmailCodeInput, setShowEmailCodeInput] = useState<boolean>(false);
   const [isCodeVerified, setIsCodeVerified] = useState<boolean>(false);
   const [successAlert, setSuccessAlert] = useState<string>('');
   const [errorAlert, setErrorAlert] = useState<string>('');
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-
-    setFormState((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const onRoleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormState((prev) => ({
-      ...prev,
-      role: event.target.value as 'trainee' | 'trainer',
-    }));
-  };
-
-  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const onSubmit = async (data: FormState) => {
     setErrorAlert('');
 
     if (isLoading) return;
@@ -67,6 +57,7 @@ const Signup: React.FC = () => {
       setLoading(true);
 
       // 회원가입 API 요청 단계 추가
+      console.log(data);
 
       setSuccessAlert('회원가입에 성공했습니다.');
 
@@ -84,6 +75,16 @@ const Signup: React.FC = () => {
   };
 
   const onEmailVerify = () => {
+    if (!watch('code')) {
+      setErrorAlert('인증코드는 필수 항목입니다.');
+      return;
+    }
+
+    if (errors.code?.message) {
+      setErrorAlert(errors.code.message);
+      return;
+    }
+
     // 이메일 코드 확인 API 요청 단계 추가
     setIsCodeVerified(true);
     setSuccessAlert('이메일 인증에 성공했습니다.');
@@ -92,22 +93,40 @@ const Signup: React.FC = () => {
   const onCloseSuccessAlert = () => setSuccessAlert('');
   const onCloseErrorAlert = () => setErrorAlert('');
 
+  const email = watch('email');
+  const isEmailValid = email && !errors.email;
+
+  const validatePasswordConfirm = (value: string) => {
+    return value === watch('password') || '비밀번호가 일치하지 않습니다.';
+  };
+
   return (
     <AuthWrapper>
       <AuthContainer>
         <AuthTitle title="환영합니다." subtitle="Create an account" />
 
-        <AuthForm onSubmit={onSubmit}>
-          <RoleSelector role={formState.role} onChange={onRoleChange} />
+        <AuthForm onSubmit={handleSubmit(onSubmit)}>
+          <RoleSelector
+            role={watch('role')}
+            onChange={(e) =>
+              setValue('role', e.target.value as 'TRAINEE' | 'TRAINER')
+            }
+          />
 
           <AuthInputBox
             label="이메일"
             iconSrc={emailIcon}
             placeholder="이메일을 입력해주세요."
-            type="email"
-            value={formState.email}
-            onChange={onChange}
+            type="text"
             disabled={showEmailCodeInput}
+            error={errors.email?.message}
+            {...register('email', {
+              required: '이메일은 필수 항목입니다.',
+              pattern: {
+                value: emailPattern,
+                message: '유효한 이메일을 입력해주세요.',
+              },
+            })}
           />
 
           {!showEmailCodeInput && (
@@ -116,6 +135,7 @@ const Signup: React.FC = () => {
               $variant="primary"
               onClick={onEmailVerificationBtnClick}
               type="button"
+              disabled={!isEmailValid}
             >
               이메일 인증
             </Button>
@@ -127,11 +147,16 @@ const Signup: React.FC = () => {
               iconSrc={emailIcon}
               placeholder="인증코드를 입력해주세요."
               type="text"
-              value={formState.code}
               id="code"
-              onChange={onChange}
               disabled={isCodeVerified}
               onClick={onEmailVerify}
+              {...register('code', {
+                required: '인증코드는 필수 항목입니다.',
+                pattern: {
+                  value: codePattern,
+                  message: '유효한 인증코드를 입력해주세요.',
+                },
+              })}
             />
           )}
 
@@ -140,19 +165,28 @@ const Signup: React.FC = () => {
             iconSrc={nameIcon}
             placeholder="이름을 입력해주세요."
             type="text"
-            value={formState.name}
             id="name"
-            onChange={onChange}
+            error={errors.name?.message}
+            {...register('name', {
+              required: '이름은 필수 항목입니다.',
+            })}
           />
 
           <AuthInputBox
             label="비밀번호"
             iconSrc={passwordIcon}
-            placeholder="영어/숫자/특수문자 포함 8 ~ 15자"
+            placeholder="영어/숫자/특수문자 모두 포함 8 ~ 15자"
             type="password"
-            value={formState.password}
-            onChange={onChange}
             showIcon={false}
+            error={errors.password?.message}
+            {...register('password', {
+              required: '비밀번호는 필수 항목입니다.',
+              pattern: {
+                value: passwordPattern,
+                message:
+                  '영어/숫자/특수문자 모두 포함 8 ~ 15자로 입력해주세요.',
+              },
+            })}
           />
 
           <AuthInputBox
@@ -160,13 +194,21 @@ const Signup: React.FC = () => {
             iconSrc={passwordIcon}
             placeholder="비밀번호를 입력해주세요."
             type="password"
-            value={formState.confirmPassword}
             id="confirmPassword"
-            onChange={onChange}
             showIcon={false}
+            error={errors.confirmPassword?.message}
+            {...register('confirmPassword', {
+              required: '비밀번호 확인란은 필수 항목입니다.',
+              validate: validatePasswordConfirm,
+            })}
           />
 
-          <Button $size="large" $variant="primary" type="submit">
+          <Button
+            $size="large"
+            $variant="primary"
+            type="submit"
+            disabled={!isCodeVerified || !isValid}
+          >
             {isLoading ? '회원가입 중...' : '회원가입'}
           </Button>
         </AuthForm>

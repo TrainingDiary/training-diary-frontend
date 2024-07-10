@@ -7,12 +7,12 @@ const ButtonWrapper = styled.button<ButtonProps>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 0;
+  padding: 8px;
   border-radius: 0.5rem;
   font-size: 1.6rem;
-  font-weight: 500;
   cursor: pointer;
   width: 100%;
+  white-space: nowrap;
 
   color: ${({ $variant, theme }) =>
     $variant === 'primary' ? theme.colors.white : theme.colors.gray600};
@@ -30,6 +30,14 @@ const ButtonWrapper = styled.button<ButtonProps>`
       $variant === 'primary' ? theme.colors.main700 : theme.colors.gray400};
     color: ${(props) => props.theme.colors.white};
   }
+
+  &:disabled {
+    background-color: ${({ $variant, theme }) =>
+      $variant === 'primary' ? theme.colors.main300 : theme.colors.gray300};
+    color: ${({ $variant, theme }) =>
+      $variant === 'primary' ? theme.colors.white : theme.colors.gray500};
+    cursor: not-allowed;
+  }
 `;
 
 // ButtonProps
@@ -39,6 +47,7 @@ interface ButtonProps {
   $variant?: 'primary';
   onClick?: () => void;
   type?: 'submit' | 'button';
+  disabled?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -47,6 +56,7 @@ const Button: React.FC<ButtonProps> = ({
   $variant,
   onClick,
   type,
+  disabled,
 }) => {
   return (
     <ButtonWrapper
@@ -54,6 +64,7 @@ const Button: React.FC<ButtonProps> = ({
       $variant={$variant}
       onClick={onClick}
       type={type}
+      disabled={disabled}
     >
       {children}
     </ButtonWrapper>
