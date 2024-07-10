@@ -7,7 +7,7 @@ const ButtonWrapper = styled.button<ButtonProps>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 0;
+  padding: 8px;
   border-radius: 0.5rem;
   font-size: 1.6rem;
   cursor: pointer;
