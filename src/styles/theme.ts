@@ -1,3 +1,9 @@
+const size = {
+  mobile: '320px',
+  tablet: '450px',
+  desktop: '1024px',
+};
+
 const theme = {
   colors: {
     main100: '#ECF9F5',
@@ -43,6 +49,11 @@ const theme = {
     small: '80px',
     medium: '100px',
     large: '100%',
+  },
+  media: {
+    mobile: `(max-width: ${size.mobile})`,
+    tablet: `(min-width: ${size.mobile}) and (max-width: ${size.tablet})`,
+    desktop: `(min-width: ${size.tablet})`,
   },
 };
 
