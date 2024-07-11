@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import Tabs from '@components/Tabs/Tabs';
+import TraineeManagement from './Trainer/TraineeManagement';
 
 const Home: React.FC = () => {
   const [role, setRole] = useState<'trainee' | 'trainer' | null>(null);
@@ -35,7 +36,7 @@ const Home: React.FC = () => {
   const trainerTabs = [
     {
       label: '트레이니 관리',
-      content: <div>Tab 1 Content</div>,
+      content: <TraineeManagement />,
     },
     {
       label: '운동 종류 관리',
