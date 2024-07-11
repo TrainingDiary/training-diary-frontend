@@ -3,11 +3,11 @@ import { css, keyframes } from 'styled-components';
 const fadeIn = keyframes`
   0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateX(-50%) translateY(20px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
 
   }
 `;
@@ -15,12 +15,12 @@ const fadeIn = keyframes`
 const fadeOut = keyframes`
   0% {
     opacity: 1;
-    transform: translateY(0);
+    transform:translateX(-50%) translateY(0);
 
   }
   100% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateX(-50%) translateY(20px);
 
   }
 `;
