@@ -13,9 +13,9 @@ import { AuthContainer } from '@components/Auth/styledComponents/AuthContainer';
 import { AuthForm } from '@components/Auth/styledComponents/AuthForm';
 import RoleSelector from '@components/Auth/RoleSelector';
 import { codePattern, emailPattern, passwordPattern } from 'src/utils/regExp';
-import emailIcon from '@icons/email.svg';
-import passwordIcon from '@icons/password.svg';
-import nameIcon from '@icons/name.svg';
+import emailIcon from '@icons/auth/email.svg';
+import passwordIcon from '@icons/auth/password.svg';
+import nameIcon from '@icons/auth/name.svg';
 
 interface FormState {
   email: string;

@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import homeIcon from '@icons/home.svg';
-import activeHomeIcon from '@icons/activeHome.svg';
-import appointmentIcon from '@icons/appointment.svg';
-import activeAppointmentIcon from '@icons/activeAppointment.svg';
-import logOutIcon from '@icons/logout.svg';
+import homeIcon from '@icons/navigation/home.svg';
+import activeHomeIcon from '@icons/navigation/activeHome.svg';
+import appointmentIcon from '@icons/navigation/appointment.svg';
+import activeAppointmentIcon from '@icons/navigation/activeAppointment.svg';
+import logOutIcon from '@icons/navigation/logout.svg';
 import { hexToRgba } from 'src/utils/hexToRgba';
 
 // 하단에 고정된 네비게이션 바 스타일 정의
@@ -44,7 +44,8 @@ const NavItem = styled.div<{ $isActive?: boolean }>`
     font-size: 1rem;
     width: 100%;
     text-decoration: none;
-    color: ${({ $isActive, theme }) => ($isActive ? theme.colors.main700 : theme.colors.gray500)};
+    color: ${({ $isActive, theme }) =>
+      $isActive ? theme.colors.main700 : theme.colors.gray500};
     span {
       background-color: ${({ $isActive, theme }) =>
         $isActive ? theme.colors.main100 : 'transparent'};
@@ -105,7 +106,11 @@ const Navigation: React.FC = () => {
           <Link to={'appointment'}>
             <span>
               <AppointmentIconBtn
-                src={location.pathname === '/appointment' ? activeAppointmentIcon : appointmentIcon}
+                src={
+                  location.pathname === '/appointment'
+                    ? activeAppointmentIcon
+                    : appointmentIcon
+                }
                 alt="appointment link button"
               />
             </span>

@@ -3,8 +3,8 @@ import styled from 'styled-components';
 
 import { fadeInStyles, fadeOutStyles } from 'src/styles/animations/fadeInOut';
 import { hexToRgba } from 'src/utils/hexToRgba';
-import errorIcon from '@icons/error.svg';
-import successIcon from '@icons/success.svg';
+import errorIcon from '@icons/alert/error.svg';
+import successIcon from '@icons/alert/success.svg';
 
 interface WrapperProps {
   $isFadingIn: boolean;

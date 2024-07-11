@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
-import homeIcon from '@icons/home.svg';
-import appointmentIcon from '@icons/appointment.svg';
-import logOutIcon from '@icons/logout.svg';
+import homeIcon from '@icons/navigation/home.svg';
+import appointmentIcon from '@icons/navigation/appointment.svg';
+import logOutIcon from '@icons/navigation/logout.svg';
 import { hexToRgba } from 'src/utils/hexToRgba';
 
 const DrawerWrapper = styled.div<{ $isOpen: boolean }>`
@@ -15,7 +15,8 @@ const DrawerWrapper = styled.div<{ $isOpen: boolean }>`
   height: 100%;
   background-color: ${({ theme }) => theme.colors.white};
   box-shadow: -2px 0 5px ${({ theme }) => hexToRgba(theme.colors.black, 0.2)};
-  transform: ${({ $isOpen }) => ($isOpen ? 'translateX(0)' : 'translateX(120%)')};
+  transform: ${({ $isOpen }) =>
+    $isOpen ? 'translateX(0)' : 'translateX(120%)'};
   transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;

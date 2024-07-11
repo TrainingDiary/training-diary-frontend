@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import hidePasswordIcon from '@icons/hidePassword.svg';
-import showPasswordIcon from '@icons/showPassword.svg';
+import hidePasswordIcon from '@icons/auth/hidePassword.svg';
+import showPasswordIcon from '@icons/auth/showPassword.svg';
 import Button from '@components/Common/Button/Button';
 
 const Wrapper = styled.div`
