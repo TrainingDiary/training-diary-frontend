@@ -1,14 +1,17 @@
 @font-face {
   font-family: 'NanumSquare';
-  src: url('/src/assets/fonts/NanumSquare.ttf') format('truetype');
+  src: url('/src/assets/fonts/NanumSquareR.ttf') format('truetype'),
+    url('/src/assets/fonts/NanumSquareR.otf') format('opentype');
 }
 
 @font-face {
   font-family: 'NanumSquareBold';
-  src: url('/src/assets/fonts/NanumSquareBold.ttf') format('truetype');
+  src: url('/src/assets/fonts/NanumSquareB.ttf') format('truetype'),
+    url('/src/assets/fonts/NanumSquareB.otf') format('opentype');
 }
 
 @font-face {
   font-family: 'NanumSquareExtraBold';
-  src: url('/src/assets/fonts/NanumSquareExtraBold.ttf') format('truetype');
+  src: url('/src/assets/fonts/NanumSquareEB.ttf') format('truetype'),
+    url('/src/assets/fonts/NanumSquareEB.otf') format('opentype');
 }
