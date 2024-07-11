@@ -26,9 +26,12 @@ const Tab = styled.button<{ $isActive: boolean }>`
   flex: 1;
   padding: 10px 0;
   border: none;
-  color: ${({ $isActive, theme }) => ($isActive ? theme.colors.gray900 : theme.colors.gray700)};
-  background: ${({ $isActive, theme }) => ($isActive ? theme.colors.white : 'transparent')};
-  font-family: ${({ $isActive }) => ($isActive ? "'NanumSquareBold' !important" : 'NanumSquare')};
+  color: ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.gray900 : theme.colors.gray700};
+  background: ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.white : 'transparent'};
+  font-family: ${({ $isActive }) =>
+    $isActive ? "'NanumSquareBold' !important" : 'NanumSquare'};
   box-shadow: ${({ $isActive, theme }) =>
     $isActive ? `0 2px 10px 1px ${theme.colors.gray400}` : 'none'};
   font-size: 1.2rem;
@@ -50,12 +53,6 @@ const TabPanel = styled.div`
   width: 100%;
   max-width: calc(100% - 40px);
   margin: 20px auto 0;
-  padding: 10px;
-  background: #fff;
-  border: 1px solid #ccc;
-
-  // todo : 없앨 것
-  padding: 50% 0;
 `;
 
 // TabItem 타입 정의
@@ -76,7 +73,11 @@ const Tabs: React.FC<TabsProps> = ({ tabs }) => {
     <Wrapper>
       <TabWrapper>
         {tabs.map((tab, index) => (
-          <Tab key={index} $isActive={activeIndex === index} onClick={() => setActiveIndex(index)}>
+          <Tab
+            key={index}
+            $isActive={activeIndex === index}
+            onClick={() => setActiveIndex(index)}
+          >
             {tab.label}
           </Tab>
         ))}
