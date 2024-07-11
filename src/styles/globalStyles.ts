@@ -8,21 +8,6 @@ ${reset};
   box-sizing: border-box;
 }
 
-@font-face {
-    font-family: 'NanumSquare';
-    src: url('/src/assets/fonts/NanumSquare.ttf') format('truetype')
-  }
-
-  @font-face {
-    font-family: 'NanumSquareBold';
-    src: url('/src/assets/fonts/NanumSquareBold.ttf') format('truetype')
-  }
-
-  @font-face {
-    font-family: 'NanumSquareExtraBold';
-    src: url('/src/assets/fonts/NanumSquareExtraBold.ttf') format('truetype')
-  }
-
 //font-size base = 10px = 1rem / ex) 16px === 1.6rem 
 html, body{
   font-size: 10px;
