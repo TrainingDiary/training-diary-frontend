@@ -3,7 +3,7 @@ import { hexToRgba } from 'src/utils/hexToRgba';
 import styled from 'styled-components';
 
 // ButtonWrapper 컴포넌트 스타일 정의
-const ButtonWrapper = styled.button<ButtonProps>`
+export const ButtonWrapper = styled.button<ButtonProps>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
