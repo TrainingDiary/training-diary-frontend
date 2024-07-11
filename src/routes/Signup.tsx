@@ -148,6 +148,7 @@ const Signup: React.FC = () => {
               placeholder="인증코드를 입력해주세요."
               type="text"
               id="code"
+              maxLength={6}
               disabled={isCodeVerified}
               onClick={onEmailVerify}
               {...register('code', {
@@ -177,6 +178,7 @@ const Signup: React.FC = () => {
             iconSrc={passwordIcon}
             placeholder="영어/숫자/특수문자 모두 포함 8 ~ 15자"
             type="password"
+            maxLength={15}
             showIcon={false}
             error={errors.password?.message}
             {...register('password', {
@@ -195,6 +197,7 @@ const Signup: React.FC = () => {
             placeholder="비밀번호를 입력해주세요."
             type="password"
             id="confirmPassword"
+            maxLength={15}
             showIcon={false}
             error={errors.confirmPassword?.message}
             {...register('confirmPassword', {
