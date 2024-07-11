@@ -9,14 +9,16 @@ import { hexToRgba } from 'src/utils/hexToRgba';
 const ModalWrapper = styled.div<{ $isOpen: boolean }>`
   position: fixed;
   top: 0;
-  left: 0;
+  left: 50%;
   width: 100%;
   height: 100%;
-  background: ${(props) => hexToRgba(props.theme.colors.black, 0.5)};
+  background: ${({ theme }) => hexToRgba(theme.colors.black, 0.5)};
   display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  max-width: 450px;
+  transform: translateX(-50%);
 `;
 
 const ModalContent = styled.div`

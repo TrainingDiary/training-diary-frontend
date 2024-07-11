@@ -6,6 +6,7 @@ import addBtn from '@icons/addbtn.svg';
 import avatar from '@icons/avatar.svg';
 import dropDownArrow from '@icons/dropDownArrow.svg';
 import { hexToRgba } from 'src/utils/hexToRgba';
+import Modal from '@components/Common/Modal/Modal';
 
 // Styled components
 const HomeWrapper = styled.div``;
@@ -70,7 +71,7 @@ const TraineeItem = styled.li`
 const AddButton = styled.button`
   display: inline-block;
   background-color: ${({ theme }) => theme.colors.main400};
-  padding: 15px;
+  padding: 15px 17px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
@@ -140,6 +141,9 @@ interface TraineeDataType {
 const TraineeManagement: React.FC = () => {
   const [traineeData, setTraineeData] = useState<TraineeDataType[]>([]);
   const [sortOption, setSortOption] = useState<string>('name');
+  const [isInputModalOpen, setInputModalOpen] = useState(false);
+  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedTraineeId, setSelectedTraineeId] = useState<number | null>(null);
 
   // Dummy data API 가져오기(msw)
   useEffect(() => {
@@ -159,11 +163,6 @@ const TraineeManagement: React.FC = () => {
     fetchData();
   }, []);
 
-  // 삭제 버튼 로직
-  const handleDelete = (id: number) => {
-    setTraineeData((prevData) => prevData.filter((trainee) => trainee.ptContractId !== id));
-  };
-
   // 필터 정렬 로직
   const handleSort = (option: string) => {
     const sortedData = [...traineeData];
@@ -177,6 +176,42 @@ const TraineeManagement: React.FC = () => {
     }
     setSortOption(option);
     setTraineeData(sortedData);
+  };
+
+  // 삭제 버튼 로직
+  const handleDelete = (id: number) => {
+    setTraineeData((prevData) => prevData.filter((trainee) => trainee.ptContractId !== id));
+  };
+
+  //추가 버튼 로직
+  const handleOpenInputModal = () => {
+    setInputModalOpen(true);
+  };
+
+  const handleCloseInputModal = () => {
+    setInputModalOpen(false);
+  };
+
+  const handleOpenConfirmModal = (id: number) => {
+    setSelectedTraineeId(id);
+    setConfirmModalOpen(true);
+  };
+
+  const handleCloseConfirmModal = () => {
+    setSelectedTraineeId(null);
+    setConfirmModalOpen(false);
+  };
+
+  const handleSaveInput = (value?: string) => {
+    console.log(`Saved value: ${value}`);
+    setInputModalOpen(false);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (selectedTraineeId !== null) {
+      handleDelete(selectedTraineeId);
+    }
+    setConfirmModalOpen(false);
   };
 
   return (
@@ -205,7 +240,7 @@ const TraineeManagement: React.FC = () => {
                     <p>{trainee.traineeName}</p>
                     <span>등록일 : {trainee.totalSessionUpdatedAt}</span>
                   </TraineeInfo>
-                  <DeleteButton onClick={() => handleDelete(trainee.ptContractId)}>
+                  <DeleteButton onClick={() => handleOpenConfirmModal(trainee.ptContractId)}>
                     삭제
                   </DeleteButton>
                 </TraineeItem>
@@ -214,11 +249,29 @@ const TraineeManagement: React.FC = () => {
               <li>트레이니 데이터가 없습니다.</li>
             )}
           </TraineeList>
-          {/* Add button 추가 TODO : Modal 구현 */}
-          <AddButton>
+          {/* Add button 추가 */}
+          <AddButton onClick={handleOpenInputModal}>
             <img src={addBtn} alt="add button" />
           </AddButton>
         </HomeLayout>
+        <Modal
+          title="트레이니 추가"
+          type="input"
+          isOpen={isInputModalOpen}
+          onClose={handleCloseInputModal}
+          onSave={handleSaveInput}
+        >
+          E-mail을 입력해주세요.
+        </Modal>
+        <Modal
+          title="트레이니 삭제"
+          type="confirm"
+          isOpen={isConfirmModalOpen}
+          onClose={handleCloseConfirmModal}
+          onSave={handleDeleteConfirm}
+        >
+          트레이니를 삭제하겠습니까?
+        </Modal>
       </HomeWrapper>
     </React.Fragment>
   );
