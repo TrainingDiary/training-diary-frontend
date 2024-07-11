@@ -1,14 +1,16 @@
 import Tabs from '@components/Tabs/Tabs';
+import MonthlyContent from './MonthlyContent';
+import WeeklyContent from './WeeklyContent';
 
 const Appointment: React.FC = () => {
   const tabs = [
     {
       label: '월별',
-      content: <div>Tab 1 Content</div>,
+      content: <MonthlyContent />,
     },
     {
       label: '주별',
-      content: <div>Tab 2 Content</div>,
+      content: <WeeklyContent />,
     },
   ];
 
