@@ -7,6 +7,7 @@ import avatar from '@icons/avatar.svg';
 import dropDownArrow from '@icons/dropDownArrow.svg';
 import { hexToRgba } from 'src/utils/hexToRgba';
 
+// Styled components
 const HomeWrapper = styled.div``;
 
 const HomeLayout = styled.div`
@@ -73,13 +74,10 @@ const AddButton = styled.button`
   border-radius: 50%;
   border: none;
   cursor: pointer;
-
   position: sticky;
   bottom: 90px;
   right: 30px;
-
   transition: 0.1s;
-
   opacity: 0.8;
 
   &:active {
@@ -141,8 +139,9 @@ interface TraineeDataType {
 
 const TraineeManagement: React.FC = () => {
   const [traineeData, setTraineeData] = useState<TraineeDataType[]>([]);
-  const [sortOption, setSortOption] = useState<string>('');
+  const [sortOption, setSortOption] = useState<string>('name');
 
+  // Dummy data API 가져오기(msw)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -154,16 +153,18 @@ const TraineeManagement: React.FC = () => {
           setTraineeData(sortedData);
         }
       } catch (error) {
-        console.log(error);
+        console.error('Failed to fetch trainee data', error);
       }
     };
     fetchData();
   }, []);
 
+  // 삭제 버튼 로직
   const handleDelete = (id: number) => {
-    setTraineeData(traineeData.filter((trainee) => trainee.ptContractId !== id));
+    setTraineeData((prevData) => prevData.filter((trainee) => trainee.ptContractId !== id));
   };
 
+  // 필터 정렬 로직
   const handleSort = (option: string) => {
     const sortedData = [...traineeData];
     if (option === 'name') {
@@ -182,6 +183,7 @@ const TraineeManagement: React.FC = () => {
     <React.Fragment>
       <HomeWrapper>
         <HomeLayout>
+          {/* Dropdown for sorting options */}
           <DropDownWrapper>
             <select onChange={(e) => handleSort(e.target.value)} value={sortOption}>
               <option value="name">이름순</option>
@@ -191,6 +193,7 @@ const TraineeManagement: React.FC = () => {
               <img src={dropDownArrow} alt="DropDown Arrow" />
             </Arrow>
           </DropDownWrapper>
+          {/* Trainee list */}
           <TraineeList>
             {traineeData.length > 0 ? (
               traineeData.map((trainee) => (
@@ -202,7 +205,6 @@ const TraineeManagement: React.FC = () => {
                     <p>{trainee.traineeName}</p>
                     <span>등록일 : {trainee.totalSessionUpdatedAt}</span>
                   </TraineeInfo>
-
                   <DeleteButton onClick={() => handleDelete(trainee.ptContractId)}>
                     삭제
                   </DeleteButton>
@@ -212,6 +214,7 @@ const TraineeManagement: React.FC = () => {
               <li>트레이니 데이터가 없습니다.</li>
             )}
           </TraineeList>
+          {/* Add button 추가 TODO : Modal 구현 */}
           <AddButton>
             <img src={addBtn} alt="add button" />
           </AddButton>
