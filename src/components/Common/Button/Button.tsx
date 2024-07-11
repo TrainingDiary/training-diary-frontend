@@ -38,6 +38,11 @@ const ButtonWrapper = styled.button<ButtonProps>`
       $variant === 'primary' ? theme.colors.white : theme.colors.gray500};
     cursor: not-allowed;
   }
+
+  @media ${({ theme }) => theme.media.mobile} {
+    width: 100%;
+    max-width: 100%;
+  }
 `;
 
 // ButtonProps

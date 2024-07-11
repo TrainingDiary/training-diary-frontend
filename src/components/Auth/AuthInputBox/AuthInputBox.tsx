@@ -20,6 +20,12 @@ const Label = styled.label`
 const InputContainer = styled.div`
   display: flex;
   gap: 20px;
+  flex-direction: row;
+
+  @media ${({ theme }) => theme.media.mobile} {
+    flex-direction: column;
+    gap: 10px;
+  }
 `;
 
 const InputWrapper = styled.div<{ disabled?: boolean }>`
