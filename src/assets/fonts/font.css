@@ -1,35 +1,44 @@
 @font-face {
   font-family: 'NanumSquare';
-  src: url('nanumsquarer-webfont.eot');
-  src: url('nanumsquarer-webfont.eot?#iefix') format('embedded-opentype'),
-    url('nanumsquarer-webfont.woff2') format('woff2'),
-    url('nanumsquarer-webfont.woff') format('woff'),
-    url('nanumsquarer-webfont.ttf') format('truetype'),
-    url('nanumsquarer-webfont.svg#nanumsquareregular') format('svg');
+  src: url('../fonts/NanumSquare/nanumsquarer-webfont.eot');
+  src: url('../fonts/NanumSquare/nanumsquarer-webfont.eot?#iefix')
+      format('embedded-opentype'),
+    url('../fonts/NanumSquare/nanumsquarer-webfont.woff2') format('woff2'),
+    url('../fonts/NanumSquare/nanumsquarer-webfont.woff') format('woff'),
+    url('../fonts/NanumSquare/nanumsquarer-webfont.ttf') format('truetype'),
+    url('../fonts/NanumSquare/nanumsquarer-webfont.svg#nanumsquareregular')
+      format('svg');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'NanumSquareBold';
-  src: url('nanumsquareb-webfont.eot');
-  src: url('nanumsquareb-webfont.eot?#iefix') format('embedded-opentype'),
-    url('nanumsquareb-webfont.woff2') format('woff2'),
-    url('nanumsquareb-webfont.woff') format('woff'),
-    url('nanumsquareb-webfont.ttf') format('truetype'),
-    url('nanumsquareb-webfont.svg#nanumsquarebold') format('svg');
+  src: url('../fonts/NanumSquareBold/nanumsquareb-webfont.eot');
+  src: url('../fonts/NanumSquareBold/nanumsquareb-webfont.eot?#iefix')
+      format('embedded-opentype'),
+    url('../fonts/NanumSquareBold/nanumsquareb-webfont.woff2') format('woff2'),
+    url('../fonts/NanumSquareBold/nanumsquareb-webfont.woff') format('woff'),
+    url('../fonts/NanumSquareBold/nanumsquareb-webfont.ttf') format('truetype'),
+    url('../fonts/NanumSquareBold/nanumsquareb-webfont.svg#nanumsquarebold')
+      format('svg');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'NanumSquareExtraBold';
-  src: url('nanumsquareeb-webfont.eot');
-  src: url('nanumsquareeb-webfont.eot?#iefix') format('embedded-opentype'),
-    url('nanumsquareeb-webfont.woff2') format('woff2'),
-    url('nanumsquareeb-webfont.woff') format('woff'),
-    url('nanumsquareeb-webfont.ttf') format('truetype'),
-    url('nanumsquareeb-webfont.svg#nanumsquareextrabold') format('svg');
+  src: url('../fonts/NanumSquareExtraBold/nanumsquareeb-webfont.eot');
+  src: url('../fonts/NanumSquareExtraBold/nanumsquareeb-webfont.eot?#iefix')
+      format('embedded-opentype'),
+    url('../fonts/NanumSquareExtraBold/nanumsquareeb-webfont.woff2')
+      format('woff2'),
+    url('../fonts/NanumSquareExtraBold/nanumsquareeb-webfont.woff')
+      format('woff'),
+    url('../fonts/NanumSquareExtraBold/nanumsquareeb-webfont.ttf')
+      format('truetype'),
+    url('../fonts/NanumSquareExtraBold/nanumsquareeb-webfont.svg#nanumsquareextrabold')
+      format('svg');
   font-weight: normal;
   font-style: normal;
 }
