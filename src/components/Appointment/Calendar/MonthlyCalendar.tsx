@@ -73,6 +73,11 @@ const FullCalendarWrapper = styled.div`
   }
 
   .fc-daygrid-day-number.fc-has-event-number {
+    background-color: ${({ theme }) => theme.colors.gray500};
+    color: ${({ theme }) => theme.colors.gray200};
+  }
+
+  .fc-daygrid-day-number.fc-selected-number {
     background-color: ${({ theme }) => theme.colors.main400};
     color: ${({ theme }) => theme.colors.white};
   }
