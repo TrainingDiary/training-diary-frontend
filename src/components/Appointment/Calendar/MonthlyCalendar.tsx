@@ -4,8 +4,10 @@ import { DayCellMountArg, DayHeaderContentArg } from '@fullcalendar/core';
 import styled from 'styled-components';
 import { format } from 'date-fns';
 
+import { hexToRgba } from 'src/utils/hexToRgba';
+
 const FullCalendarWrapper = styled.div`
-  box-shadow: 0 1px 4px 1px ${({ theme }) => theme.colors.gray300};
+  box-shadow: 0 4px 4px ${({ theme }) => hexToRgba(theme.colors.black, 0.25)};
 
   .fc-toolbar.fc-header-toolbar {
     margin-bottom: 0;
@@ -27,20 +29,27 @@ const FullCalendarWrapper = styled.div`
     padding: 14px 12px;
     border: none;
 
-    &:hover,
-    &:focus,
+    &:hover {
+      background-color: transparent;
+    }
+
     &:not(:disabled):active {
       background-color: ${({ theme }) => theme.colors.main200};
       color: ${({ theme }) => theme.colors.main500};
+    }
+
+    &:not(:disabled):active:focus {
+      box-shadow: none;
+    }
+
+    &:focus {
       box-shadow: none;
     }
   }
 
   .fc-dayGridMonth-view {
     padding: 15px 0;
-    font-family: 'Roboto';
-    font-weight: 500;
-    font-style: normal;
+    font-family: 'NanumSquareBold';
     font-size: 1.5rem;
     color: ${({ theme }) => theme.colors.gray900};
   }
