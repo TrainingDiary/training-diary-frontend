@@ -6,7 +6,11 @@ ${reset};
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; /* Safari and older versions of Chrome */
+  -webkit-touch-callout: none; /* Prevent callout to copy image, etc when tap to hold */
 }
+
+
 
 //font-size base = 10px = 1rem / ex) 16px === 1.6rem 
 html, body{
