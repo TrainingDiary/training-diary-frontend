@@ -14,31 +14,19 @@ const renderWithTheme = (component: React.ReactElement) => {
 describe('Modal 컴포넌트 테스트', () => {
   test('모달이 열렸을 때 렌더링 되어야 한다.', () => {
     renderWithTheme(
-      <Modal
-        title="테스트 모달"
-        type="confirm"
-        isOpen={true}
-        onClose={() => {}}
-      >
+      <Modal title="테스트 모달" type="confirm" isOpen={true} onClose={() => {}}>
         정말로 이 작업을 수행하시겠습니까?
       </Modal>
     );
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText('테스트 모달')).toBeInTheDocument();
-    expect(
-      screen.getByText('정말로 이 작업을 수행하시겠습니까?')
-    ).toBeInTheDocument();
+    expect(screen.getByText('정말로 이 작업을 수행하시겠습니까?')).toBeInTheDocument();
   });
 
   test('모달이 닫혔을 때 렌더링 되지 않아야 한다.', () => {
     renderWithTheme(
-      <Modal
-        title="테스트 모달"
-        type="confirm"
-        isOpen={false}
-        onClose={() => {}}
-      >
+      <Modal title="테스트 모달" type="confirm" isOpen={false} onClose={() => {}}>
         정말로 이 작업을 수행하시겠습니까?
       </Modal>
     );
@@ -62,13 +50,7 @@ describe('Modal 컴포넌트 테스트', () => {
   test('저장 버튼 클릭 시 onSave 함수가 호출되어야 한다.', () => {
     const handleSave = jest.fn();
     renderWithTheme(
-      <Modal
-        title="입력 모달"
-        type="input"
-        isOpen={true}
-        onClose={() => {}}
-        onSave={handleSave}
-      >
+      <Modal title="입력 모달" type="input" isOpen={true} onClose={() => {}} onSave={handleSave}>
         입력할 내용을 적어주세요.
       </Modal>
     );
@@ -76,7 +58,7 @@ describe('Modal 컴포넌트 테스트', () => {
     const input = screen.getByPlaceholderText('입력할 내용을 적어주세요.');
     fireEvent.change(input, { target: { value: '새 입력값' } });
 
-    const saveButton = screen.getByText('추가');
+    const saveButton = screen.getByText('저장');
     fireEvent.click(saveButton);
 
     expect(handleSave).toHaveBeenCalledWith('새 입력값');
