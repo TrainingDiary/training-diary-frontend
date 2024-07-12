@@ -7,6 +7,7 @@ import avatar from '@icons/avatar.svg';
 import dropDownArrow from '@icons/dropDownArrow.svg';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import Modal from '@components/Common/Modal/Modal';
+import formatDate from 'src/utils/formatDate';
 
 // Styled components
 const HomeWrapper = styled.div``;
@@ -127,6 +128,11 @@ const TraineeInfo = styled.div`
     font-family: 'NanumSquareBold';
     color: ${({ theme }) => theme.colors.gray900};
   }
+
+  span {
+    font-size: 1.2rem;
+    color: ${({ theme }) => theme.colors.gray600};
+  }
 `;
 
 interface TraineeDataType {
@@ -149,7 +155,7 @@ const TraineeManagement: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get('/api/pt-contract');
+        const res = await axios.get('/api/pt-contracts');
         if (res.status === 200 && res.data) {
           const sortedData = res.data.sort((a: TraineeDataType, b: TraineeDataType) =>
             a.traineeName.localeCompare(b.traineeName)
@@ -238,7 +244,7 @@ const TraineeManagement: React.FC = () => {
                   </Avatar>
                   <TraineeInfo>
                     <p>{trainee.traineeName}</p>
-                    <span>등록일 : {trainee.totalSessionUpdatedAt}</span>
+                    <span>등록일 : {formatDate(trainee.totalSessionUpdatedAt)}</span>
                   </TraineeInfo>
                   <DeleteButton onClick={() => handleOpenConfirmModal(trainee.ptContractId)}>
                     삭제

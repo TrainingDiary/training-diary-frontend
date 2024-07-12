@@ -4,15 +4,15 @@ import Tabs from '@components/Tabs/Tabs';
 import TraineeManagement from './Trainer/TraineeManagement';
 
 const Home: React.FC = () => {
-  const [role, setRole] = useState<'trainee' | 'trainer' | null>(null);
+  const [role, setRole] = useState<'TRAINEE' | 'TRAINER' | null>(null);
 
   // 가정: role을 로그인 시 가져오는 함수
   useEffect(() => {
     // 실제로는 로그인 후 role을 받아오는 로직이 필요합니다.
     const fetchUserRole = async () => {
       // 예시: 로그인 후 받아온 role
-      const userRole = 'trainer'; // 'trainee'로 바꾸어 테스트 가능
-      setRole(userRole as 'trainee' | 'trainer');
+      const userRole = 'TRAINER'; // 'TRAINEE'로 바꾸어 테스트 가능
+      setRole(userRole as 'TRAINEE' | 'TRAINER');
     };
 
     fetchUserRole();
@@ -51,7 +51,7 @@ const Home: React.FC = () => {
 
   return (
     <div>
-      <Tabs tabs={role === 'trainer' ? trainerTabs : traineeTabs} />
+      <Tabs tabs={role === 'TRAINER' ? trainerTabs : traineeTabs} />
     </div>
   );
 };

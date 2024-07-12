@@ -12,7 +12,7 @@ export const handlers = [
     return;
   }),
 
-  http.get('/api/pt-contract', () => {
+  http.get('/api/pt-contracts', () => {
     return HttpResponse.json(trainee);
   }),
 ];
