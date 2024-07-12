@@ -4,6 +4,11 @@ import styled from 'styled-components';
 const Wrapper = styled.div`
   display: flex;
   gap: 20px;
+
+  @media ${({ theme }) => theme.media.mobile} {
+    flex-direction: column;
+    gap: 10px;
+  }
 `;
 
 const HiddenRadio = styled.input`

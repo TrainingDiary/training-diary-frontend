@@ -2,9 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import googleIcon from '@icons/google.svg';
-import naverIcon from '@icons/naver.svg';
-import kakaoIcon from '@icons/kakao.svg';
+import googleIcon from '@icons/socialLogin/google.svg';
+import naverIcon from '@icons/socialLogin/naver.svg';
+import kakaoIcon from '@icons/socialLogin/kakao.svg';
 
 const Wrapper = styled.div`
   display: flex;

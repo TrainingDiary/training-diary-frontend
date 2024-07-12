@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import backIcon from '@icons/backIcon.svg';
-import bellIcon from '@icons/bell.svg';
-import hamBtnIcon from '@icons/hamBtn.svg';
+import backIcon from '@icons/header/backIcon.svg';
+import bellIcon from '@icons/header/bell.svg';
+import hamBtnIcon from '@icons/header/hamBtn.svg';
 import Drawer from './Drawer';
 
 const HeaderWrapper = styled.header`
@@ -64,9 +64,10 @@ const Header: React.FC = () => {
       <HeaderWrapper>
         <IconWrapper>
           <Icon onClick={handleBackClick}>
-            {location.pathname !== '/' && location.pathname !== '/appointment' && (
-              <img src={backIcon} alt="Back" />
-            )}
+            {location.pathname !== '/' &&
+              location.pathname !== '/appointment' && (
+                <img src={backIcon} alt="Back" />
+              )}
           </Icon>
         </IconWrapper>
         <h1>트.다</h1>
@@ -79,7 +80,11 @@ const Header: React.FC = () => {
           </Icon>
         </IconWrapper>
       </HeaderWrapper>
-      <Drawer $isOpen={isDrawerOpen} onClose={toggleDrawer} onLogout={handleLogout} />
+      <Drawer
+        $isOpen={isDrawerOpen}
+        onClose={toggleDrawer}
+        onLogout={handleLogout}
+      />
     </React.Fragment>
   );
 };

@@ -6,13 +6,18 @@ ${reset};
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; /* Safari and older versions of Chrome */
+  -webkit-touch-callout: none; /* Prevent callout to copy image, etc when tap to hold */
 }
+
+
 
 //font-size base = 10px = 1rem / ex) 16px === 1.6rem 
 html, body{
   font-size: 10px;
   line-height: 1.5;
   font-family: 'NanumSquare', 'Noto Sans KR', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
   height: 100vh;
   background-color: ${(props) => props.theme.colors.gray200};
 }

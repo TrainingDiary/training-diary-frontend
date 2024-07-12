@@ -1,0 +1,46 @@
+/*삼성인터넷 나눔스퀘어 출력 테스트. 프로젝트와 연결되어 있지않음. 테스트 끝나고 지울 것. */
+
+@font-face {
+  font-family: 'NanumSquare';
+  src: url('../fonts/NanumSquare/nanumsquarer-webfont.eot');
+  src: url('../fonts/NanumSquare/nanumsquarer-webfont.eot?#iefix')
+      format('embedded-opentype'),
+    url('../fonts/NanumSquare/nanumsquarer-webfont.woff2') format('woff2'),
+    url('../fonts/NanumSquare/nanumsquarer-webfont.woff') format('woff'),
+    url('../fonts/NanumSquare/nanumsquarer-webfont.ttf') format('truetype'),
+    url('../fonts/NanumSquare/nanumsquarer-webfont.svg#nanumsquareregular')
+      format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NanumSquareBold';
+  src: url('../fonts/NanumSquareBold/nanumsquareb-webfont.eot');
+  src: url('../fonts/NanumSquareBold/nanumsquareb-webfont.eot?#iefix')
+      format('embedded-opentype'),
+    url('../fonts/NanumSquareBold/nanumsquareb-webfont.woff2') format('woff2'),
+    url('../fonts/NanumSquareBold/nanumsquareb-webfont.woff') format('woff'),
+    url('../fonts/NanumSquareBold/nanumsquareb-webfont.ttf') format('truetype'),
+    url('../fonts/NanumSquareBold/nanumsquareb-webfont.svg#nanumsquarebold')
+      format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NanumSquareExtraBold';
+  src: url('../fonts/NanumSquareExtraBold/nanumsquareeb-webfont.eot');
+  src: url('../fonts/NanumSquareExtraBold/nanumsquareeb-webfont.eot?#iefix')
+      format('embedded-opentype'),
+    url('../fonts/NanumSquareExtraBold/nanumsquareeb-webfont.woff2')
+      format('woff2'),
+    url('../fonts/NanumSquareExtraBold/nanumsquareeb-webfont.woff')
+      format('woff'),
+    url('../fonts/NanumSquareExtraBold/nanumsquareeb-webfont.ttf')
+      format('truetype'),
+    url('../fonts/NanumSquareExtraBold/nanumsquareeb-webfont.svg#nanumsquareextrabold')
+      format('svg');
+  font-weight: normal;
+  font-style: normal;
+}

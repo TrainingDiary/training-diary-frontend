@@ -10,8 +10,8 @@ import AuthInputBox from '@components/Auth/AuthInputBox/AuthInputBox';
 import { AuthWrapper } from '@components/Auth/styledComponents/AuthWrapper';
 import { AuthContainer } from '@components/Auth/styledComponents/AuthContainer';
 import { AuthForm } from '@components/Auth/styledComponents/AuthForm';
-import emailIcon from '@icons/email.svg';
-import passwordIcon from '@icons/password.svg';
+import emailIcon from '@icons/auth/email.svg';
+import passwordIcon from '@icons/auth/password.svg';
 
 interface FormState {
   email: string;
