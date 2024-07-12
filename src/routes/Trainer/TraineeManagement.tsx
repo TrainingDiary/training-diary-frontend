@@ -8,6 +8,7 @@ import dropDownArrow from '@icons/dropDownArrow.svg';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import Modal from '@components/Common/Modal/Modal';
 import formatDate from 'src/utils/formatDate';
+import { Link } from 'react-router-dom';
 
 // Styled components
 const HomeWrapper = styled.div``;
@@ -23,16 +24,19 @@ const HomeLayout = styled.div`
 const DropDownWrapper = styled.div`
   width: 100%;
   max-width: 120px;
-  position: relative;
   select {
     width: 100%;
+    border-radius: 5px;
+    border: none;
+    appearance: none;
     padding: 10px;
     border-radius: 5px;
     background-color: ${({ theme }) => theme.colors.white};
     border: 1px solid ${({ theme }) => theme.colors.gray300};
     box-shadow: 0 1px 4px 0 ${({ theme }) => hexToRgba(theme.colors.black, 0.2)};
-    appearance: none;
     font-size: 1.2rem;
+    background: url(${dropDownArrow}) no-repeat 97% center;
+    background-size: auto;
 
     &:focus {
       outline: none;
@@ -42,15 +46,6 @@ const DropDownWrapper = styled.div`
       padding: 10px;
     }
   }
-`;
-
-const Arrow = styled.div`
-  position: absolute;
-  height: 100%;
-  top: 0;
-  right: 10px;
-  display: inline-flex;
-  align-items: center;
 `;
 
 const TraineeList = styled.ul`
@@ -65,22 +60,43 @@ const TraineeList = styled.ul`
 const TraineeItem = styled.li`
   display: flex;
   align-items: center;
-  gap: 10px;
-  background-color: ${({ theme }) => theme.colors.white};
+  a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: ${({ theme }) => theme.colors.white};
+    width: 100%;
+    text-decoration: none;
+    flex: 1;
+  }
 `;
 
 const AddButton = styled.button`
-  display: inline-block;
   background-color: ${({ theme }) => theme.colors.main400};
   padding: 15px 17px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  position: sticky;
-  bottom: 90px;
-  right: 30px;
   transition: 0.1s;
   opacity: 0.8;
+  position: fixed;
+
+  max-width: 60px;
+
+  @media ${({ theme }) => theme.media.mobile} {
+    right: 30px;
+    bottom: 110px;
+  }
+  @media ${({ theme }) => theme.media.tablet} {
+    right: 30px;
+    bottom: 110px;
+  }
+  @media ${({ theme }) => theme.media.desktop} {
+    right: 0px;
+    left: 300px;
+    margin: 0 auto;
+    bottom: 110px;
+  }
 
   &:active {
     background-color: ${({ theme }) => theme.colors.main600};
@@ -116,6 +132,7 @@ const DeleteButton = styled.button`
   border-radius: 5px;
   cursor: pointer;
   font-size: 1.6rem;
+  max-height: 30px;
 `;
 
 const TraineeInfo = styled.div`
@@ -239,24 +256,23 @@ const TraineeManagement: React.FC = () => {
               <option value="name">이름순</option>
               <option value="date">PT 등록 최신순</option>
             </select>
-            <Arrow>
-              <img src={dropDownArrow} alt="DropDown Arrow" />
-            </Arrow>
           </DropDownWrapper>
           {/* Trainee list */}
           <TraineeList>
             {traineeData.length > 0 ? (
               traineeData.map((trainee) => (
                 <TraineeItem key={trainee.ptContractId}>
-                  <Avatar>
-                    <img src={avatar} alt="user avatar" />
-                  </Avatar>
-                  <TraineeInfo>
-                    <p>{trainee.traineeName}</p>
-                    <span>
-                      등록일 : {formatDate(trainee.totalSessionUpdatedAt)}
-                    </span>
-                  </TraineeInfo>
+                  <Link to={`/trainee/${trainee.traineeId}`}>
+                    <Avatar>
+                      <img src={avatar} alt="user avatar" />
+                    </Avatar>
+                    <TraineeInfo>
+                      <p>{trainee.traineeName}</p>
+                      <span>
+                        등록일 : {formatDate(trainee.totalSessionUpdatedAt)}
+                      </span>
+                    </TraineeInfo>
+                  </Link>
                   <DeleteButton
                     onClick={() => handleOpenConfirmModal(trainee.ptContractId)}
                   >
@@ -268,11 +284,11 @@ const TraineeManagement: React.FC = () => {
               <li>트레이니 데이터가 없습니다.</li>
             )}
           </TraineeList>
-          {/* Add button 추가 */}
-          <AddButton onClick={handleOpenInputModal}>
-            <img src={addBtn} alt="add button" />
-          </AddButton>
         </HomeLayout>
+        {/* Add button 추가 */}
+        <AddButton onClick={handleOpenInputModal}>
+          <img src={addBtn} alt="add button" />
+        </AddButton>
         <Modal
           title="트레이니 추가"
           type="input"

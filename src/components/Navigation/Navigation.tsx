@@ -65,6 +65,7 @@ const LogOutNav = styled.div`
   width: 100%;
   text-decoration: none;
   color: ${({ theme }) => theme.colors.gray500};
+  cursor: pointer;
   span {
     border-radius: 5px;
     padding: 8px;
