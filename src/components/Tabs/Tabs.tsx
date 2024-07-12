@@ -52,7 +52,7 @@ const Tab = styled.button<{ $isActive: boolean }>`
 const TabPanel = styled.div`
   width: 100%;
   max-width: calc(100% - 40px);
-  margin: 20px auto 50px;
+  margin: 20px auto 90px;
 `;
 
 // TabItem 타입 정의
