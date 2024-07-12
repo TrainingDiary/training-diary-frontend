@@ -28,7 +28,7 @@ export const ButtonWrapper = styled.button<ButtonProps>`
   &:active {
     background-color: ${({ $variant, theme }) =>
       $variant === 'primary' ? theme.colors.main700 : theme.colors.gray400};
-    color: ${(props) => props.theme.colors.white};
+    color: ${({ theme }) => theme.colors.white};
   }
 
   &:disabled {
@@ -47,7 +47,7 @@ export const ButtonWrapper = styled.button<ButtonProps>`
 
 // ButtonProps
 interface ButtonProps {
-  children: string;
+  children: string | void;
   $size: 'small' | 'medium' | 'large';
   $variant?: 'primary';
   onClick?: () => void;

@@ -5,6 +5,7 @@ import Login from './Login';
 import Signup from './Signup';
 import Layout from './Layout';
 import Appointment from './Appointment/Appointment';
+import TraineeInfo from './TraineeInfo';
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
       {
         path: 'appointment',
         element: <Appointment />,
+      },
+      {
+        path: 'trainee/:id',
+        element: <TraineeInfo />,
       },
     ],
   },
