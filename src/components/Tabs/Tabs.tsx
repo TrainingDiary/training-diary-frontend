@@ -15,10 +15,10 @@ const TabWrapper = styled.div`
   margin: 0 auto;
   border-bottom: 1px solid #ccc;
   padding: 5px;
-  background-color: ${(props) => props.theme.colors.gray100};
+  background-color: ${({ theme }) => theme.colors.gray100};
   border-radius: 100px;
   overflow: hidden;
-  box-shadow: ${(props) => `0 1px 4px 1px ${props.theme.colors.gray300}`};
+  box-shadow: ${({ theme }) => `0 1px 4px 1px ${theme.colors.gray300}`};
 `;
 
 // Tab 컴포넌트 스타일 정의
@@ -52,7 +52,7 @@ const Tab = styled.button<{ $isActive: boolean }>`
 const TabPanel = styled.div`
   width: 100%;
   max-width: calc(100% - 40px);
-  margin: 20px auto 0;
+  margin: 20px auto 50px;
 `;
 
 // TabItem 타입 정의

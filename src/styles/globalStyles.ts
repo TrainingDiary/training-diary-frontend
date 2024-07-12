@@ -19,7 +19,7 @@ html, body{
   font-family: 'NanumSquare', 'Noto Sans KR', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
   height: 100vh;
-  background-color: ${(props) => props.theme.colors.gray200};
+  background-color: ${({ theme }) => theme.colors.gray200};
 }
 
 button{
@@ -36,7 +36,7 @@ h1 {
 
 #root{
   margin: 0 auto;
-  background-color: ${(props) => props.theme.colors.white};
+  background-color: ${({ theme }) => theme.colors.white};
   height: 100%;
   position: relative;
   overflow-x: hidden;
