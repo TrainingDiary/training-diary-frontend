@@ -35,7 +35,9 @@ const DropDownWrapper = styled.div`
     border: 1px solid ${({ theme }) => theme.colors.gray300};
     box-shadow: 0 1px 4px 0 ${({ theme }) => hexToRgba(theme.colors.black, 0.2)};
     font-size: 1.2rem;
-    background: url(${dropDownArrow}) no-repeat 97% center;
+    background-image: url(${dropDownArrow});
+    background-position: 97% center;
+    background-repeat: no-repeat;
     background-size: auto;
 
     &:focus {
