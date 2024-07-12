@@ -1,5 +1,6 @@
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
 import { DayCellMountArg, DayHeaderContentArg } from '@fullcalendar/core';
 import styled from 'styled-components';
 import { format } from 'date-fns';
@@ -68,6 +69,9 @@ const FullCalendarWrapper = styled.div`
   }
 
   .fc-daygrid-day-number {
+    display: inline-block;
+    text-align: center;
+    width: 60%;
     padding: 2px 3px;
     border-radius: 3px;
   }
@@ -99,27 +103,57 @@ const dayHeaderContent = (arg: DayHeaderContentArg) => {
   return dayNames[arg.date.getUTCDay()];
 };
 
-const events = [
-  { title: 'event 1', date: '2024-07-25' },
-  { title: 'event 2', date: '2024-07-17' },
-];
-
-const dayCellDidMount = (info: DayCellMountArg) => {
-  const eventDates = events.map((event) => event.date);
+const updateDayCell = (
+  info: DayCellMountArg,
+  selectedButton: string | null,
+  selectedDates: string[],
+  scheduledDates: string[],
+  reservedDates: string[]
+) => {
   const formattedDate = format(info.date, 'yyyy-MM-dd');
-  if (eventDates.includes(formattedDate)) {
-    const dayNumberElement = info.el.querySelector('.fc-daygrid-day-number');
-    if (dayNumberElement) {
-      dayNumberElement.classList.add('fc-has-event-number');
-    }
+  const dayNumberElement = info.el.querySelector('.fc-daygrid-day-number');
+
+  if (!dayNumberElement) return;
+
+  if (selectedButton === null && reservedDates.includes(formattedDate)) {
+    dayNumberElement.classList.add('fc-selected-number');
+  }
+
+  if (selectedButton === 'open' && scheduledDates.includes(formattedDate)) {
+    dayNumberElement.classList.add('fc-has-event-number');
+  }
+
+  if (selectedDates.includes(formattedDate)) {
+    dayNumberElement.classList.add('fc-selected-number');
   }
 };
 
-const MonthlyCalendar: React.FC = () => {
+interface MonthlyCalendarProps {
+  data: {
+    scheduledDates: string[];
+    reservedDates: string[];
+  };
+  selectedButton: string | null;
+  selectedDates: string[];
+  onDateClick: (date: Date) => void;
+}
+
+const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
+  data,
+  selectedButton,
+  selectedDates,
+  onDateClick,
+}) => {
+  const { scheduledDates, reservedDates } = data;
+  const formattedSelectedDates = selectedDates.map((date) =>
+    format(date, 'yyyy-MM-dd')
+  );
+
   return (
     <FullCalendarWrapper>
       <FullCalendar
-        plugins={[dayGridPlugin]}
+        key={formattedSelectedDates.join() + selectedButton}
+        plugins={[dayGridPlugin, interactionPlugin]}
         headerToolbar={{
           left: 'prev',
           center: 'title',
@@ -128,8 +162,23 @@ const MonthlyCalendar: React.FC = () => {
         fixedWeekCount={false}
         height="auto"
         dayHeaderContent={dayHeaderContent}
-        events={events}
-        dayCellDidMount={dayCellDidMount}
+        dayCellDidMount={(info) =>
+          updateDayCell(
+            info,
+            selectedButton,
+            formattedSelectedDates,
+            scheduledDates,
+            reservedDates
+          )
+        }
+        dateClick={(info) => {
+          if (
+            !scheduledDates.includes(format(info.date, 'yyyy-MM-dd')) ||
+            selectedButton === 'register'
+          ) {
+            onDateClick(info.date);
+          }
+        }}
       />
     </FullCalendarWrapper>
   );
