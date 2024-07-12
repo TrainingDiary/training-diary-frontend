@@ -19,8 +19,8 @@ const Nav = styled.nav`
   align-items: center;
   gap: 30px;
   padding: 5px 0;
-  background-color: ${(props) => props.theme.colors.white};
-  box-shadow: 0 -2px 20px ${(props) => hexToRgba(props.theme.colors.black, 0.1)};
+  background-color: ${({ theme }) => theme.colors.white};
+  box-shadow: 0 -2px 20px ${({ theme }) => hexToRgba(theme.colors.black, 0.1)};
   justify-content: space-between;
   border-radius: 20px 20px 0 0;
 `;
@@ -64,7 +64,7 @@ const LogOutNav = styled.div`
   font-size: 1rem;
   width: 100%;
   text-decoration: none;
-  color: ${(props) => props.theme.colors.gray500};
+  color: ${({ theme }) => theme.colors.gray500};
   span {
     border-radius: 5px;
     padding: 8px;

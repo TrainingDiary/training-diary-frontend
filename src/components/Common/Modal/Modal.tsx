@@ -13,7 +13,7 @@ const ModalWrapper = styled.div<{ $isOpen: boolean }>`
   width: 100%;
   height: 100%;
   background: ${({ theme }) => hexToRgba(theme.colors.black, 0.5)};
-  display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
+  display: ${({ $isOpen }) => ($isOpen ? 'flex' : 'none')};
   justify-content: center;
   align-items: center;
   z-index: 1000;
@@ -25,7 +25,7 @@ const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: ${(props) => props.theme.colors.white};
+  background: ${({ theme }) => theme.colors.white};
   padding: 20px;
   border-radius: 10px;
   width: 100%;
@@ -46,24 +46,24 @@ const ModalInputWrapper = styled.div`
 const ModalInput = styled.input`
   padding: 10px 16px;
   border-radius: 5px;
-  border: solid 1px ${(props) => props.theme.colors.gray400};
+  border: solid 1px ${({ theme }) => theme.colors.gray400};
   outline: none;
-  color: ${(props) => props.theme.colors.gray900};
+  color: ${({ theme }) => theme.colors.gray900};
   &::placeholder {
-    color: ${(props) => props.theme.colors.gray500};
+    color: ${({ theme }) => theme.colors.gray500};
   }
 `;
 
 const ErrorMessage = styled.span`
   font-size: 1.2rem;
-  color: ${(props) => props.theme.colors.red300};
+  color: ${({ theme }) => theme.colors.red300};
   line-height: 20px;
   //TODO : error시 메시지 표출
   visibility: hidden;
 `;
 
 const ModalConfirmContent = styled.p`
-  color: ${(props) => props.theme.colors.red400};
+  color: ${({ theme }) => theme.colors.red400};
   font-size: 1.4rem;
   margin: 10px 0;
 `;
@@ -92,6 +92,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave?: (value?: string) => void;
+  btnConfirm?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -101,6 +102,7 @@ const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  btnConfirm,
 }) => {
   const [inputValue, setInputValue] = useState('');
 
@@ -143,7 +145,7 @@ const Modal: React.FC<ModalProps> = ({
             취소
           </Button>
           <Button $variant={'primary'} $size={'small'} onClick={handleSave}>
-            저장
+            {btnConfirm ? btnConfirm : '추가'}
           </Button>
         </ButtonGroup>
       </ModalContent>

@@ -149,7 +149,9 @@ const TraineeManagement: React.FC = () => {
   const [sortOption, setSortOption] = useState<string>('name');
   const [isInputModalOpen, setInputModalOpen] = useState(false);
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [selectedTraineeId, setSelectedTraineeId] = useState<number | null>(null);
+  const [selectedTraineeId, setSelectedTraineeId] = useState<number | null>(
+    null
+  );
 
   // Dummy data API 가져오기(msw)
   useEffect(() => {
@@ -157,8 +159,9 @@ const TraineeManagement: React.FC = () => {
       try {
         const res = await axios.get('/api/pt-contracts');
         if (res.status === 200 && res.data) {
-          const sortedData = res.data.sort((a: TraineeDataType, b: TraineeDataType) =>
-            a.traineeName.localeCompare(b.traineeName)
+          const sortedData = res.data.sort(
+            (a: TraineeDataType, b: TraineeDataType) =>
+              a.traineeName.localeCompare(b.traineeName)
           );
           setTraineeData(sortedData);
         }
@@ -177,7 +180,8 @@ const TraineeManagement: React.FC = () => {
     } else if (option === 'date') {
       sortedData.sort(
         (a, b) =>
-          new Date(b.totalSessionUpdatedAt).getTime() - new Date(a.totalSessionUpdatedAt).getTime()
+          new Date(b.totalSessionUpdatedAt).getTime() -
+          new Date(a.totalSessionUpdatedAt).getTime()
       );
     }
     setSortOption(option);
@@ -186,7 +190,9 @@ const TraineeManagement: React.FC = () => {
 
   // 삭제 버튼 로직
   const handleDelete = (id: number) => {
-    setTraineeData((prevData) => prevData.filter((trainee) => trainee.ptContractId !== id));
+    setTraineeData((prevData) =>
+      prevData.filter((trainee) => trainee.ptContractId !== id)
+    );
   };
 
   //추가 버튼 로직
@@ -226,7 +232,10 @@ const TraineeManagement: React.FC = () => {
         <HomeLayout>
           {/* Dropdown for sorting options */}
           <DropDownWrapper>
-            <select onChange={(e) => handleSort(e.target.value)} value={sortOption}>
+            <select
+              onChange={(e) => handleSort(e.target.value)}
+              value={sortOption}
+            >
               <option value="name">이름순</option>
               <option value="date">PT 등록 최신순</option>
             </select>
@@ -244,9 +253,13 @@ const TraineeManagement: React.FC = () => {
                   </Avatar>
                   <TraineeInfo>
                     <p>{trainee.traineeName}</p>
-                    <span>등록일 : {formatDate(trainee.totalSessionUpdatedAt)}</span>
+                    <span>
+                      등록일 : {formatDate(trainee.totalSessionUpdatedAt)}
+                    </span>
                   </TraineeInfo>
-                  <DeleteButton onClick={() => handleOpenConfirmModal(trainee.ptContractId)}>
+                  <DeleteButton
+                    onClick={() => handleOpenConfirmModal(trainee.ptContractId)}
+                  >
                     삭제
                   </DeleteButton>
                 </TraineeItem>
@@ -275,6 +288,7 @@ const TraineeManagement: React.FC = () => {
           isOpen={isConfirmModalOpen}
           onClose={handleCloseConfirmModal}
           onSave={handleDeleteConfirm}
+          btnConfirm="삭제"
         >
           트레이니를 삭제하겠습니까?
         </Modal>
