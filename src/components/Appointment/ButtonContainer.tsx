@@ -51,7 +51,7 @@ const ButtonContainer: React.FC<ButtonContainerProps> = ({
         $selectedButton={selectedButton}
         disabled={selectedButton !== null && selectedButton !== 'open'}
       >
-        수업일 일괄 오픈
+        수업 일괄 오픈
       </BorderlessButtonWrapper>
       <BorderlessButtonWrapper
         $size="large"
