@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import Button from '../Button/Button';
-import closeIcon from '@icons/closeBtn.svg';
+import closeIcon from '@icons/modal/closeBtn.svg';
 import { hexToRgba } from 'src/utils/hexToRgba';
 
 // 스타일 정의
@@ -92,7 +92,14 @@ interface ModalProps {
   onSave?: (value?: string) => void;
 }
 
-const Modal: React.FC<ModalProps> = ({ title, type, children, isOpen, onClose, onSave }) => {
+const Modal: React.FC<ModalProps> = ({
+  title,
+  type,
+  children,
+  isOpen,
+  onClose,
+  onSave,
+}) => {
   const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
@@ -126,7 +133,9 @@ const Modal: React.FC<ModalProps> = ({ title, type, children, isOpen, onClose, o
             <ErrorMessage>ErrorMessage</ErrorMessage>
           </ModalInputWrapper>
         )}
-        {type === 'confirm' && <ModalConfirmContent>{children}</ModalConfirmContent>}
+        {type === 'confirm' && (
+          <ModalConfirmContent>{children}</ModalConfirmContent>
+        )}
         <ButtonGroup>
           <Button $size={'small'} onClick={onClose}>
             취소

@@ -3,8 +3,8 @@ import styled from 'styled-components';
 
 import { fadeInStyles, fadeOutStyles } from 'src/styles/animations/fadeInOut';
 import { hexToRgba } from 'src/utils/hexToRgba';
-import errorIcon from '@icons/error.svg';
-import successIcon from '@icons/success.svg';
+import errorIcon from '@icons/alert/error.svg';
+import successIcon from '@icons/alert/success.svg';
 
 interface WrapperProps {
   $isFadingIn: boolean;
@@ -16,7 +16,7 @@ const Wrapper = styled.div<WrapperProps>`
   align-items: center;
   padding: 12px 20px;
   width: calc(100% - 40px);
-  max-width: 727px;
+  max-width: 410px;
   border: none;
   border-radius: 8px;
   background-color: ${({ theme, $type }) =>
@@ -24,7 +24,8 @@ const Wrapper = styled.div<WrapperProps>`
   box-shadow: 0 4px 4px ${({ theme }) => hexToRgba(theme.colors.gray800, 0.4)};
   position: fixed;
   bottom: 100px;
-  left: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 9999;
 
   ${({ $isFadingIn }) => ($isFadingIn ? fadeInStyles : fadeOutStyles)};

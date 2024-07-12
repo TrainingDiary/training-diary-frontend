@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import hidePasswordIcon from '@icons/hidePassword.svg';
-import showPasswordIcon from '@icons/showPassword.svg';
+import hidePasswordIcon from '@icons/auth/hidePassword.svg';
+import showPasswordIcon from '@icons/auth/showPassword.svg';
 import Button from '@components/Common/Button/Button';
 
 const Wrapper = styled.div`
@@ -20,6 +20,12 @@ const Label = styled.label`
 const InputContainer = styled.div`
   display: flex;
   gap: 20px;
+  flex-direction: row;
+
+  @media ${({ theme }) => theme.media.mobile} {
+    flex-direction: column;
+    gap: 10px;
+  }
 `;
 
 const InputWrapper = styled.div<{ disabled?: boolean }>`
