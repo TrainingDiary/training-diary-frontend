@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
 import { DayCellMountArg, DayHeaderContentArg } from '@fullcalendar/core';
 import styled from 'styled-components';
 import { format } from 'date-fns';
@@ -68,12 +70,35 @@ const FullCalendarWrapper = styled.div`
   }
 
   .fc-daygrid-day-number {
+    display: inline-block;
+    text-align: center;
+    width: 60%;
     padding: 2px 3px;
     border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .fc-daygrid-day-number.active-enabled:active {
+    background-color: ${({ theme }) => theme.colors.gray200};
+  }
+
+  .fc-daygrid-day-number.fc-reserved-number {
+    background-color: ${({ theme }) => theme.colors.main400};
+    color: ${({ theme }) => theme.colors.white};
+
+    &:active {
+      background-color: ${({ theme }) => theme.colors.main500};
+    }
   }
 
   .fc-daygrid-day-number.fc-has-event-number {
-    background-color: ${({ theme }) => theme.colors.main400};
+    background-color: ${({ theme }) => theme.colors.gray500};
+    color: ${({ theme }) => theme.colors.gray200};
+    cursor: not-allowed;
+  }
+
+  .fc-daygrid-day-number.fc-selected-number {
+    background-color: ${({ theme }) => theme.colors.main600};
     color: ${({ theme }) => theme.colors.white};
   }
 
@@ -94,37 +119,91 @@ const dayHeaderContent = (arg: DayHeaderContentArg) => {
   return dayNames[arg.date.getUTCDay()];
 };
 
-const events = [
-  { title: 'event 1', date: '2024-07-25' },
-  { title: 'event 2', date: '2024-07-17' },
-];
-
-const dayCellDidMount = (info: DayCellMountArg) => {
-  const eventDates = events.map((event) => event.date);
+const updateDayCell = (
+  info: DayCellMountArg,
+  selectedButton: string | null,
+  selectedDates: string[],
+  scheduledDates: string[],
+  reservedDates: string[]
+) => {
   const formattedDate = format(info.date, 'yyyy-MM-dd');
-  if (eventDates.includes(formattedDate)) {
-    const dayNumberElement = info.el.querySelector('.fc-daygrid-day-number');
-    if (dayNumberElement) {
-      dayNumberElement.classList.add('fc-has-event-number');
+  const dayNumberElement = info.el.querySelector('.fc-daygrid-day-number');
+
+  if (!dayNumberElement) return;
+
+  if (selectedButton === null) {
+    dayNumberElement.classList.add('active-enabled');
+
+    if (reservedDates.includes(formattedDate)) {
+      dayNumberElement.classList.add('fc-reserved-number');
     }
+  }
+
+  if (selectedButton === 'open' && scheduledDates.includes(formattedDate)) {
+    dayNumberElement.classList.add('fc-has-event-number');
+  }
+
+  if (selectedDates.includes(formattedDate)) {
+    dayNumberElement.classList.add('fc-selected-number');
   }
 };
 
-const MonthlyCalendar: React.FC = () => {
+interface MonthlyCalendarProps {
+  data: {
+    scheduledDates: string[];
+    reservedDates: string[];
+  };
+  selectedButton: string | null;
+  selectedDates: string[];
+  onDateClick: (date: Date) => void;
+}
+
+const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
+  data,
+  selectedButton,
+  selectedDates,
+  onDateClick,
+}) => {
+  const [initialDate, setInitialDate] = useState<Date>(new Date());
+
+  const { scheduledDates, reservedDates } = data;
+  const formattedSelectedDates = selectedDates.map((date) =>
+    format(date, 'yyyy-MM-dd')
+  );
+
   return (
     <FullCalendarWrapper>
       <FullCalendar
-        plugins={[dayGridPlugin]}
+        key={formattedSelectedDates.join() + selectedButton}
+        plugins={[dayGridPlugin, interactionPlugin]}
         headerToolbar={{
           left: 'prev',
           center: 'title',
           right: 'next',
         }}
+        initialDate={initialDate}
         fixedWeekCount={false}
         height="auto"
         dayHeaderContent={dayHeaderContent}
-        events={events}
-        dayCellDidMount={dayCellDidMount}
+        dayCellDidMount={(info) =>
+          updateDayCell(
+            info,
+            selectedButton,
+            formattedSelectedDates,
+            scheduledDates,
+            reservedDates
+          )
+        }
+        dateClick={(info) => {
+          if (
+            !scheduledDates.includes(format(info.date, 'yyyy-MM-dd')) ||
+            selectedButton === 'register'
+          ) {
+            onDateClick(info.date);
+          }
+
+          setInitialDate(info.date);
+        }}
       />
     </FullCalendarWrapper>
   );
