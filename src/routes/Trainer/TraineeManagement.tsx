@@ -4,7 +4,6 @@ import axios from 'axios';
 
 import addBtn from '@icons/home/addbtn.svg';
 import avatar from '@icons/home/avatar.svg';
-import dropDownArrow from '@icons/hoem/dropDownArrow.svg';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import Modal from '@components/Common/Modal/Modal';
 import formatDate from 'src/utils/formatDate';
