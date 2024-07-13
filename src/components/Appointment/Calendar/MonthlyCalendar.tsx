@@ -74,16 +74,26 @@ const FullCalendarWrapper = styled.div`
     width: 60%;
     padding: 2px 3px;
     border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .fc-daygrid-day-number.active-enabled:active {
+    background-color: ${({ theme }) => theme.colors.gray200};
   }
 
   .fc-daygrid-day-number.fc-reserved-number {
     background-color: ${({ theme }) => theme.colors.main400};
     color: ${({ theme }) => theme.colors.white};
+
+    &:active {
+      background-color: ${({ theme }) => theme.colors.main500};
+    }
   }
 
   .fc-daygrid-day-number.fc-has-event-number {
     background-color: ${({ theme }) => theme.colors.gray500};
     color: ${({ theme }) => theme.colors.gray200};
+    cursor: not-allowed;
   }
 
   .fc-daygrid-day-number.fc-selected-number {
@@ -120,8 +130,12 @@ const updateDayCell = (
 
   if (!dayNumberElement) return;
 
-  if (selectedButton === null && reservedDates.includes(formattedDate)) {
-    dayNumberElement.classList.add('fc-reserved-number');
+  if (selectedButton === null) {
+    dayNumberElement.classList.add('active-enabled');
+
+    if (reservedDates.includes(formattedDate)) {
+      dayNumberElement.classList.add('fc-reserved-number');
+    }
   }
 
   if (selectedButton === 'open' && scheduledDates.includes(formattedDate)) {
