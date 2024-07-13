@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -163,6 +164,8 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   selectedDates,
   onDateClick,
 }) => {
+  const [initialDate, setInitialDate] = useState<Date>(new Date());
+
   const { scheduledDates, reservedDates } = data;
   const formattedSelectedDates = selectedDates.map((date) =>
     format(date, 'yyyy-MM-dd')
@@ -178,6 +181,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
           center: 'title',
           right: 'next',
         }}
+        initialDate={initialDate}
         fixedWeekCount={false}
         height="auto"
         dayHeaderContent={dayHeaderContent}
@@ -197,6 +201,8 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
           ) {
             onDateClick(info.date);
           }
+
+          setInitialDate(info.date);
         }}
       />
     </FullCalendarWrapper>
