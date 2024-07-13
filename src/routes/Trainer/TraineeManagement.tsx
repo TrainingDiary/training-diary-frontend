@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 
-import addBtn from '@icons/addbtn.svg';
-import avatar from '@icons/avatar.svg';
-import dropDownArrow from '@icons/dropDownArrow.svg';
+import addBtn from '@icons/home/addbtn.svg';
+import avatar from '@icons/home/avatar.svg';
+import dropDownArrow from '@icons/hoem/dropDownArrow.svg';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import Modal from '@components/Common/Modal/Modal';
 import formatDate from 'src/utils/formatDate';
@@ -35,7 +35,7 @@ const DropDownWrapper = styled.div`
     border: 1px solid ${({ theme }) => theme.colors.gray300};
     box-shadow: 0 1px 4px 0 ${({ theme }) => hexToRgba(theme.colors.black, 0.2)};
     font-size: 1.2rem;
-    background-image: url(${dropDownArrow});
+    background-image: url('/src/assets/icons/home/dropDownArrow.svg');
     background-position: 97% center;
     background-repeat: no-repeat;
     background-size: auto;
@@ -81,24 +81,12 @@ const AddButton = styled.button`
   cursor: pointer;
   transition: 0.1s;
   opacity: 0.8;
-  position: fixed;
+  line-height: 1;
 
-  max-width: 60px;
-
-  @media ${({ theme }) => theme.media.mobile} {
-    right: 30px;
-    bottom: 110px;
-  }
-  @media ${({ theme }) => theme.media.tablet} {
-    right: 30px;
-    bottom: 110px;
-  }
-  @media ${({ theme }) => theme.media.desktop} {
-    right: 0px;
-    left: 300px;
-    margin: 0 auto;
-    bottom: 110px;
-  }
+  position: sticky;
+  bottom: 80px;
+  right: 30px;
+  margin-left: auto;
 
   &:active {
     background-color: ${({ theme }) => theme.colors.main600};
@@ -135,6 +123,7 @@ const DeleteButton = styled.button`
   cursor: pointer;
   font-size: 1.6rem;
   max-height: 30px;
+  line-height: 1;
 `;
 
 const TraineeInfo = styled.div`
@@ -286,11 +275,12 @@ const TraineeManagement: React.FC = () => {
               <li>트레이니 데이터가 없습니다.</li>
             )}
           </TraineeList>
+          {/* Add button 추가 */}
+          <AddButton onClick={handleOpenInputModal}>
+            <img src={addBtn} alt="add button" />
+          </AddButton>
         </HomeLayout>
-        {/* Add button 추가 */}
-        <AddButton onClick={handleOpenInputModal}>
-          <img src={addBtn} alt="add button" />
-        </AddButton>
+
         <Modal
           title="트레이니 추가"
           type="input"
