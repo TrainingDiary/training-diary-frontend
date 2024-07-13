@@ -41,7 +41,8 @@ const Time = styled.div`
     display: none;
   }
 
-  @media (max-width: 450px) {
+  @media ${({ theme }) => theme.media.tablet},
+    ${({ theme }) => theme.media.mobile} {
     .full-time {
       display: none;
     }

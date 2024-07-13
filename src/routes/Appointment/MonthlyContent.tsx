@@ -46,25 +46,20 @@ const MonthlyContent: React.FC = () => {
   const handleButtonClick = (buttonType: string) => {
     setSelectedDates([]);
 
-    if (selectedButton === buttonType) {
-      setSelectedButton(null);
-    } else {
-      setSelectedButton(buttonType);
-    }
+    setSelectedButton((prevSelectedButton) =>
+      prevSelectedButton === buttonType ? null : buttonType
+    );
   };
 
   const handleDateClick = (date: Date) => {
     if (!selectedButton) return;
     const formattedDate = format(date, 'yyyy-MM-dd');
 
-    setSelectedDates((prevDates) => {
-      const dateExists = prevDates.includes(formattedDate);
-      if (dateExists) {
-        return prevDates.filter((date) => date !== formattedDate);
-      } else {
-        return [...prevDates, formattedDate];
-      }
-    });
+    setSelectedDates((prevDates) =>
+      prevDates.includes(formattedDate)
+        ? prevDates.filter((date) => date !== formattedDate)
+        : [...prevDates, formattedDate]
+    );
   };
 
   if (isLoading) return <div>Loading...</div>;
