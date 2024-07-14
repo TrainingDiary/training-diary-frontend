@@ -39,10 +39,14 @@ const CompleteButton = styled.button`
 `;
 
 interface MonthlyContentProps {
-  onDateSelect: (date: string) => void;
+  onDateSelect: (date: Date) => void;
+  initialDate: Date | null;
 }
 
-const MonthlyContent: React.FC<MonthlyContentProps> = ({ onDateSelect }) => {
+const MonthlyContent: React.FC<MonthlyContentProps> = ({
+  onDateSelect,
+  initialDate,
+}) => {
   const { data, isLoading, error } = useSchedules();
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
@@ -56,12 +60,12 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({ onDateSelect }) => {
   };
 
   const handleDateClick = (date: Date) => {
-    const formattedDate = format(date, 'yyyy-MM-dd');
-
     if (!selectedButton) {
-      onDateSelect(formattedDate);
+      onDateSelect(date);
       return;
     }
+
+    const formattedDate = format(date, 'yyyy-MM-dd');
 
     setSelectedDates((prevDates) =>
       prevDates.includes(formattedDate)
@@ -79,6 +83,7 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({ onDateSelect }) => {
         data={data}
         selectedButton={selectedButton}
         selectedDates={selectedDates}
+        initialDate={initialDate}
         onDateClick={handleDateClick}
       />
       <ButtonContainer

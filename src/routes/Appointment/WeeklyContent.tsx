@@ -1,11 +1,11 @@
 import React from 'react';
 
 interface WeeklyContentProps {
-  date?: string | null;
+  date?: Date | null;
 }
 
 const WeeklyContent: React.FC<WeeklyContentProps> = ({ date }) => {
-  return <div>주별 콘텐츠: {date}</div>;
+  return <div>주별 콘텐츠</div>;
 };
 
 export default WeeklyContent;
