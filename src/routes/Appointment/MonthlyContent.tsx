@@ -1,7 +1,8 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { format } from 'date-fns';
 
+import Alert from '@components/Common/Alert/Alert';
 import MonthlyCalendar from '@components/Appointment/Calendar/MonthlyCalendar';
 import ButtonContainer from '@components/Appointment/ButtonContainer';
 import TimeTableContainer from '@components/Appointment/TimeTableContainer';
@@ -50,8 +51,16 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
   const { data, isLoading, error } = useSchedules();
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
+  const [errorAlert, setErrorAlert] = useState<string>('');
 
-  const handleButtonClick = (buttonType: string) => {
+  useEffect(() => {
+    if (selectedDates.length === 0) {
+      setSelectedTimes([]);
+    }
+  }, [selectedDates]);
+
+  const onButtonClick = (buttonType: string) => {
     setSelectedDates([]);
 
     setSelectedButton((prevSelectedButton) =>
@@ -59,7 +68,7 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
     );
   };
 
-  const handleDateClick = (date: Date) => {
+  const onDateClick = (date: Date) => {
     if (!selectedButton) {
       onDateSelect(date);
       return;
@@ -74,6 +83,21 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
     );
   };
 
+  const onTimeClick = (time: string) => {
+    if (selectedButton && selectedDates.length === 0) {
+      setErrorAlert('먼저 날짜를 선택해주세요.');
+      return;
+    }
+
+    setSelectedTimes((prevTimes) =>
+      prevTimes.includes(time)
+        ? prevTimes.filter((t) => t !== time)
+        : [...prevTimes, time]
+    );
+  };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -84,19 +108,25 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
         selectedButton={selectedButton}
         selectedDates={selectedDates}
         initialDate={initialDate}
-        onDateClick={handleDateClick}
+        onDateClick={onDateClick}
       />
       <ButtonContainer
-        onButtonClick={handleButtonClick}
+        onButtonClick={onButtonClick}
         selectedButton={selectedButton}
       />
 
       {selectedButton && (
         <Fragment>
           <Divider />
-          <TimeTableContainer />
+          <TimeTableContainer
+            selectedTimes={selectedTimes}
+            onTimeClick={onTimeClick}
+          />
           <CompleteButton>시간 선택 완료</CompleteButton>
         </Fragment>
+      )}
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
       )}
     </Wrapper>
   );
