@@ -38,7 +38,11 @@ const CompleteButton = styled.button`
   }
 `;
 
-const MonthlyContent: React.FC = () => {
+interface MonthlyContentProps {
+  onDateSelect: (date: string) => void;
+}
+
+const MonthlyContent: React.FC<MonthlyContentProps> = ({ onDateSelect }) => {
   const { data, isLoading, error } = useSchedules();
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
@@ -52,8 +56,12 @@ const MonthlyContent: React.FC = () => {
   };
 
   const handleDateClick = (date: Date) => {
-    if (!selectedButton) return;
     const formattedDate = format(date, 'yyyy-MM-dd');
+
+    if (!selectedButton) {
+      onDateSelect(formattedDate);
+      return;
+    }
 
     setSelectedDates((prevDates) =>
       prevDates.includes(formattedDate)
