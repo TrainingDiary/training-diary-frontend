@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 import addBtn from '@icons/addbtn.svg';
 import avatar from '@icons/avatar.svg';
 import dropDownArrow from '@icons/dropDownArrow.svg';
-import { hexToRgba } from 'src/utils/hexToRgba';
 import Modal from '@components/Common/Modal/Modal';
+import { hexToRgba } from 'src/utils/hexToRgba';
 import formatDate from 'src/utils/formatDate';
-import { Link } from 'react-router-dom';
+import { useModal } from 'src/hooks/useModal';
 
 // Styled components
 const HomeWrapper = styled.div``;
@@ -166,8 +167,8 @@ interface TraineeDataType {
 const TraineeManagement: React.FC = () => {
   const [traineeData, setTraineeData] = useState<TraineeDataType[]>([]);
   const [sortOption, setSortOption] = useState<string>('name');
-  const [isInputModalOpen, setInputModalOpen] = useState(false);
-  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
+  const inputModal = useModal();
+  const confirmModal = useModal();
   const [selectedTraineeId, setSelectedTraineeId] = useState<number | null>(
     null
   );
@@ -216,33 +217,33 @@ const TraineeManagement: React.FC = () => {
 
   //추가 버튼 로직
   const handleOpenInputModal = () => {
-    setInputModalOpen(true);
+    inputModal.openModal();
   };
 
   const handleCloseInputModal = () => {
-    setInputModalOpen(false);
+    inputModal.closeModal();
   };
 
   const handleOpenConfirmModal = (id: number) => {
     setSelectedTraineeId(id);
-    setConfirmModalOpen(true);
+    confirmModal.openModal();
   };
 
   const handleCloseConfirmModal = () => {
     setSelectedTraineeId(null);
-    setConfirmModalOpen(false);
+    confirmModal.closeModal();
   };
 
   const handleSaveInput = (value?: string) => {
     console.log(`Saved value: ${value}`);
-    setInputModalOpen(false);
+    inputModal.closeModal();
   };
 
   const handleDeleteConfirm = () => {
     if (selectedTraineeId !== null) {
       handleDelete(selectedTraineeId);
     }
-    setConfirmModalOpen(false);
+    confirmModal.closeModal();
   };
 
   return (
@@ -294,7 +295,7 @@ const TraineeManagement: React.FC = () => {
         <Modal
           title="트레이니 추가"
           type="input"
-          isOpen={isInputModalOpen}
+          isOpen={inputModal.isOpen}
           onClose={handleCloseInputModal}
           onSave={handleSaveInput}
         >
@@ -303,7 +304,7 @@ const TraineeManagement: React.FC = () => {
         <Modal
           title="트레이니 삭제"
           type="confirm"
-          isOpen={isConfirmModalOpen}
+          isOpen={confirmModal.isOpen}
           onClose={handleCloseConfirmModal}
           onSave={handleDeleteConfirm}
           btnConfirm="삭제"
