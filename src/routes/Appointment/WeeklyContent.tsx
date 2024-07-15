@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import WeeklyCalendar from '@components/Appointment/Calendar/WeeklyCalendar';
+import WeeklyCalendar from '@components/Appointment/WeeklyCalendar';
 
 const Wrapper = styled.div`
   display: flex;
