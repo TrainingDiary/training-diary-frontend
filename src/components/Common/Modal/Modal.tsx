@@ -38,6 +38,18 @@ const Title = styled.h2`
   font-family: 'NanumSquareExtraBold';
 `;
 
+const TitleGroup = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const CloseButton = styled.button`
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+`;
+
 const ModalInputWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -79,16 +91,6 @@ const ModalCustomWrapper = styled.div`
   font-size: 1.4rem;
   color: ${({ theme }) => theme.colors.red300};
   text-align: right;
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
 `;
 
 const ButtonGroup = styled.div`
@@ -134,10 +136,13 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <ModalWrapper $isOpen={isOpen} role="dialog" aria-hidden={!isOpen}>
       <ModalContent>
-        <CloseButton onClick={onClose}>
-          <img src={closeIcon} alt="Close Icon" />
-        </CloseButton>
-        <Title>{title}</Title>
+        <TitleGroup>
+          <Title>{title}</Title>
+          <CloseButton onClick={onClose}>
+            <img src={closeIcon} alt="Close Icon" />
+          </CloseButton>
+        </TitleGroup>
+
         {type === 'input' && (
           <ModalInputWrapper>
             <ModalInput

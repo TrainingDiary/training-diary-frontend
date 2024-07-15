@@ -23,6 +23,7 @@ const Nav = styled.nav`
   box-shadow: 0 -2px 20px ${({ theme }) => hexToRgba(theme.colors.black, 0.1)};
   justify-content: space-between;
   border-radius: 20px 20px 0 0;
+  z-index: 1000;
 `;
 
 // 네비게이션 링크 스타일 정의
