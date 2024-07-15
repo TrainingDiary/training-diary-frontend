@@ -6,6 +6,7 @@ import backIcon from '@icons/header/backIcon.svg';
 import bellIcon from '@icons/header/bell.svg';
 import hamBtnIcon from '@icons/header/hamBtn.svg';
 import Drawer from './Drawer';
+import { hexToRgba } from 'src/utils/hexToRgba';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -17,6 +18,7 @@ const HeaderWrapper = styled.header`
   position: relative;
 
   padding: 20px;
+  line-height: 1;
 
   h1 {
     font-size: 2.4rem;
@@ -24,17 +26,26 @@ const HeaderWrapper = styled.header`
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
-    line-height: 1;
   }
 `;
 
 const IconWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 30px;
 `;
+
 const Icon = styled.div`
   cursor: pointer;
+  padding: 10px 13px;
+`;
+
+const BackIcon = styled.div`
+  cursor: pointer;
+  & > img {
+    padding: 10px 13px;
+    box-shadow: 0 0 10px ${({ theme }) => hexToRgba(theme.colors.gray900, 0.2)};
+    border-radius: 10px;
+  }
 `;
 
 const Header: React.FC = () => {
@@ -63,12 +74,12 @@ const Header: React.FC = () => {
     <React.Fragment>
       <HeaderWrapper>
         <IconWrapper>
-          <Icon onClick={handleBackClick}>
+          <BackIcon onClick={handleBackClick}>
             {location.pathname !== '/' &&
               location.pathname !== '/appointment' && (
                 <img src={backIcon} alt="Back" />
               )}
-          </Icon>
+          </BackIcon>
         </IconWrapper>
         <h1>트.다</h1>
         <IconWrapper>
