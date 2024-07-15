@@ -72,7 +72,7 @@ const TraineeItem = styled.li`
   }
 `;
 
-const AddButton = styled.button`
+export const AddButton = styled.button`
   background-color: ${({ theme }) => theme.colors.main400};
   padding: 15px 17px;
   border-radius: 50%;
