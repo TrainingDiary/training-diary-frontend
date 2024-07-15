@@ -162,7 +162,6 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
       <FormGroup>
         <Label>주의사항 노트:</Label>
         <TextArea
-          type="text"
           value={remark}
           onChange={(e) => setRemark(e.target.value)}
         ></TextArea>

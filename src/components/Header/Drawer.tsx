@@ -106,8 +106,10 @@ const Drawer: React.FC<DrawerProps> = ({ $isOpen, onClose, onLogout }) => {
   useEffect(() => {
     if ($isOpen) {
       document.body.style.overflow = 'hidden';
+      document.body.style.height = 'auto';
     } else {
       document.body.style.overflow = 'unset';
+      document.body.style.height = '100vh';
     }
 
     return () => {

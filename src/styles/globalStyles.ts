@@ -38,7 +38,7 @@ h1 {
 #root{
   margin: 0 auto;
   background-color: ${({ theme }) => theme.colors.white};
-  min-height: 100%;
+  height: 100%;
   position: relative;
   overflow-x: hidden;
 }
