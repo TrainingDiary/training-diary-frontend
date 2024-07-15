@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import Button from '../Button/Button';
@@ -136,7 +136,9 @@ const Modal: React.FC<ModalProps> = ({
             <ModalInput
               type="text"
               value={inputValue}
-              placeholder={children}
+              placeholder={
+                typeof children === 'string' ? children : '입력해주세요.'
+              }
               onChange={(e) => setInputValue(e.target.value)}
             />
             <ErrorMessage>ErrorMessage</ErrorMessage>
