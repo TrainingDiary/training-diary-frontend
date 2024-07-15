@@ -7,8 +7,10 @@ import Modal from '@components/Common/Modal/Modal';
 import MonthlyCalendar from '@components/Appointment/Calendar/MonthlyCalendar';
 import ButtonContainer from '@components/Appointment/ButtonContainer';
 import TimeTableContainer from '@components/Appointment/TimeTableContainer';
+import TraineeList from '@components/Appointment/TraineeList';
 import useSchedules from 'src/hooks/useSchedules';
 import useModals from 'src/hooks/useModals';
+import { traineeList } from 'src/mocks/data/traineeList';
 
 const Wrapper = styled.div`
   display: flex;
@@ -55,6 +57,9 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
+  const [selectedTraineeId, setSelectedTraineeId] = useState<number | null>(
+    null
+  );
   const [errorAlert, setErrorAlert] = useState<string>('');
 
   useEffect(() => {
@@ -130,6 +135,10 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
     setSelectedButton(null); // 리렌더링 흉내내기 (삭제예정)
   };
 
+  const onClickTrainee = (id: number) => {
+    setSelectedTraineeId(id);
+  };
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -171,6 +180,21 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
         btnConfirm="저장"
       >
         선택한 일자, 시간에 수업을 일괄 오픈할까요?
+      </Modal>
+      <Modal
+        title="수업 일괄 등록"
+        type="custom"
+        isOpen={isOpen('registerModal')}
+        onClose={() => onCloseModal('registerModal')}
+        onSave={() => onSaveModal('registerModal')}
+        btnConfirm="저장"
+      >
+        <TraineeList
+          items={traineeList}
+          selectedTraineeId={selectedTraineeId}
+          onClick={onClickTrainee}
+        />
+        저장 시 바로 적용됩니다.
       </Modal>
     </Wrapper>
   );

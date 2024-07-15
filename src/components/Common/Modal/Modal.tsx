@@ -24,7 +24,7 @@ const ModalWrapper = styled.div<{ $isOpen: boolean }>`
 const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   background: ${({ theme }) => theme.colors.white};
   padding: 20px;
   border-radius: 10px;
@@ -68,6 +68,15 @@ const ModalConfirmContent = styled.p`
   margin: 10px 0;
 `;
 
+const ModalCustomWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  font-size: 1.4rem;
+  color: ${({ theme }) => theme.colors.red300};
+  text-align: right;
+`;
+
 const CloseButton = styled.button`
   position: absolute;
   top: 10px;
@@ -87,8 +96,8 @@ const ButtonGroup = styled.div`
 // ModalProps 타입 정의
 interface ModalProps {
   title: string;
-  children?: string;
-  type: 'input' | 'confirm';
+  children?: React.ReactNode;
+  type: 'input' | 'confirm' | 'custom';
   isOpen: boolean;
   onClose: () => void;
   onSave?: (value?: string) => void;
@@ -131,7 +140,7 @@ const Modal: React.FC<ModalProps> = ({
             <ModalInput
               type="text"
               value={inputValue}
-              placeholder={children}
+              placeholder={typeof children === 'string' ? children : undefined}
               onChange={(e) => setInputValue(e.target.value)}
             />
             <ErrorMessage>ErrorMessage</ErrorMessage>
@@ -139,6 +148,9 @@ const Modal: React.FC<ModalProps> = ({
         )}
         {type === 'confirm' && (
           <ModalConfirmContent>{children}</ModalConfirmContent>
+        )}
+        {type === 'custom' && (
+          <ModalCustomWrapper>{children}</ModalCustomWrapper>
         )}
         <ButtonGroup>
           <Button $size={'small'} onClick={onClose}>
