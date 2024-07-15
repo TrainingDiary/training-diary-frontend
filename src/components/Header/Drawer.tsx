@@ -21,7 +21,7 @@ const DrawerWrapper = styled.div<{ $isOpen: boolean }>`
   display: flex;
   flex-direction: column;
   padding: 20px;
-  z-index: 1000;
+  z-index: 1002;
 `;
 
 const DrawerItem = styled(Link)`

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import Tabs from '@components/Tabs/Tabs';
 import TraineeManagement from './Trainer/TraineeManagement';
+import WorkOutManagement from './Trainer/WorkOutManagement';
 
 const Home: React.FC = () => {
   const [role, setRole] = useState<'TRAINEE' | 'TRAINER' | null>(null);
@@ -40,7 +41,7 @@ const Home: React.FC = () => {
     },
     {
       label: '운동 종류 관리',
-      content: <div>Tab 2 Content</div>,
+      content: <WorkOutManagement />,
     },
   ];
 
