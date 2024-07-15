@@ -2,10 +2,11 @@
 import { http, HttpResponse } from 'msw';
 
 import { traineeList } from './data/traineeList';
+import { workoutList } from './data/workoutList';
 
 export const handlers = [
   // 정적 파일 요청을 처리하는 핸들러 추가
-  http.get('/src/assets/icons/:file', () => {
+  http.get('/src/assets/icons/:folder/:file', () => {
     return;
   }),
   http.get(
@@ -17,5 +18,9 @@ export const handlers = [
 
   http.get('/api/pt-contracts', () => {
     return HttpResponse.json(traineeList);
+  }),
+
+  http.get('api/workout-types', () => {
+    return HttpResponse.json(workoutList);
   }),
 ];

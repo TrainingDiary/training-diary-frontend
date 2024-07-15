@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 
-import { hexToRgba } from 'src/utils/hexToRgba';
 import addBtn from '@icons/home/addbtn.svg';
 import { AddButton } from './TraineeManagement';
-import Button from '@components/Common/Button/Button';
+import Modal from '@components/Common/Modal/Modal';
+import Card from './Card';
 
-// Styled components
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -15,117 +15,91 @@ const Wrapper = styled.div`
   gap: 20px;
 `;
 
-const Card = styled.div`
-  width: 100%;
-  max-width: 400px;
-  background-color: ${({ theme }) => theme.colors.white};
-  border-radius: 10px;
-  box-shadow: 0 4px 6px ${({ theme }) => hexToRgba(theme.colors.gray900, 0.2)};
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`;
-
-const CardHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const TitleGroup = styled.div`
-  width: 100%;
-  display: flex;
-  flex-grow: 1;
-  align-items: center;
-  gap: 4px;
-  color: ${({ theme }) => theme.colors.gray900};
-`;
-
-const CardTitle = styled.p`
-  font-weight: bold;
-  font-size: 1.6rem;
-  font-family: 'NanumSquareExtraBold';
-`;
-
-const CardSubtitle = styled.span`
-  font-size: 1.2rem;
-  line-height: 1;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  width: 100%;
-
-  & > button {
-    line-height: 1;
-    font-size: 1.2rem;
-    max-width: 60px;
-  }
-`;
-
-const Divider = styled.div`
-  height: 1px;
-  background-color: ${({ theme }) => theme.colors.main500};
-  width: 100%;
-`;
-
-const CardBody = styled.div`
-  color: ${({ theme }) => theme.colors.gray700};
-  font-size: 1.3rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const Tags = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-`;
-
-const Tag = styled.span`
-  background-color: ${({ theme }) => theme.colors.gray200};
-  color: ${({ theme }) => theme.colors.main700};
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 1.1rem;
-`;
+// msw data type 정의
+interface WorkoutDataType {
+  id: number;
+  name: string;
+  target_muscle: string;
+  remark: string;
+  weight_input_required: boolean;
+  set_input_required: boolean;
+  rep_input_required: boolean;
+  time_input_required: boolean;
+  speed_input_required: boolean;
+}
 
 const WorkOutManagement: React.FC = () => {
+  const [workouts, setWorkouts] = useState<WorkoutDataType[]>([]);
+  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedWorkoutId, setSelectedWorkoutId] = useState<number | null>(
+    null
+  );
+
+  // msw 데이터 불러오기
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+      try {
+        const response = await axios.get('/api/workout-types');
+        setWorkouts(response.data);
+      } catch (error) {
+        console.error('Failed to fetch workouts', error);
+      }
+    };
+
+    fetchWorkouts();
+  }, []);
+
+  const handleOpenConfirmModal = (id: number) => {
+    setSelectedWorkoutId(id);
+    setConfirmModalOpen(true);
+  };
+
+  const handleCloseConfirmModal = () => {
+    setSelectedWorkoutId(null);
+    setConfirmModalOpen(false);
+  };
+
+  // TODO : delete api 추후 적용
+  const handleDeleteConfirm = () => {
+    if (selectedWorkoutId !== null) {
+      setWorkouts((prevWorkouts) =>
+        prevWorkouts.filter((workout) => workout.id !== selectedWorkoutId)
+      );
+    }
+    setConfirmModalOpen(false);
+  };
+
+  const getWorkoutName = (id: number | null) => {
+    if (id === null) return '';
+    const workout = workouts.find((workout) => workout.id === id);
+    return workout ? workout.name : '';
+  };
+
   return (
     <Wrapper>
-      <Card>
-        <CardHeader>
-          <TitleGroup>
-            <CardTitle>운동명</CardTitle>
-            <CardSubtitle>주요자극부위</CardSubtitle>
-          </TitleGroup>
-          <ButtonGroup>
-            <Button $size="small">삭제</Button>
-            <Button $size="small">수정</Button>
-          </ButtonGroup>
-        </CardHeader>
-        <Divider />
-        <CardBody>
-          주의 사항을 입력해주는 곳인데 무엇을 적어야 할까요? 길어진면 언제까지
-          보여져야 할까요? 지금 더 길어지면 어떻게 보여지는지 테스트 합니다.
-        </CardBody>
-        <Tags>
-          <Tag>#무게</Tag>
-          <Tag>#속도</Tag>
-          <Tag>#시간</Tag>
-          <Tag>#세트횟수</Tag>
-        </Tags>
-      </Card>
+      {workouts.map((workout) => (
+        <Card
+          key={workout.id}
+          workout={workout}
+          onDelete={handleOpenConfirmModal}
+          onEdit={() => console.log('Edit workout', workout.id)}
+        />
+      ))}
       {/* Add button 추가 */}
       <AddButton>
         <img src={addBtn} alt="add button" />
       </AddButton>
+      <Modal
+        title="운동 종류 삭제"
+        type="confirm"
+        isOpen={isConfirmModalOpen}
+        onClose={handleCloseConfirmModal}
+        onSave={handleDeleteConfirm}
+        btnConfirm="삭제"
+      >
+        {selectedWorkoutId &&
+          `'${getWorkoutName(selectedWorkoutId)}' 를(을) 삭제하겠습니까?`}
+      </Modal>
     </Wrapper>
   );
 };
