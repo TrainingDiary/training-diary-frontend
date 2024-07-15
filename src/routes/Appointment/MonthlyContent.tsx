@@ -3,10 +3,12 @@ import styled from 'styled-components';
 import { format } from 'date-fns';
 
 import Alert from '@components/Common/Alert/Alert';
+import Modal from '@components/Common/Modal/Modal';
 import MonthlyCalendar from '@components/Appointment/Calendar/MonthlyCalendar';
 import ButtonContainer from '@components/Appointment/ButtonContainer';
 import TimeTableContainer from '@components/Appointment/TimeTableContainer';
 import useSchedules from 'src/hooks/useSchedules';
+import useModals from 'src/hooks/useModals';
 
 const Wrapper = styled.div`
   display: flex;
@@ -49,6 +51,7 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
   initialDate,
 }) => {
   const { data, isLoading, error } = useSchedules();
+  const { openModal, closeModal, isOpen } = useModals();
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
@@ -98,6 +101,35 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
 
   const onCloseErrorAlert = () => setErrorAlert('');
 
+  const onCompleteClick = () => {
+    if (selectedButton === 'open') {
+      openModal('openModal');
+    } else if (selectedButton === 'register') {
+      openModal('registerModal');
+    }
+  };
+
+  const onCloseModal = (modalName: string) => {
+    if (modalName === 'openModal') {
+      closeModal('openModal');
+    } else if (modalName === 'registerModal') {
+      closeModal('registerModal');
+    }
+  };
+
+  const onSaveModal = (modalName: string) => {
+    closeModal(modalName);
+
+    if (modalName === 'openModal') {
+      // 수업 일괄 오픈 API 요청 단계 추가 (추후 react-query 이용한 refetch)
+    } else if (modalName === 'registerModal') {
+      // 수업 일괄 등록 API 요청 단계 추가 (추후 react-query 이용한 refetch)
+    }
+
+    setSelectedDates([]); // 리렌더링 흉내내기 (삭제예정)
+    setSelectedButton(null); // 리렌더링 흉내내기 (삭제예정)
+  };
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -122,12 +154,24 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
             selectedTimes={selectedTimes}
             onTimeClick={onTimeClick}
           />
-          <CompleteButton>시간 선택 완료</CompleteButton>
+          <CompleteButton onClick={onCompleteClick}>
+            시간 선택 완료
+          </CompleteButton>
         </Fragment>
       )}
       {errorAlert && (
         <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
       )}
+      <Modal
+        title="수업 일괄 오픈"
+        type="confirm"
+        isOpen={isOpen('openModal')}
+        onClose={() => onCloseModal('openModal')}
+        onSave={() => onSaveModal('openModal')}
+        btnConfirm="저장"
+      >
+        선택한 일자, 시간에 수업을 일괄 오픈할까요?
+      </Modal>
     </Wrapper>
   );
 };

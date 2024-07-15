@@ -13,6 +13,7 @@ const useSchedules = () => {
   useEffect(() => {
     const getSchedules = () => {
       try {
+        console.log('api조회');
         // 스케줄 목록 조회 API 단계 추가 (현재는 더미 데이터 사용)
 
         const scheduled: string[] = [];
