@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import avatar from '@icons/avatar.svg';
+import avatar from '@icons/home/avatar.svg';
 
 const TraineeListWrapper = styled.ul`
   width: 100%;
