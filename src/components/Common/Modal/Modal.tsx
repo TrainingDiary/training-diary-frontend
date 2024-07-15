@@ -24,7 +24,7 @@ const ModalWrapper = styled.div<{ $isOpen: boolean }>`
 const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
   background: ${({ theme }) => theme.colors.white};
   padding: 20px;
   border-radius: 10px;
@@ -66,12 +66,16 @@ const ModalConfirmContent = styled.p`
   color: ${({ theme }) => theme.colors.red400};
   font-size: 1.4rem;
   margin: 10px 0;
+
+  @media ${({ theme }) => theme.media.mobile} {
+    font-size: 1.3rem;
+  }
 `;
 
 const ModalCustomWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
   font-size: 1.4rem;
   color: ${({ theme }) => theme.colors.red300};
   text-align: right;
