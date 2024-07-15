@@ -6,7 +6,11 @@ const useSchedules = () => {
   const [data, setData] = useState<{
     scheduledDates: string[];
     reservedDates: string[];
-  }>({ scheduledDates: [], reservedDates: [] });
+    reservedAndAppliedDates: {
+      startDate: string;
+      notAllowedTimes: string[];
+    }[];
+  }>({ scheduledDates: [], reservedDates: [], reservedAndAppliedDates: [] });
   const [isLoading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
@@ -18,14 +22,33 @@ const useSchedules = () => {
 
         const scheduled: string[] = [];
         const reserved: string[] = [];
+        const reservedAndApplied: {
+          startDate: string;
+          notAllowedTimes: string[];
+        }[] = [];
 
         scheduleList.forEach((schedule) => {
           if (schedule.existReserved) reserved.push(schedule.startDate);
 
+          reservedAndApplied.push({
+            startDate: schedule.startDate,
+            notAllowedTimes: schedule.details
+              .filter(
+                (detail) =>
+                  detail.status === 'RESERVED' ||
+                  detail.status === 'RESERVE_APPLIED'
+              )
+              .map((detail) => detail.startTime),
+          });
+
           scheduled.push(schedule.startDate);
         });
 
-        setData({ scheduledDates: scheduled, reservedDates: reserved });
+        setData({
+          scheduledDates: scheduled,
+          reservedDates: reserved,
+          reservedAndAppliedDates: reservedAndApplied,
+        });
       } catch (error: unknown) {
         setError(error instanceof Error ? error.message : 'Unknown error');
       } finally {
