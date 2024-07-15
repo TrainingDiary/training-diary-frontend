@@ -93,7 +93,7 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
 
   const onTimeClick = (time: string) => {
     if (selectedButton && selectedDates.length === 0) {
-      setErrorAlert('먼저 날짜를 선택해주세요.');
+      setErrorAlert('날짜를 먼저 선택해주세요.');
       return;
     }
 
@@ -115,16 +115,10 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
   };
 
   const onCloseModal = (modalName: string) => {
-    if (modalName === 'openModal') {
-      closeModal('openModal');
-    } else if (modalName === 'registerModal') {
-      closeModal('registerModal');
-    }
+    closeModal(modalName);
   };
 
   const onSaveModal = (modalName: string) => {
-    closeModal(modalName);
-
     if (modalName === 'openModal') {
       // 수업 일괄 오픈 API 요청 단계 추가 (추후 react-query 이용한 refetch)
     } else if (modalName === 'registerModal') {
@@ -160,6 +154,9 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
         <Fragment>
           <Divider />
           <TimeTableContainer
+            reservedAndAppliedDates={data.reservedAndAppliedDates}
+            selectedButton={selectedButton}
+            selectedDates={selectedDates}
             selectedTimes={selectedTimes}
             onTimeClick={onTimeClick}
           />

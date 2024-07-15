@@ -180,7 +180,8 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
 
     if (
       selectedButton === null ||
-      (selectedButton !== null && !scheduledDates.includes(formattedDate))
+      selectedButton === 'register' ||
+      (selectedButton == 'open' && !scheduledDates.includes(formattedDate))
     ) {
       onDateClick(info.date);
       setCurrentDate(info.date);
