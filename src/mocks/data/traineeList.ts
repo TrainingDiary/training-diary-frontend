@@ -10,7 +10,7 @@ export const traineeList = [
   {
     ptContractId: 2,
     totalSessionUpdatedAt: '2024-07-10T06:17:57.598',
-    totalSession: 15,
+    totalSession: 150,
     trainerId: 2,
     traineeId: 2,
     traineeName: '나수강',

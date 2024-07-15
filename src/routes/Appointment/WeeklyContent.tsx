@@ -1,6 +1,10 @@
 import React from 'react';
 
-const WeeklyContent: React.FC = () => {
+interface WeeklyContentProps {
+  date?: Date | null;
+}
+
+const WeeklyContent: React.FC<WeeklyContentProps> = ({}) => {
   return <div>주별 콘텐츠</div>;
 };
 

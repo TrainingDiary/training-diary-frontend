@@ -78,6 +78,19 @@ const ModalConfirmContent = styled.p`
   color: ${({ theme }) => theme.colors.red400};
   font-size: 1.4rem;
   margin: 10px 0;
+
+  @media ${({ theme }) => theme.media.mobile} {
+    font-size: 1.3rem;
+  }
+`;
+
+const ModalCustomWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 1.4rem;
+  color: ${({ theme }) => theme.colors.red300};
+  text-align: right;
 `;
 
 const ButtonGroup = styled.div`
@@ -90,7 +103,7 @@ const ButtonGroup = styled.div`
 interface ModalProps {
   title: string;
   children?: React.ReactNode;
-  type: 'input' | 'confirm';
+  type: 'input' | 'confirm' | 'custom';
   isOpen: boolean;
   onClose: () => void;
   onSave?: (value?: string) => void;
@@ -118,7 +131,6 @@ const Modal: React.FC<ModalProps> = ({
     if (onSave) {
       onSave(inputValue);
     }
-    onClose();
   };
 
   return (
@@ -136,9 +148,7 @@ const Modal: React.FC<ModalProps> = ({
             <ModalInput
               type="text"
               value={inputValue}
-              placeholder={
-                typeof children === 'string' ? children : '입력해주세요.'
-              }
+              placeholder={typeof children === 'string' ? children : undefined}
               onChange={(e) => setInputValue(e.target.value)}
             />
             <ErrorMessage>ErrorMessage</ErrorMessage>
@@ -146,6 +156,9 @@ const Modal: React.FC<ModalProps> = ({
         )}
         {type === 'confirm' && (
           <ModalConfirmContent>{children}</ModalConfirmContent>
+        )}
+        {type === 'custom' && (
+          <ModalCustomWrapper>{children}</ModalCustomWrapper>
         )}
         <ButtonGroup>
           <Button $size={'small'} onClick={onClose}>

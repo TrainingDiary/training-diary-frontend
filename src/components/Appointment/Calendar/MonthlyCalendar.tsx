@@ -1,9 +1,9 @@
 import { useState } from 'react';
+import styled from 'styled-components';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { DayCellMountArg, DayHeaderContentArg } from '@fullcalendar/core';
-import styled from 'styled-components';
 import { format } from 'date-fns';
 
 import { hexToRgba } from 'src/utils/hexToRgba';
@@ -155,6 +155,7 @@ interface MonthlyCalendarProps {
   };
   selectedButton: string | null;
   selectedDates: string[];
+  initialDate: Date | null;
   onDateClick: (date: Date) => void;
 }
 
@@ -162,14 +163,30 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   data,
   selectedButton,
   selectedDates,
+  initialDate,
   onDateClick,
 }) => {
-  const [initialDate, setInitialDate] = useState<Date>(new Date());
+  const [currentDate, setCurrentDate] = useState<Date>(
+    initialDate || new Date()
+  );
 
   const { scheduledDates, reservedDates } = data;
   const formattedSelectedDates = selectedDates.map((date) =>
     format(date, 'yyyy-MM-dd')
   );
+
+  const handleDateClick = (info: { date: Date }) => {
+    const formattedDate = format(info.date, 'yyyy-MM-dd');
+
+    if (
+      selectedButton === null ||
+      selectedButton === 'register' ||
+      (selectedButton == 'open' && !scheduledDates.includes(formattedDate))
+    ) {
+      onDateClick(info.date);
+      setCurrentDate(info.date);
+    }
+  };
 
   return (
     <FullCalendarWrapper>
@@ -181,7 +198,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
           center: 'title',
           right: 'next',
         }}
-        initialDate={initialDate}
+        initialDate={currentDate}
         fixedWeekCount={false}
         height="auto"
         dayHeaderContent={dayHeaderContent}
@@ -194,16 +211,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
             reservedDates
           )
         }
-        dateClick={(info) => {
-          if (
-            !scheduledDates.includes(format(info.date, 'yyyy-MM-dd')) ||
-            selectedButton === 'register'
-          ) {
-            onDateClick(info.date);
-          }
-
-          setInitialDate(info.date);
-        }}
+        dateClick={handleDateClick}
       />
     </FullCalendarWrapper>
   );

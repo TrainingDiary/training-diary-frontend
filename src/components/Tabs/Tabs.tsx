@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 // Wrapper 전체 wrap 스타일 정의
@@ -64,10 +64,23 @@ interface TabItem {
 // TabsProps 타입 정의
 interface TabsProps {
   tabs: TabItem[];
+  currentIndex?: number;
+  onTabChange?: (index: number) => void;
 }
 
-const Tabs: React.FC<TabsProps> = ({ tabs }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
+const Tabs: React.FC<TabsProps> = ({ tabs, currentIndex = 0, onTabChange }) => {
+  const [activeIndex, setActiveIndex] = useState(currentIndex);
+
+  useEffect(() => {
+    setActiveIndex(currentIndex);
+  }, [currentIndex]);
+
+  const handleTabClick = (index: number) => {
+    setActiveIndex(index);
+    if (onTabChange) {
+      onTabChange(index);
+    }
+  };
 
   return (
     <Wrapper>
@@ -76,7 +89,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs }) => {
           <Tab
             key={index}
             $isActive={activeIndex === index}
-            onClick={() => setActiveIndex(index)}
+            onClick={() => handleTabClick(index)}
           >
             {tab.label}
           </Tab>
