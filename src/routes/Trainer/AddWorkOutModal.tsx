@@ -25,6 +25,17 @@ const Input = styled.input`
   width: 100%;
 `;
 
+const TextArea = styled.textarea`
+  padding: 10px;
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
+  border-radius: 5px;
+  outline: none;
+  width: 100%;
+  font-family: 'NanumSquare', 'NotoSans KR', system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+    'Open Sans', 'Helvetica Neue', sans-serif;
+`;
+
 const CheckboxGroup = styled.div`
   display: flex;
   gap: 10px;
@@ -150,11 +161,11 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
       </FormGroup>
       <FormGroup>
         <Label>주의사항 노트:</Label>
-        <Input
+        <TextArea
           type="text"
           value={remark}
           onChange={(e) => setRemark(e.target.value)}
-        />
+        ></TextArea>
       </FormGroup>
       <FormGroup>
         <Label>속성 값:</Label>

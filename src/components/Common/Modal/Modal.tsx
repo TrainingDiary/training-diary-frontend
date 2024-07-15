@@ -16,7 +16,7 @@ const ModalWrapper = styled.div<{ $isOpen: boolean }>`
   display: ${({ $isOpen }) => ($isOpen ? 'flex' : 'none')};
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1003;
   max-width: 450px;
   transform: translateX(-50%);
 `;
