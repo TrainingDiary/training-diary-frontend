@@ -107,6 +107,9 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
   const onCloseErrorAlert = () => setErrorAlert('');
 
   const onCompleteClick = () => {
+    if (!selectedDates.length) return setErrorAlert('날짜를 선택해주세요.');
+    if (!selectedTimes.length) return setErrorAlert('시간을 선택해주세요.');
+
     if (selectedButton === 'open') {
       openModal('openModal');
     } else if (selectedButton === 'register') {
@@ -122,9 +125,12 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
     if (modalName === 'openModal') {
       // 수업 일괄 오픈 API 요청 단계 추가 (추후 react-query 이용한 refetch)
     } else if (modalName === 'registerModal') {
+      if (!selectedTraineeId) return setErrorAlert('트레이니를 선택해주세요.');
+
       // 수업 일괄 등록 API 요청 단계 추가 (추후 react-query 이용한 refetch)
     }
 
+    closeModal(modalName);
     setSelectedDates([]); // 리렌더링 흉내내기 (삭제예정)
     setSelectedButton(null); // 리렌더링 흉내내기 (삭제예정)
   };

@@ -235,12 +235,14 @@ const TraineeManagement: React.FC = () => {
 
   const handleSaveInput = (value?: string) => {
     console.log(`Saved value: ${value}`);
+    closeModal('addModal');
   };
 
   const handleDeleteConfirm = () => {
     if (selectedTraineeId !== null) {
       handleDelete(selectedTraineeId);
     }
+    closeModal('deleteModal');
   };
 
   return (

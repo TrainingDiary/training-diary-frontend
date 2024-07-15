@@ -129,7 +129,6 @@ const Modal: React.FC<ModalProps> = ({
     if (onSave) {
       onSave(inputValue);
     }
-    onClose();
   };
 
   return (
