@@ -39,11 +39,14 @@ const DateText = styled.span`
 `;
 
 interface WeeklyCalendarProps {
-  date?: Date | null;
+  selectedDate: Date;
+  onDateChange: (date: Date) => void;
 }
 
-const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ date }) => {
-  const [selectedDate, setSelectedDate] = useState<Date>(date || new Date());
+const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
+  selectedDate,
+  onDateChange,
+}) => {
   const [week, setWeek] = useState<Date[]>([]);
   const calendarRef = useRef<HTMLDivElement>(null);
 
@@ -77,7 +80,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ date }) => {
   };
 
   const onClickDate = (date: Date) => {
-    setSelectedDate(date);
+    onDateChange(date);
     scrollCenter(date);
   };
 
@@ -109,9 +112,23 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ date }) => {
     }
   };
 
+  const onWheelScroll = (e: WheelEvent) => {
+    if (calendarRef.current) {
+      calendarRef.current.scrollLeft += e.deltaY;
+    }
+  };
+
   useEffect(() => {
     setWeek(generateInitialMonth(selectedDate));
     setTimeout(() => scrollCenter(selectedDate, 'auto'), 0);
+
+    const calendar = calendarRef.current;
+    if (calendar) {
+      calendar.addEventListener('wheel', onWheelScroll);
+      return () => {
+        calendar.removeEventListener('wheel', onWheelScroll);
+      };
+    }
   }, []);
 
   return (
