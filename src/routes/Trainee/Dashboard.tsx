@@ -91,7 +91,7 @@ const Select = styled.select`
 const Graph = styled.div``;
 
 const Dashboard: React.FC = () => {
-  const { id } = useParams<{ id?: string }>();
+  // const { id } = useParams<{ id?: string }>();
   const [editInfo, setEditInfo] = useState(true);
 
   const [info, setInfo] = useState({
