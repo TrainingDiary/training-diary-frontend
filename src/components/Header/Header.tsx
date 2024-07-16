@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import backIcon from '@icons/header/backIcon.svg';
 import bellIcon from '@icons/header/bell.svg';
@@ -20,12 +20,18 @@ const HeaderWrapper = styled.header`
   padding: 20px;
   line-height: 1;
 
-  h1 {
+  a {
+    display: block;
     font-size: 2.4rem;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
+    text-decoration: none;
+    color: ${({ theme }) => theme.colors.gray900};
+  }
+
+  h1 {
   }
 `;
 
@@ -81,7 +87,9 @@ const Header: React.FC = () => {
               )}
           </BackIcon>
         </IconWrapper>
-        <h1>트.다</h1>
+        <Link to={'/'}>
+          <h1>트.다</h1>
+        </Link>
         <IconWrapper>
           <Icon>
             <img src={bellIcon} alt="Bell" />
