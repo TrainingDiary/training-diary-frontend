@@ -13,25 +13,28 @@ const Section = styled.div`
   border-radius: 10px;
   box-shadow: 0 4px 4px ${({ theme }) => hexToRgba(theme.colors.black, 0.25)};
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `;
 
 const SectionHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
 `;
 
 const SectionTitle = styled.h2`
   font-size: 1.6rem;
   color: ${({ theme }) => theme.colors.gray900};
+  font-family: 'NanumSquareBold';
 `;
 
 const EditButton = styled.button`
-  background: none;
+  background: ${({ theme }) => theme.colors.gray100};
   border: 1px solid ${({ theme }) => theme.colors.gray300};
   border-radius: 5px;
-  padding: 5px 10px;
+  padding: 5px 13px;
   cursor: pointer;
   font-size: 1.2rem;
   color: ${({ theme }) => theme.colors.gray900};
@@ -50,16 +53,16 @@ const InfoItem = styled.div`
 `;
 
 const Label = styled.label`
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: ${({ theme }) => theme.colors.gray900};
-  width: 150px;
+  width: 200px;
 `;
 
 const Input = styled.input<{ unit?: string }>`
   border: 1px solid ${({ theme }) => theme.colors.main500};
   border-radius: 5px;
   padding: 5px 10px;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: ${({ theme }) => theme.colors.gray900};
   width: 100%;
   max-width: 220px;
@@ -79,7 +82,7 @@ const Select = styled.select`
   border: 1px solid ${({ theme }) => theme.colors.main500};
   border-radius: 5px;
   padding: 5px 10px;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: ${({ theme }) => theme.colors.gray900};
   width: 100%;
   max-width: 220px;
