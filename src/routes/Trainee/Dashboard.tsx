@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+
 import { hexToRgba } from 'src/utils/hexToRgba';
+import weight from '@icons/dashboard/weight.svg';
+import bodyFat from '@icons/dashboard/bodyFat.svg';
+import muscleMass from '@icons/dashboard/muscleMass.svg';
 
 const Wrapper = styled.div`
   display: flex;
@@ -56,6 +60,18 @@ const Label = styled.label`
   font-size: 1.4rem;
   color: ${({ theme }) => theme.colors.gray900};
   width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  span {
+    min-width: 23px;
+    min-height: 24px;
+    display: flex;
+    background-color: ${({ theme }) => theme.colors.main200};
+    align-items: center;
+    justify-content: center;
+  }
 `;
 
 const Input = styled.input<{ unit?: string }>`
@@ -236,15 +252,30 @@ const Dashboard: React.FC = () => {
         </SectionHeader>
         <InfoGroup>
           <InfoItem>
-            <Label>몸무게</Label>
+            <Label>
+              <span>
+                <img src={weight} alt="" />
+              </span>
+              몸무게
+            </Label>
             <Input type="text" value={`${info.weight} kg`} readOnly />
           </InfoItem>
           <InfoItem>
-            <Label>체지방률</Label>
+            <Label>
+              <span>
+                <img src={bodyFat} alt="" />
+              </span>
+              체지방률
+            </Label>
             <Input type="text" value={`${info.bodyFatPercentage} %`} readOnly />
           </InfoItem>
           <InfoItem>
-            <Label>근골격량</Label>
+            <Label>
+              <span>
+                <img src={muscleMass} alt="" />
+              </span>
+              근골격량
+            </Label>
             <Input type="text" value={`${info.muscleMass} kg`} readOnly />
           </InfoItem>
         </InfoGroup>
