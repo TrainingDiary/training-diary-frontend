@@ -36,7 +36,52 @@ const WorkOutManagement: React.FC = () => {
   const [selectedWorkoutId, setSelectedWorkoutId] = useState<number | null>(
     null
   );
-  const [initialData, setInitialData] = useState<WorkoutDataType | null>(null); // 수정
+  const [formState, setFormState] = useState({
+    name: '',
+    targetMuscle: '',
+    remark: '',
+    attributes: {
+      weight: false,
+      set: false,
+      rep: false,
+      time: false,
+      speed: false,
+    },
+  });
+
+  const initialAttributesState = {
+    weight: false,
+    set: false,
+    rep: false,
+    time: false,
+    speed: false,
+  };
+
+  const initialFormState = {
+    name: '',
+    targetMuscle: '',
+    remark: '',
+    attributes: initialAttributesState,
+  };
+
+  const initializeFormState = (data: WorkoutDataType | null) => {
+    if (data) {
+      setFormState({
+        name: data.name,
+        targetMuscle: data.target_muscle,
+        remark: data.remark,
+        attributes: {
+          weight: data.weight_input_required,
+          set: data.set_input_required,
+          rep: data.rep_input_required,
+          time: data.time_input_required,
+          speed: data.speed_input_required,
+        },
+      });
+    } else {
+      setFormState(initialFormState);
+    }
+  };
 
   // msw 데이터 불러오기
   useEffect(() => {
@@ -52,7 +97,9 @@ const WorkOutManagement: React.FC = () => {
     fetchWorkouts();
   }, []);
 
+  // 추가 버튼
   const handleOpenAddModal = () => {
+    initializeFormState(null);
     openModal('addModal');
   };
 
@@ -63,10 +110,11 @@ const WorkOutManagement: React.FC = () => {
 
   // 수정 버튼
   const handleOpenEditModal = (workout: WorkoutDataType) => {
-    setInitialData(workout);
+    initializeFormState(workout);
     openModal('addModal');
   };
 
+  // 삭제 버튼
   const handleOpenDeleteModal = (id: number) => {
     setSelectedWorkoutId(id);
     openModal('deleteModal');
@@ -78,8 +126,8 @@ const WorkOutManagement: React.FC = () => {
   };
 
   // TODO : 추가 적용
-  const handleSaveInput = (value?: string) => {
-    console.log(`Saved value: ${value}`);
+  const handleSaveInput = (workout: WorkoutDataType) => {
+    console.log(`Saved workout: ${workout}`);
     closeModal('addModal');
   };
 
@@ -127,8 +175,9 @@ const WorkOutManagement: React.FC = () => {
       <AddWorkOutModal
         isOpen={isOpen('addModal')}
         onClose={handleCloseAddModal}
-        onSave={() => handleSaveInput}
-        initialData={initialData}
+        onSave={handleSaveInput}
+        formState={formState}
+        setFormState={setFormState}
       />
     </Wrapper>
   );

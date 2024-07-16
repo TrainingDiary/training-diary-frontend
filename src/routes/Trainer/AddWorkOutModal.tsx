@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import Modal from '@components/Common/Modal/Modal';
@@ -34,6 +34,8 @@ const TextArea = styled.textarea`
   font-family: 'NanumSquare', 'NotoSans KR', system-ui, -apple-system,
     BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
     'Open Sans', 'Helvetica Neue', sans-serif;
+  resize: none;
+  max-height: 90px;
 `;
 
 const CheckboxGroup = styled.div`
@@ -66,69 +68,69 @@ interface AddWorkOutModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (workout: WorkoutDataType) => void;
-  initialData?: WorkoutDataType | null; // 기존 데이터를 받을 수 있도록 수정
+  formState: {
+    name: string;
+    targetMuscle: string;
+    remark: string;
+    attributes: {
+      weight: boolean;
+      set: boolean;
+      rep: boolean;
+      time: boolean;
+      speed: boolean;
+    };
+  };
+  setFormState: React.Dispatch<
+    React.SetStateAction<{
+      name: string;
+      targetMuscle: string;
+      remark: string;
+      attributes: {
+        weight: boolean;
+        set: boolean;
+        rep: boolean;
+        time: boolean;
+        speed: boolean;
+      };
+    }>
+  >;
 }
 
 const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
   isOpen,
   onClose,
   onSave,
-  initialData = null, // 기본값을 null로 설정
+  formState,
+  setFormState,
 }) => {
-  const [name, setName] = useState('');
-  const [targetMuscle, setTargetMuscle] = useState('');
-  const [remark, setRemark] = useState('');
-  const [attributes, setAttributes] = useState({
-    weight: false,
-    set: false,
-    rep: false,
-    time: false,
-    speed: false,
-  });
+  const handleInputChange = (field: string, value: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
-  // 모달이 열릴 때 초기 데이터를 설정
-  useEffect(() => {
-    if (initialData) {
-      setName(initialData.name);
-      setTargetMuscle(initialData.target_muscle);
-      setRemark(initialData.remark);
-      setAttributes({
-        weight: initialData.weight_input_required,
-        set: initialData.set_input_required,
-        rep: initialData.rep_input_required,
-        time: initialData.time_input_required,
-        speed: initialData.speed_input_required,
-      });
-    } else {
-      // 초기화
-      setName('');
-      setTargetMuscle('');
-      setRemark('');
-      setAttributes({
-        weight: false,
-        set: false,
-        rep: false,
-        time: false,
-        speed: false,
-      });
-    }
-  }, [initialData]);
-
-  const handleAttributeChange = (attr: keyof typeof attributes) => {
-    setAttributes((prev) => ({ ...prev, [attr]: !prev[attr] }));
+  const handleAttributeChange = (attr: keyof typeof formState.attributes) => {
+    setFormState((prev) => ({
+      ...prev,
+      attributes: {
+        ...prev.attributes,
+        [attr]: !prev.attributes[attr],
+      },
+    }));
   };
 
   const handleSave = () => {
     const newWorkout: WorkoutDataType = {
-      id: initialData?.id || Date.now(), // 임시 ID 또는 기존 ID 사용
-      name,
-      target_muscle: targetMuscle,
-      remark,
-      weight_input_required: attributes.weight,
-      set_input_required: attributes.set,
-      rep_input_required: attributes.rep,
-      time_input_required: attributes.time,
-      speed_input_required: attributes.speed,
+      id: Date.now(), // 임시 ID 할당
+      name: formState.name,
+      target_muscle: formState.targetMuscle,
+      remark: formState.remark,
+      weight_input_required: formState.attributes.weight,
+      set_input_required: formState.attributes.set,
+      rep_input_required: formState.attributes.rep,
+      time_input_required: formState.attributes.time,
+      speed_input_required: formState.attributes.speed,
     };
     onSave(newWorkout);
     onClose();
@@ -136,51 +138,59 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
 
   return (
     <Modal
-      title={initialData ? '운동 종류 수정' : '운동 종류 추가'}
+      title={formState.name ? '운동 종류 수정' : '운동 종류 추가'}
       type="custom"
       isOpen={isOpen}
       onClose={onClose}
       onSave={handleSave}
-      btnConfirm={initialData ? '수정' : '추가'}
+      btnConfirm={formState.name ? '수정' : '추가'}
     >
       <FormGroup>
         <Label>운동명:</Label>
         <Input
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={formState.name}
+          onChange={(e) => handleInputChange('name', e.target.value)}
         />
       </FormGroup>
       <FormGroup>
         <Label>주요 자극 부위:</Label>
         <Input
           type="text"
-          value={targetMuscle}
-          onChange={(e) => setTargetMuscle(e.target.value)}
+          value={formState.targetMuscle}
+          onChange={(e) => handleInputChange('targetMuscle', e.target.value)}
         />
       </FormGroup>
       <FormGroup>
         <Label>주의사항 노트:</Label>
         <TextArea
-          value={remark}
-          onChange={(e) => setRemark(e.target.value)}
+          value={formState.remark}
+          onChange={(e) => handleInputChange('remark', e.target.value)}
         ></TextArea>
       </FormGroup>
       <FormGroup>
         <Label>속성 값:</Label>
         <CheckboxGroup>
-          {Object.keys(attributes).map((attr) => (
+          {Object.keys(formState.attributes).map((attr) => (
             <CheckboxLabel
               key={attr}
               className={
-                attributes[attr as keyof typeof attributes] ? 'selected' : ''
+                formState.attributes[attr as keyof typeof formState.attributes]
+                  ? 'selected'
+                  : ''
               }
             >
               <input
                 type="checkbox"
-                checked={attributes[attr as keyof typeof attributes]}
+                checked={
+                  formState.attributes[
+                    attr as keyof typeof formState.attributes
+                  ]
+                }
                 onChange={() =>
-                  handleAttributeChange(attr as keyof typeof attributes)
+                  handleAttributeChange(
+                    attr as keyof typeof formState.attributes
+                  )
                 }
               />
               {attr === 'weight' && '무게'}
