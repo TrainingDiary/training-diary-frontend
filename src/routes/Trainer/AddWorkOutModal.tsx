@@ -35,7 +35,6 @@ const TextArea = styled.textarea`
     BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
     'Open Sans', 'Helvetica Neue', sans-serif;
   resize: none;
-  max-height: 90px;
 `;
 
 const CheckboxGroup = styled.div`
