@@ -104,16 +104,17 @@ interface DrawerProps {
 
 const Drawer: React.FC<DrawerProps> = ({ $isOpen, onClose, onLogout }) => {
   useEffect(() => {
+    const $root = document.getElementById('root');
+    if (!$root) return;
     if ($isOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.height = 'auto';
+      $root.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = 'unset';
-      document.body.style.height = '100vh';
+      $root.style.overflow = 'unset';
+      $root.style.overflowX = 'hidden';
     }
-
     return () => {
-      document.body.style.overflow = 'unset';
+      $root.style.overflow = 'unset';
+      $root.style.overflowX = 'hidden';
     };
   }, [$isOpen]);
   return (
