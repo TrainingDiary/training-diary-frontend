@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-
 import { hexToRgba } from 'src/utils/hexToRgba';
 import useModals from 'src/hooks/useModals';
 import weight from '@icons/dashboard/weight.svg';
@@ -36,14 +35,19 @@ const SectionTitle = styled.h2`
   font-family: 'NanumSquareBold';
 `;
 
-const EditButton = styled.button`
-  background: ${({ theme }) => theme.colors.gray100};
-  border: 1px solid ${({ theme }) => theme.colors.gray300};
+const EditButton = styled.button<{ $editMode?: boolean }>`
+  background: ${({ theme, $editMode }) =>
+    $editMode ? theme.colors.gray100 : theme.colors.main500};
+  border: 1px solid
+    ${({ theme, $editMode }) =>
+      $editMode ? theme.colors.gray300 : theme.colors.main500};
   border-radius: 5px;
   padding: 5px 13px;
   cursor: pointer;
   font-size: 1.2rem;
-  color: ${({ theme }) => theme.colors.gray900};
+  color: ${({ theme, $editMode }) =>
+    $editMode ? theme.colors.gray900 : theme.colors.white};
+  transition: all 0.1s;
 `;
 
 const InfoGroup = styled.div`
@@ -76,8 +80,12 @@ const Label = styled.label`
   }
 `;
 
-const Input = styled.input<{ $unit?: string }>`
-  border: 1px solid ${({ theme }) => theme.colors.main500};
+const Input = styled.input<{ $unit?: string; $editMode?: boolean }>`
+  border: 1px solid
+    ${({ theme, $editMode }) =>
+      $editMode ? theme.colors.main500 : theme.colors.gray300};
+  background-color: ${({ theme, $editMode }) =>
+    $editMode ? theme.colors.white : theme.colors.gray100};
   border-radius: 5px;
   padding: 5px 10px;
   font-size: 1.4rem;
@@ -86,6 +94,8 @@ const Input = styled.input<{ $unit?: string }>`
   max-width: 220px;
   text-align: right;
   outline: none;
+  transition: border-color 0.3s;
+
   ${({ $unit }) =>
     $unit &&
     `
@@ -96,8 +106,10 @@ const Input = styled.input<{ $unit?: string }>`
   `}
 `;
 
-const Select = styled.select`
-  border: 1px solid ${({ theme }) => theme.colors.main500};
+const Select = styled.select<{ $editMode: boolean }>`
+  border: 1px solid
+    ${({ theme, $editMode }) =>
+      $editMode ? theme.colors.main500 : theme.colors.gray300};
   border-radius: 5px;
   padding: 5px 10px;
   font-size: 1.4rem;
@@ -106,6 +118,7 @@ const Select = styled.select`
   max-width: 220px;
   text-align: right;
   outline: none;
+  transition: border-color 0.3s;
 `;
 
 const Graph = styled.div``;
@@ -215,11 +228,13 @@ const Dashboard: React.FC = () => {
         <SectionHeader>
           <SectionTitle>회원 이름</SectionTitle>
           {editInfo ? (
-            <EditButton onClick={() => setEditInfo(false)}>
+            <EditButton $editMode={editInfo} onClick={() => setEditInfo(false)}>
               정보 수정
             </EditButton>
           ) : (
-            <EditButton onClick={() => setEditInfo(true)}>정보 저장</EditButton>
+            <EditButton $editMode={editInfo} onClick={() => setEditInfo(true)}>
+              정보 저장
+            </EditButton>
           )}
         </SectionHeader>
         <InfoGroup>
@@ -231,6 +246,7 @@ const Dashboard: React.FC = () => {
               value={info.count}
               readOnly={editInfo}
               onChange={handleInputChange}
+              $editMode={!editInfo}
             />
           </InfoItem>
           <InfoItem>
@@ -241,6 +257,7 @@ const Dashboard: React.FC = () => {
               value={`${info.age}(세)`}
               readOnly={editInfo}
               onChange={handleInputChange}
+              $editMode={!editInfo}
             />
           </InfoItem>
           <InfoItem>
@@ -251,6 +268,7 @@ const Dashboard: React.FC = () => {
               value={info.gender}
               readOnly={editInfo}
               onChange={handleInputChange}
+              $editMode={!editInfo}
             />
           </InfoItem>
           <InfoItem>
@@ -261,17 +279,24 @@ const Dashboard: React.FC = () => {
               value={`${info.height}(cm)`}
               readOnly={editInfo}
               onChange={handleInputChange}
+              $editMode={!editInfo}
             />
           </InfoItem>
           <InfoItem>
             <Label>목표 설정</Label>
             {editInfo ? (
-              <Input type="text" value={info.targetType} readOnly />
+              <Input
+                type="text"
+                value={info.targetType}
+                readOnly
+                $editMode={!editInfo}
+              />
             ) : (
               <Select
                 name="targetType"
                 value={info.targetType}
                 onChange={handleSelectChange}
+                $editMode={!editInfo}
               >
                 <option value="몸무게">몸무게</option>
                 <option value="체지방률">체지방률</option>
@@ -288,6 +313,7 @@ const Dashboard: React.FC = () => {
               readOnly={editInfo}
               onChange={handleInputChange}
               $unit={getUnit(info.targetType)}
+              $editMode={!editInfo}
             />
           </InfoItem>
           <InfoItem>
@@ -298,6 +324,7 @@ const Dashboard: React.FC = () => {
               value={info.targetReward}
               readOnly={editInfo}
               onChange={handleInputChange}
+              $editMode={!editInfo}
             />
           </InfoItem>
         </InfoGroup>
