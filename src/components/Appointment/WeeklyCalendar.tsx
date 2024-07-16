@@ -9,6 +9,7 @@ const CalendarWrapper = styled.div`
   overflow-x: auto;
   white-space: nowrap;
   gap: 20px;
+  padding-bottom: 10px;
 `;
 
 const CalendarItem = styled.div<{ $isSelected: boolean }>`
@@ -24,7 +25,7 @@ const CalendarItem = styled.div<{ $isSelected: boolean }>`
   background-color: ${({ theme, $isSelected }) =>
     $isSelected ? theme.colors.main600 : theme.colors.gray100};
   box-shadow: ${({ theme, $isSelected }) =>
-    $isSelected ? `0 4px 4px ${hexToRgba(theme.colors.gray600, 0.5)}` : 'none'};
+    $isSelected ? `0 4px 4px ${hexToRgba(theme.colors.main600, 0.5)}` : 'none'};
   color: ${({ theme, $isSelected }) =>
     $isSelected ? theme.colors.white : theme.colors.gray900};
   cursor: pointer;
