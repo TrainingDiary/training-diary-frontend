@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { hexToRgba } from 'src/utils/hexToRgba';
+import useModals from 'src/hooks/useModals';
 import weight from '@icons/dashboard/weight.svg';
 import bodyFat from '@icons/dashboard/bodyFat.svg';
 import muscleMass from '@icons/dashboard/muscleMass.svg';
+import InbodyModal from './InbodyModal';
 
 const Wrapper = styled.div`
   display: flex;
@@ -74,7 +76,7 @@ const Label = styled.label`
   }
 `;
 
-const Input = styled.input<{ unit?: string }>`
+const Input = styled.input<{ $unit?: string }>`
   border: 1px solid ${({ theme }) => theme.colors.main500};
   border-radius: 5px;
   padding: 5px 10px;
@@ -84,11 +86,11 @@ const Input = styled.input<{ unit?: string }>`
   max-width: 220px;
   text-align: right;
   outline: none;
-  ${({ unit }) =>
-    unit &&
+  ${({ $unit }) =>
+    $unit &&
     `
     &::after {
-      content: '${unit}';
+      content: '${$unit}';
       margin-left: 5px;
     }
   `}
@@ -108,17 +110,44 @@ const Select = styled.select`
 
 const Graph = styled.div``;
 
+export interface InbodyData {
+  date: Date;
+  weight: string;
+  bodyFatPercentage: string;
+  muscleMass: string;
+}
+
+export interface InfoData {
+  count: string;
+  age: number;
+  gender: string;
+  height: number;
+  targetType: string;
+  targetValue: number;
+  targetReward: string;
+  weight: number;
+  bodyFatPercentage: number;
+  muscleMass: number;
+}
+
 const Dashboard: React.FC = () => {
   const [editInfo, setEditInfo] = useState(true);
+  const { openModal, closeModal, isOpen } = useModals();
+  const [inbodyData, setInbodyData] = useState<InbodyData>({
+    date: new Date(),
+    weight: '',
+    bodyFatPercentage: '',
+    muscleMass: '',
+  });
 
-  const [info, setInfo] = useState({
+  const [info, setInfo] = useState<InfoData>({
     count: '15',
     age: 22,
     gender: '남',
     height: 180,
-    goal: '몸무게',
-    goalValue: 70,
-    goalReward: 'PT 횟수 1회 추가',
+    targetType: '몸무게',
+    targetValue: 70,
+    targetReward: 'PT 횟수 1회 추가',
     weight: 78,
     bodyFatPercentage: 15,
     muscleMass: 30.6,
@@ -140,8 +169,36 @@ const Dashboard: React.FC = () => {
     }));
   };
 
-  const getUnit = (goal: string) => {
-    switch (goal) {
+  const handleInbodyInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setInbodyData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleDateChange = (date: Date | null) => {
+    if (date) {
+      setInbodyData((prevData) => ({
+        ...prevData,
+        date,
+      }));
+    }
+  };
+
+  const handleSaveModal = () => {
+    // 인바디 데이터 저장 로직 추가
+    setInfo((prevInfo) => ({
+      ...prevInfo,
+      weight: parseFloat(inbodyData.weight) || 0,
+      bodyFatPercentage: parseFloat(inbodyData.bodyFatPercentage) || 0,
+      muscleMass: parseFloat(inbodyData.muscleMass) || 0,
+    }));
+    closeModal('inbodyModal');
+  };
+
+  const getUnit = (targetType: string) => {
+    switch (targetType) {
       case '체지방률':
         return '%';
       case '몸무게':
@@ -162,7 +219,7 @@ const Dashboard: React.FC = () => {
               정보 수정
             </EditButton>
           ) : (
-            <EditButton onClick={() => setEditInfo(true)}>저장</EditButton>
+            <EditButton onClick={() => setEditInfo(true)}>정보 저장</EditButton>
           )}
         </SectionHeader>
         <InfoGroup>
@@ -209,11 +266,11 @@ const Dashboard: React.FC = () => {
           <InfoItem>
             <Label>목표 설정</Label>
             {editInfo ? (
-              <Input type="text" value={info.goal} readOnly />
+              <Input type="text" value={info.targetType} readOnly />
             ) : (
               <Select
-                name="goal"
-                value={info.goal}
+                name="targetType"
+                value={info.targetType}
                 onChange={handleSelectChange}
               >
                 <option value="몸무게">몸무게</option>
@@ -226,19 +283,19 @@ const Dashboard: React.FC = () => {
             <Label>목표 수치</Label>
             <Input
               type="text"
-              name="goalValue"
-              value={info.goalValue}
+              name="targetValue"
+              value={info.targetValue}
               readOnly={editInfo}
               onChange={handleInputChange}
-              unit={getUnit(info.goal)}
+              $unit={getUnit(info.targetType)}
             />
           </InfoItem>
           <InfoItem>
             <Label>목표 보상</Label>
             <Input
               type="text"
-              name="goalReward"
-              value={info.goalReward}
+              name="targetReward"
+              value={info.targetReward}
               readOnly={editInfo}
               onChange={handleInputChange}
             />
@@ -248,13 +305,15 @@ const Dashboard: React.FC = () => {
       <Section>
         <SectionHeader>
           <SectionTitle>인바디 정보</SectionTitle>
-          <EditButton>인바디 추가</EditButton>
+          <EditButton onClick={() => openModal('inbodyModal')}>
+            인바디 추가
+          </EditButton>
         </SectionHeader>
         <InfoGroup>
           <InfoItem>
             <Label>
               <span>
-                <img src={weight} alt="" />
+                <img src={weight} alt="weight icon" />
               </span>
               몸무게
             </Label>
@@ -263,7 +322,7 @@ const Dashboard: React.FC = () => {
           <InfoItem>
             <Label>
               <span>
-                <img src={bodyFat} alt="" />
+                <img src={bodyFat} alt="bodyFat icon" />
               </span>
               체지방률
             </Label>
@@ -272,7 +331,7 @@ const Dashboard: React.FC = () => {
           <InfoItem>
             <Label>
               <span>
-                <img src={muscleMass} alt="" />
+                <img src={muscleMass} alt="muscleMass icon" />
               </span>
               근골격량
             </Label>
@@ -281,6 +340,15 @@ const Dashboard: React.FC = () => {
         </InfoGroup>
       </Section>
       <Graph>{/* TODO : Graph 구현 */}</Graph>
+
+      <InbodyModal
+        isOpen={isOpen('inbodyModal')}
+        onClose={() => closeModal('inbodyModal')}
+        onSave={handleSaveModal}
+        inbodyData={inbodyData}
+        handleDateChange={handleDateChange}
+        handleInputChange={handleInbodyInputChange}
+      />
     </Wrapper>
   );
 };
