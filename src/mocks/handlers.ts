@@ -20,7 +20,7 @@ export const handlers = [
     return HttpResponse.json(traineeList);
   }),
 
-  http.get('api/workout-types', () => {
+  http.get('/api/workout-types', () => {
     return HttpResponse.json(workoutList);
   }),
 ];

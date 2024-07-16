@@ -17,7 +17,7 @@ export const workoutList = [
     name: '스쿼트',
     target_muscle: '다리',
     remark:
-      '무릎이 발끝을 넘지 않도록 하세요. 편하게 갈 수 있는 만큼 깊이 내려가세요.',
+      '무릎이 발끝을 넘지 않도록 하세요. 편하게 갈 수 있는 만큼 깊이 내려가세요.무릎이 발끝을 넘지 않도록 하세요. 편하게 갈 수 있는 만큼 깊이 내려가세요.무릎이 발끝을 넘지 않도록 하세요. 편하게 갈 수 있는 만큼 깊이 내려가세요.',
     weight_input_required: true,
     set_input_required: true,
     rep_input_required: true,
