@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { hexToRgba } from 'src/utils/hexToRgba';
-import { useParams } from 'react-router-dom';
 
 const Wrapper = styled.div`
   display: flex;
@@ -91,7 +90,6 @@ const Select = styled.select`
 const Graph = styled.div``;
 
 const Dashboard: React.FC = () => {
-  // const { id } = useParams<{ id?: string }>();
   const [editInfo, setEditInfo] = useState(true);
 
   const [info, setInfo] = useState({
