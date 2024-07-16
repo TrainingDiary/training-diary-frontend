@@ -5,7 +5,7 @@ import Login from './Login';
 import Signup from './Signup';
 import Layout from './Layout';
 import Appointment from './Appointment/Appointment';
-import TraineeInfo from './TraineeInfo';
+import TraineeInfo from './Trainee/TraineeInfo';
 
 const router = createBrowserRouter([
   {
