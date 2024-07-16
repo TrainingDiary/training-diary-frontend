@@ -14,11 +14,11 @@ const Home: React.FC = () => {
     // 실제로는 로그인 후 role을 받아오는 로직이 필요합니다.
     const fetchUserRole = async () => {
       // 예시: 로그인 후 받아온 role
-      const userRole = 'TRAINEE'; // 'TRAINEE'로 바꾸어 테스트 가능
+      const userRole = 'TRAINER'; // 'TRAINEE'로 바꾸어 테스트 가능
       setRole(userRole as 'TRAINEE' | 'TRAINER');
 
       // 추가: TRAINEE 역할로 로그인 시 리다이렉트
-      if (userRole === 'TRAINEE') {
+      if (userRole !== 'TRAINER') {
         const userId = '1'; // 여기에 실제 사용자 ID를 설정해야 합니다.
         navigate(`/trainee/${userId}`);
       }
