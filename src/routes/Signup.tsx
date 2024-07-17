@@ -146,9 +146,8 @@ const Signup: React.FC = () => {
               label="이메일 인증"
               iconSrc={emailIcon}
               placeholder="인증코드를 입력해주세요."
-              type="text"
+              type="number"
               id="code"
-              maxLength={6}
               disabled={isCodeVerified}
               onClick={onEmailVerify}
               {...register('code', {
