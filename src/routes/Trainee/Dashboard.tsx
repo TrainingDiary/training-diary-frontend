@@ -265,7 +265,7 @@ const Dashboard: React.FC = () => {
             <Input
               type="text"
               name="age"
-              value={`${info.age} 세`}
+              value={editInfo ? `${info.age} 세` : info.age}
               readOnly={editInfo}
               onChange={handleInputChange}
               $editMode={!editInfo}
@@ -287,7 +287,7 @@ const Dashboard: React.FC = () => {
             <Input
               type="text"
               name="height"
-              value={`${info.height}cm`}
+              value={editInfo ? `${info.height} cm` : info.height}
               readOnly={editInfo}
               onChange={handleInputChange}
               $editMode={!editInfo}
@@ -320,7 +320,7 @@ const Dashboard: React.FC = () => {
             <Input
               type="text"
               name="targetValue"
-              value={info.targetValue}
+              value={`${info.targetValue} ${getUnit(info.targetType)}`}
               readOnly={editInfo}
               onChange={handleInputChange}
               $unit={getUnit(info.targetType)}
