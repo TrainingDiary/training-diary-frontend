@@ -26,6 +26,7 @@ const ScheduleTable = styled.div`
 const TimeBox = styled.div`
   display: flex;
   gap: 12.5px;
+  align-items: center;
 `;
 
 const Time = styled.span`
@@ -35,7 +36,6 @@ const Time = styled.span`
 `;
 
 const Dot = styled.span`
-  margin-top: 8px;
   width: 4px;
   height: 4px;
   background-color: ${({ theme }) => theme.colors.main600};
