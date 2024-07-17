@@ -320,7 +320,11 @@ const Dashboard: React.FC = () => {
             <Input
               type="text"
               name="targetValue"
-              value={`${info.targetValue} ${getUnit(info.targetType)}`}
+              value={
+                editInfo
+                  ? `${info.targetValue} ${getUnit(info.targetType)}`
+                  : `${info.targetValue}`
+              }
               readOnly={editInfo}
               onChange={handleInputChange}
               $unit={getUnit(info.targetType)}
