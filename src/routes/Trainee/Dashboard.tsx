@@ -78,6 +78,7 @@ const Label = styled.label`
     background-color: ${({ theme }) => theme.colors.main200};
     align-items: center;
     justify-content: center;
+    border-radius: 5px;
   }
 `;
 
@@ -90,12 +91,14 @@ const Input = styled.input<{ $unit?: string; $editMode?: boolean }>`
   border-radius: 5px;
   padding: 5px 10px;
   font-size: 1.4rem;
-  color: ${({ theme }) => theme.colors.gray900};
+  color: ${({ theme, $editMode }) =>
+    $editMode ? theme.colors.gray900 : theme.colors.gray600};
   width: 100%;
   max-width: 220px;
   text-align: right;
   outline: none;
   transition: border-color 0.3s;
+  cursor: ${({ $editMode }) => ($editMode ? 'auto' : 'not-allowed')};
 
   ${({ $unit }) =>
     $unit &&

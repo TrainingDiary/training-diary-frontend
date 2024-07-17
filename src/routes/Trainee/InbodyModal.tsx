@@ -58,6 +58,7 @@ const Input = styled.input<{ $unit?: string }>`
 
 const DatePickerWrapper = styled.div`
   width: 100%;
+  max-width: 220px;
 
   .react-datepicker__calendar-icon {
     fill: ${({ theme }) => theme.colors.main600};
