@@ -51,7 +51,6 @@ const Tab = styled.button<{ $isActive: boolean }>`
 // TabPanel 컴포넌트 스타일 정의
 const TabPanel = styled.div`
   width: 100%;
-  max-width: calc(100% - 40px);
   margin: 20px auto 90px;
 `;
 
