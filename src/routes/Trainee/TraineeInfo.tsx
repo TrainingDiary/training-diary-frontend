@@ -2,6 +2,7 @@ import React from 'react';
 
 import Tabs from '@components/Tabs/Tabs';
 import Dashboard from './Dashboard';
+import Diet from './Diet';
 
 const TraineeInfo: React.FC = () => {
   const tabs = [
@@ -15,7 +16,7 @@ const TraineeInfo: React.FC = () => {
     },
     {
       label: '식단 관리',
-      content: <div>Tab 3 Content</div>,
+      content: <Diet />,
     },
   ];
   return (
