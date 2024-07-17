@@ -135,7 +135,7 @@ export interface InbodyData {
 }
 
 export interface InfoData {
-  count: string;
+  remainingSessions: number;
   age: number;
   gender: string;
   height: number;
@@ -158,7 +158,7 @@ const Dashboard: React.FC = () => {
   });
 
   const [info, setInfo] = useState<InfoData>({
-    count: '15',
+    remainingSessions: 15,
     age: 22,
     gender: '남',
     height: 180,
@@ -243,11 +243,11 @@ const Dashboard: React.FC = () => {
         </SectionHeader>
         <InfoGroup>
           <InfoItem>
-            <Label>잔여 횟수(count)</Label>
+            <Label>잔여 횟수(remainingSessions)</Label>
             <Input
               type="text"
-              name="count"
-              value={info.count}
+              name="remainingSessions"
+              value={info.remainingSessions}
               readOnly={editInfo}
               onChange={handleInputChange}
               $editMode={!editInfo}
