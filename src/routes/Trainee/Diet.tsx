@@ -40,10 +40,8 @@ const Diet: React.FC = () => {
     if (isLoading) return;
     setLoading(true);
 
-    setTimeout(() => {
-      setImages(prevImages => [...prevImages, ...getMoreImages()]);
-      setLoading(false);
-    }, 1000);
+    setImages(prevImages => [...prevImages, ...getMoreImages()]);
+    setLoading(false);
   };
 
   useEffect(() => setImages(getMoreImages(24)), []);
