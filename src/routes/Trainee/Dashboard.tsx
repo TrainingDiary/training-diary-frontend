@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { differenceInYears } from 'date-fns';
 
 import { hexToRgba } from 'src/utils/hexToRgba';
 import useModals from 'src/hooks/useModals';
@@ -7,6 +8,7 @@ import weight from '@icons/dashboard/weight.svg';
 import bodyFat from '@icons/dashboard/bodyFat.svg';
 import muscleMass from '@icons/dashboard/muscleMass.svg';
 import InbodyModal from './InbodyModal';
+import Calendar from './Calendar';
 
 const Wrapper = styled.div`
   display: flex;
@@ -111,6 +113,36 @@ const Input = styled.input<{ $unit?: string; $editMode?: boolean }>`
   `}
 `;
 
+const TextArea = styled.textarea<{ $unit?: string; $editMode?: boolean }>`
+  border: 1px solid
+    ${({ theme, $editMode }) =>
+      $editMode ? theme.colors.main500 : theme.colors.gray300};
+  background-color: ${({ theme, $editMode }) =>
+    $editMode ? theme.colors.white : theme.colors.gray100};
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 1.4rem;
+  color: ${({ theme, $editMode }) =>
+    $editMode ? theme.colors.gray900 : theme.colors.gray600};
+  width: 100%;
+  max-width: 220px;
+  text-align: right;
+  outline: none;
+  transition: border-color 0.3s;
+  cursor: ${({ $editMode }) => ($editMode ? 'auto' : 'not-allowed')};
+  resize: none;
+  font-family: 'NanumSquare';
+
+  ${({ $unit }) =>
+    $unit &&
+    `
+    &::after {
+      content: '${$unit}';
+      margin-left: 5px;
+    }
+  `}
+`;
+
 const Select = styled.select<{ $editMode: boolean }>`
   border: 1px solid
     ${({ theme, $editMode }) =>
@@ -157,13 +189,13 @@ export interface InfoData {
 const Dashboard: React.FC = () => {
   const [editInfo, setEditInfo] = useState(true);
   const { openModal, closeModal, isOpen } = useModals();
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [inbodyData, setInbodyData] = useState<InbodyData>({
     date: new Date(),
     weight: '',
     bodyFatPercentage: '',
     muscleMass: '',
   });
-
   const [info, setInfo] = useState<InfoData>({
     remainingSessions: 15,
     age: 22,
@@ -178,6 +210,14 @@ const Dashboard: React.FC = () => {
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setInfo((prevInfo) => ({
+      ...prevInfo,
+      [name]: value,
+    }));
+  };
+
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setInfo((prevInfo) => ({
       ...prevInfo,
@@ -203,10 +243,12 @@ const Dashboard: React.FC = () => {
 
   const handleDateChange = (date: Date | null) => {
     if (date) {
-      setInbodyData((prevData) => ({
-        ...prevData,
-        date,
+      const calculatedAge = differenceInYears(new Date(), date);
+      setInfo((prevInfo) => ({
+        ...prevInfo,
+        age: calculatedAge,
       }));
+      setSelectedDate(date);
     }
   };
 
@@ -262,14 +304,20 @@ const Dashboard: React.FC = () => {
           </InfoItem>
           <InfoItem>
             <Label>나이</Label>
-            <Input
-              type="text"
-              name="age"
-              value={editInfo ? `${info.age} 세` : info.age}
-              readOnly={editInfo}
-              onChange={handleInputChange}
-              $editMode={!editInfo}
-            />
+            {editInfo ? (
+              <Input
+                type="text"
+                name="age"
+                value={`${info.age} 세`}
+                readOnly
+                $editMode={!editInfo}
+              />
+            ) : (
+              <Calendar
+                selectedDate={selectedDate}
+                onDateChange={handleDateChange}
+              />
+            )}
           </InfoItem>
           <InfoItem>
             <Label>성별</Label>
@@ -333,14 +381,13 @@ const Dashboard: React.FC = () => {
           </InfoItem>
           <InfoItem>
             <Label>목표 보상</Label>
-            <Input
-              type="text"
+            <TextArea
               name="targetReward"
               value={info.targetReward}
               readOnly={editInfo}
-              onChange={handleInputChange}
+              onChange={handleTextAreaChange}
               $editMode={!editInfo}
-            />
+            ></TextArea>
           </InfoItem>
         </InfoGroup>
       </Section>
@@ -389,7 +436,12 @@ const Dashboard: React.FC = () => {
         onClose={() => closeModal('inbodyModal')}
         onSave={handleSaveModal}
         inbodyData={inbodyData}
-        handleDateChange={handleDateChange}
+        handleDateChange={(date) =>
+          setInbodyData((prevData) => ({
+            ...prevData,
+            date: date || new Date(),
+          }))
+        }
         handleInputChange={handleInbodyInputChange}
       />
     </Wrapper>
