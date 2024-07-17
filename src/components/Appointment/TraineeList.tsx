@@ -46,8 +46,16 @@ const TraineeInfo = styled.div`
   display: flex;
   flex: 1;
   justify-content: space-between;
+  align-items: center;
   font-size: 1.6rem;
   color: ${({ theme }) => theme.colors.gray900};
+
+  span:last-child {
+    width: 104px;
+    text-align: left;
+    font-size: 1.4rem;
+    color: ${({ theme }) => theme.colors.gray600};
+  }
 `;
 
 interface TraineeDataType {

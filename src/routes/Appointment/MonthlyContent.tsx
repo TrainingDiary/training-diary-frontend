@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 
 import Alert from '@components/Common/Alert/Alert';
 import Modal from '@components/Common/Modal/Modal';
-import MonthlyCalendar from '@components/Appointment/Calendar/MonthlyCalendar';
+import MonthlyCalendar from '@components/Appointment/MonthlyCalendar';
 import ButtonContainer from '@components/Appointment/ButtonContainer';
 import TimeTableContainer from '@components/Appointment/TimeTableContainer';
 import TraineeList from '@components/Appointment/TraineeList';
