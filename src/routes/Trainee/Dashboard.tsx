@@ -11,7 +11,7 @@ import InbodyModal from './InbodyModal';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 30px;
 `;
 
 const Section = styled.div`
@@ -22,6 +22,7 @@ const Section = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+  border: solid 1px ${({ theme }) => theme.colors.gray200};
 `;
 
 const SectionHeader = styled.div`
@@ -123,6 +124,12 @@ const Select = styled.select<{ $editMode: boolean }>`
   text-align: right;
   outline: none;
   transition: border-color 0.3s;
+`;
+
+const Divider = styled.div`
+  height: 2px;
+  background-color: ${({ theme }) => theme.colors.main500};
+  width: 100%;
 `;
 
 const Graph = styled.div``;
@@ -243,7 +250,7 @@ const Dashboard: React.FC = () => {
         </SectionHeader>
         <InfoGroup>
           <InfoItem>
-            <Label>잔여 횟수(remainingSessions)</Label>
+            <Label>잔여 횟수</Label>
             <Input
               type="text"
               name="remainingSessions"
@@ -254,18 +261,18 @@ const Dashboard: React.FC = () => {
             />
           </InfoItem>
           <InfoItem>
-            <Label>나이(age)</Label>
+            <Label>나이</Label>
             <Input
               type="text"
               name="age"
-              value={`${info.age}(세)`}
+              value={`${info.age} 세`}
               readOnly={editInfo}
               onChange={handleInputChange}
               $editMode={!editInfo}
             />
           </InfoItem>
           <InfoItem>
-            <Label>성별(gender)</Label>
+            <Label>성별</Label>
             <Input
               type="text"
               name="gender"
@@ -276,11 +283,11 @@ const Dashboard: React.FC = () => {
             />
           </InfoItem>
           <InfoItem>
-            <Label>키(height)</Label>
+            <Label>키</Label>
             <Input
               type="text"
               name="height"
-              value={`${info.height}(cm)`}
+              value={`${info.height}cm`}
               readOnly={editInfo}
               onChange={handleInputChange}
               $editMode={!editInfo}
@@ -333,6 +340,7 @@ const Dashboard: React.FC = () => {
           </InfoItem>
         </InfoGroup>
       </Section>
+      <Divider />
       <Section>
         <SectionHeader>
           <SectionTitle>인바디 정보</SectionTitle>
