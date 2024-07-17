@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import homeIcon from '@icons/navigation/home.svg';
@@ -83,6 +83,7 @@ const Navigation: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(true); // 로그인 상태 관리
+  const { id } = useParams<{ id: string }>();
 
   const handleLogout = () => {
     // TODO : 로그아웃 로직 구현
@@ -93,11 +94,20 @@ const Navigation: React.FC = () => {
   return (
     <React.Fragment>
       <Nav>
-        <NavItem $isActive={location.pathname === '/'}>
+        <NavItem
+          $isActive={
+            location.pathname === '/' || location.pathname === `/trainee/${id}`
+          }
+        >
           <Link to={''}>
             <span>
               <HomeBtn
-                src={location.pathname === '/' ? activeHomeIcon : homeIcon}
+                src={
+                  location.pathname === '/' ||
+                  location.pathname === `/trainee/${id}`
+                    ? activeHomeIcon
+                    : homeIcon
+                }
                 alt="home link button"
               />
             </span>

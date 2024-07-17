@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Tabs from '@components/Tabs/Tabs';
 import TraineeManagement from './Trainer/TraineeManagement';
@@ -6,6 +7,7 @@ import WorkOutManagement from './Trainer/WorkOutManagement';
 
 const Home: React.FC = () => {
   const [role, setRole] = useState<'TRAINEE' | 'TRAINER' | null>(null);
+  const navigate = useNavigate();
 
   // 가정: role을 로그인 시 가져오는 함수
   useEffect(() => {
@@ -14,25 +16,16 @@ const Home: React.FC = () => {
       // 예시: 로그인 후 받아온 role
       const userRole = 'TRAINER'; // 'TRAINEE'로 바꾸어 테스트 가능
       setRole(userRole as 'TRAINEE' | 'TRAINER');
+
+      // 추가: TRAINEE 역할로 로그인 시 리다이렉트
+      if (userRole !== 'TRAINER') {
+        const userId = '1'; // 여기에 실제 사용자 ID를 설정해야 합니다.
+        navigate(`/trainee/${userId}`);
+      }
     };
 
     fetchUserRole();
-  }, []);
-
-  const traineeTabs = [
-    {
-      label: '대시보드',
-      content: <div>Tab 1 Content</div>,
-    },
-    {
-      label: '운동 기록',
-      content: <div>Tab 2 Content</div>,
-    },
-    {
-      label: '식단 관리',
-      content: <div>Tab 3 Content</div>,
-    },
-  ];
+  }, [navigate]);
 
   const trainerTabs = [
     {
@@ -52,7 +45,7 @@ const Home: React.FC = () => {
 
   return (
     <div>
-      <Tabs tabs={role === 'TRAINER' ? trainerTabs : traineeTabs} />
+      <Tabs tabs={trainerTabs} />
     </div>
   );
 };

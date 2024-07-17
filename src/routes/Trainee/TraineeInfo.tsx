@@ -1,12 +1,13 @@
 import React from 'react';
 
 import Tabs from '@components/Tabs/Tabs';
+import Dashboard from './Dashboard';
 
 const TraineeInfo: React.FC = () => {
   const tabs = [
     {
       label: '대시보드',
-      content: <div>Tab 1 Content</div>,
+      content: <Dashboard />,
     },
     {
       label: '운동 기록',
