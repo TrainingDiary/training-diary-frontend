@@ -186,7 +186,10 @@ const Divider = styled.div`
   width: 100%;
 `;
 
-const Graph = styled.div``;
+const Graph = styled.div`
+  position: relative;
+  width: 100%;
+`;
 
 export interface InbodyData {
   date: Date;
@@ -385,7 +388,7 @@ const Dashboard: React.FC = () => {
             <InfoItem>
               <Label>잔여 횟수</Label>
               <Input
-                type="text"
+                type="number"
                 name="remainingSessions"
                 value={info.remainingSessions}
                 readOnly={editInfo}
@@ -397,7 +400,7 @@ const Dashboard: React.FC = () => {
               <Label>나이</Label>
               {editInfo ? (
                 <Input
-                  type="text"
+                  type={editInfo ? 'text' : 'number'}
                   name="age"
                   value={`${info.age} 세`}
                   readOnly
@@ -424,7 +427,7 @@ const Dashboard: React.FC = () => {
             <InfoItem>
               <Label>키</Label>
               <Input
-                type="text"
+                type={editInfo ? 'text' : 'number'}
                 name="height"
                 value={editInfo ? `${info.height} cm` : info.height}
                 readOnly={editInfo}
@@ -457,7 +460,7 @@ const Dashboard: React.FC = () => {
             <InfoItem>
               <Label>목표 수치</Label>
               <Input
-                type="text"
+                type={editInfo ? 'text' : 'number'}
                 name="targetValue"
                 value={
                   editInfo
@@ -526,8 +529,10 @@ const Dashboard: React.FC = () => {
         </Section>
         <Graph>
           <Line
+            style={{ width: '100%', height: '100%' }}
             data={chartData}
             options={{
+              animation: false,
               responsive: true,
               plugins: {
                 legend: {

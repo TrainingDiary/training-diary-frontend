@@ -115,7 +115,7 @@ const InbodyModal: React.FC<InbodyModalProps> = ({
       <InfoItem>
         <Label>몸무게(kg)</Label>
         <Input
-          type="text"
+          type="number"
           name="weight"
           value={inbodyData.weight}
           onChange={handleInputChange}
@@ -124,7 +124,7 @@ const InbodyModal: React.FC<InbodyModalProps> = ({
       <InfoItem>
         <Label>체지방률(%)</Label>
         <Input
-          type="text"
+          type="number"
           name="bodyFatPercentage"
           value={inbodyData.bodyFatPercentage}
           onChange={handleInputChange}
@@ -133,7 +133,7 @@ const InbodyModal: React.FC<InbodyModalProps> = ({
       <InfoItem>
         <Label>근골격량(kg)</Label>
         <Input
-          type="text"
+          type="number"
           name="muscleMass"
           value={inbodyData.muscleMass}
           onChange={handleInputChange}
