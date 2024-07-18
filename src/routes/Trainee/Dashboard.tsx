@@ -154,15 +154,6 @@ const TextArea = styled.textarea<{ $unit?: string; $editMode?: boolean }>`
   cursor: ${({ $editMode }) => ($editMode ? 'auto' : 'not-allowed')};
   resize: none;
   font-family: 'NanumSquare';
-
-  ${({ $unit }) =>
-    $unit &&
-    `
-    &::after {
-      content: '${$unit}';
-      margin-left: 5px;
-    }
-  `}
 `;
 
 const Select = styled.select<{ $editMode: boolean }>`
