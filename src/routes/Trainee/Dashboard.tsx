@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { differenceInYears } from 'date-fns';
+import { differenceInYears, format } from 'date-fns';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 
 import { hexToRgba } from 'src/utils/hexToRgba';
 import useModals from 'src/hooks/useModals';
@@ -10,6 +21,16 @@ import muscleMass from '@icons/dashboard/muscleMass.svg';
 import InbodyModal from './InbodyModal';
 import Calendar from './Calendar';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
+
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const Wrapper = styled.div`
   display: flex;
@@ -209,6 +230,39 @@ const Dashboard: React.FC = () => {
     bodyFatPercentage: 15,
     muscleMass: 30.6,
   });
+  const [chartData, setChartData] = useState({
+    labels: [format(new Date(), 'MM.dd')],
+    datasets: [
+      {
+        label: '몸무게',
+        data: [78],
+        borderColor: '#FF3B3B',
+        pointBackgroundColor: '#FF3B3B',
+        fill: false,
+      },
+      {
+        label: '체지방률',
+        data: [15],
+        borderColor: '#3B98FF',
+        pointBackgroundColor: '#3B98FF',
+        fill: false,
+      },
+      {
+        label: '근골격량',
+        data: [30.6],
+        borderColor: '#ADB5BD',
+        pointBackgroundColor: '#ADB5BD',
+        fill: false,
+      },
+      {
+        label: '목표수치',
+        data: [70],
+        borderColor: '#89DAC1',
+        pointBackgroundColor: '#89DAC1',
+        fill: false,
+      },
+    ],
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -254,13 +308,42 @@ const Dashboard: React.FC = () => {
   };
 
   const handleSaveModal = () => {
-    // 인바디 데이터 저장 로직 추가
+    const formattedDate = format(inbodyData.date, 'MM.dd');
+    setChartData(prevData => ({
+      ...prevData,
+      labels: [...prevData.labels, formattedDate],
+      datasets: prevData.datasets.map(dataset => {
+        if (dataset.label === '몸무게') {
+          return {
+            ...dataset,
+            data: [...dataset.data, parseFloat(inbodyData.weight)],
+          };
+        }
+        if (dataset.label === '체지방률') {
+          return {
+            ...dataset,
+            data: [...dataset.data, parseFloat(inbodyData.bodyFatPercentage)],
+          };
+        }
+        if (dataset.label === '근골격량') {
+          return {
+            ...dataset,
+            data: [...dataset.data, parseFloat(inbodyData.muscleMass)],
+          };
+        }
+        if (dataset.label === '목표수치') {
+          return { ...dataset, data: [...dataset.data, info.targetValue] };
+        }
+        return dataset;
+      }),
+    }));
     setInfo(prevInfo => ({
       ...prevInfo,
       weight: parseFloat(inbodyData.weight) || 0,
       bodyFatPercentage: parseFloat(inbodyData.bodyFatPercentage) || 0,
       muscleMass: parseFloat(inbodyData.muscleMass) || 0,
     }));
+
     closeModal('inbodyModal');
   };
 
@@ -441,8 +524,25 @@ const Dashboard: React.FC = () => {
             </InfoItem>
           </InfoGroup>
         </Section>
-        <Graph>{/* TODO : Graph 구현 */}</Graph>
-
+        <Graph>
+          <Line
+            data={chartData}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  align: 'start',
+                  maxWidth: 100,
+                },
+                title: {
+                  display: true,
+                  text: '인바디 차트',
+                },
+              },
+            }}
+          />
+        </Graph>
         <InbodyModal
           isOpen={isOpen('inbodyModal')}
           onClose={() => closeModal('inbodyModal')}
