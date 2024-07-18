@@ -160,15 +160,21 @@ const Select = styled.select<{ $editMode: boolean }>`
   border: 1px solid
     ${({ theme, $editMode }) =>
       $editMode ? theme.colors.main500 : theme.colors.gray300};
+  background-color: ${({ theme, $editMode }) =>
+    $editMode ? theme.colors.white : theme.colors.gray100};
   border-radius: 5px;
   padding: 5px 10px;
   font-size: 1.4rem;
-  color: ${({ theme }) => theme.colors.gray900};
+  color: ${({ theme, $editMode }) =>
+    $editMode ? theme.colors.gray900 : theme.colors.gray600};
   width: 100%;
   max-width: 220px;
   text-align: right;
   outline: none;
   transition: border-color 0.3s;
+  cursor: ${({ $editMode }) => ($editMode ? 'auto' : 'not-allowed')};
+  resize: none;
+  font-family: 'NanumSquare';
 `;
 
 const Divider = styled.div`
