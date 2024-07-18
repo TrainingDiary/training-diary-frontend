@@ -529,10 +529,8 @@ const Dashboard: React.FC = () => {
         </Section>
         <Graph>
           <Line
-            style={{ width: '100%', height: '100%' }}
             data={chartData}
             options={{
-              animation: false,
               responsive: true,
               plugins: {
                 legend: {
