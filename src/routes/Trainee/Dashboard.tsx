@@ -188,7 +188,7 @@ const Divider = styled.div`
 
 const Graph = styled.div`
   position: relative;
-  width: 100%;
+  min-width: 100%;
 `;
 
 export interface InbodyData {
