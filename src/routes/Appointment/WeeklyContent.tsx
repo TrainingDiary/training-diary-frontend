@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import WeeklyCalendar from '@components/Appointment/WeeklyCalendar';
 import ScheduleDetail from '@components/Appointment/ScheduleDetail';
+import { SectionWrapper } from '@components/Common/SectionWrapper';
 
 const Wrapper = styled.div`
   display: flex;
@@ -22,10 +23,15 @@ const WeeklyContent: React.FC<WeeklyContentProps> = ({ date }) => {
   };
 
   return (
-    <Wrapper>
-      <WeeklyCalendar selectedDate={selectedDate} onDateChange={onDateChange} />
-      <ScheduleDetail selectedDate={selectedDate} />
-    </Wrapper>
+    <SectionWrapper>
+      <Wrapper>
+        <WeeklyCalendar
+          selectedDate={selectedDate}
+          onDateChange={onDateChange}
+        />
+        <ScheduleDetail selectedDate={selectedDate} />
+      </Wrapper>
+    </SectionWrapper>
   );
 };
 

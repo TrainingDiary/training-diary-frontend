@@ -44,9 +44,9 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div>
+    <React.Fragment>
       <Tabs tabs={trainerTabs} />
-    </div>
+    </React.Fragment>
   );
 };
 

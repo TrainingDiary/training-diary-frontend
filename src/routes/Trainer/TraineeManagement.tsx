@@ -9,10 +9,9 @@ import Modal from '@components/Common/Modal/Modal';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import formatDate from 'src/utils/formatDate';
 import useModals from 'src/hooks/useModals';
+import { SectionWrapper } from '@components/Common/SectionWrapper';
 
 // Styled components
-const HomeWrapper = styled.div``;
-
 const HomeLayout = styled.div`
   display: flex;
   flex-direction: column;
@@ -197,8 +196,8 @@ const TraineeManagement: React.FC = () => {
 
   // 삭제 버튼 로직
   const handleDelete = (id: number) => {
-    setTraineeData((prevData) =>
-      prevData.filter((trainee) => trainee.ptContractId !== id)
+    setTraineeData(prevData =>
+      prevData.filter(trainee => trainee.ptContractId !== id)
     );
   };
 
@@ -235,12 +234,12 @@ const TraineeManagement: React.FC = () => {
 
   return (
     <React.Fragment>
-      <HomeWrapper>
+      <SectionWrapper>
         <HomeLayout>
           {/* Dropdown for sorting options */}
           <DropDownWrapper>
             <select
-              onChange={(e) => handleSort(e.target.value)}
+              onChange={e => handleSort(e.target.value)}
               value={sortOption}
             >
               <option value="name">이름순</option>
@@ -250,7 +249,7 @@ const TraineeManagement: React.FC = () => {
           {/* Trainee list */}
           <TraineeList>
             {traineeData.length > 0 ? (
-              traineeData.map((trainee) => (
+              traineeData.map(trainee => (
                 <TraineeItem key={trainee.ptContractId}>
                   <Link to={`/trainee/${trainee.traineeId}`}>
                     <Avatar>
@@ -299,7 +298,7 @@ const TraineeManagement: React.FC = () => {
         >
           트레이니를 삭제하겠습니까?
         </Modal>
-      </HomeWrapper>
+      </SectionWrapper>
     </React.Fragment>
   );
 };

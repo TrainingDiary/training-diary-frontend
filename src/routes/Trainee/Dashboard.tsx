@@ -9,6 +9,7 @@ import bodyFat from '@icons/dashboard/bodyFat.svg';
 import muscleMass from '@icons/dashboard/muscleMass.svg';
 import InbodyModal from './InbodyModal';
 import Calendar from './Calendar';
+import { SectionWrapper } from '@components/Common/SectionWrapper';
 
 const Wrapper = styled.div`
   display: flex;
@@ -211,7 +212,7 @@ const Dashboard: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setInfo((prevInfo) => ({
+    setInfo(prevInfo => ({
       ...prevInfo,
       [name]: value,
     }));
@@ -219,7 +220,7 @@ const Dashboard: React.FC = () => {
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setInfo((prevInfo) => ({
+    setInfo(prevInfo => ({
       ...prevInfo,
       [name]: value,
     }));
@@ -227,7 +228,7 @@ const Dashboard: React.FC = () => {
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setInfo((prevInfo) => ({
+    setInfo(prevInfo => ({
       ...prevInfo,
       [name]: value,
     }));
@@ -235,7 +236,7 @@ const Dashboard: React.FC = () => {
 
   const handleInbodyInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setInbodyData((prevData) => ({
+    setInbodyData(prevData => ({
       ...prevData,
       [name]: value,
     }));
@@ -244,7 +245,7 @@ const Dashboard: React.FC = () => {
   const handleDateChange = (date: Date | null) => {
     if (date) {
       const calculatedAge = differenceInYears(new Date(), date);
-      setInfo((prevInfo) => ({
+      setInfo(prevInfo => ({
         ...prevInfo,
         age: calculatedAge,
       }));
@@ -254,7 +255,7 @@ const Dashboard: React.FC = () => {
 
   const handleSaveModal = () => {
     // 인바디 데이터 저장 로직 추가
-    setInfo((prevInfo) => ({
+    setInfo(prevInfo => ({
       ...prevInfo,
       weight: parseFloat(inbodyData.weight) || 0,
       bodyFatPercentage: parseFloat(inbodyData.bodyFatPercentage) || 0,
@@ -276,175 +277,187 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <Wrapper>
-      <Section>
-        <SectionHeader>
-          <SectionTitle>회원 이름</SectionTitle>
-          {editInfo ? (
-            <EditButton $editMode={editInfo} onClick={() => setEditInfo(false)}>
-              정보 수정
-            </EditButton>
-          ) : (
-            <EditButton $editMode={editInfo} onClick={() => setEditInfo(true)}>
-              정보 저장
-            </EditButton>
-          )}
-        </SectionHeader>
-        <InfoGroup>
-          <InfoItem>
-            <Label>잔여 횟수</Label>
-            <Input
-              type="text"
-              name="remainingSessions"
-              value={info.remainingSessions}
-              readOnly={editInfo}
-              onChange={handleInputChange}
-              $editMode={!editInfo}
-            />
-          </InfoItem>
-          <InfoItem>
-            <Label>나이</Label>
+    <SectionWrapper>
+      <Wrapper>
+        <Section>
+          <SectionHeader>
+            <SectionTitle>회원 이름</SectionTitle>
             {editInfo ? (
-              <Input
-                type="text"
-                name="age"
-                value={`${info.age} 세`}
-                readOnly
-                $editMode={!editInfo}
-              />
-            ) : (
-              <Calendar
-                selectedDate={selectedDate}
-                onDateChange={handleDateChange}
-              />
-            )}
-          </InfoItem>
-          <InfoItem>
-            <Label>성별</Label>
-            <Input
-              type="text"
-              name="gender"
-              value={info.gender}
-              readOnly={editInfo}
-              onChange={handleInputChange}
-              $editMode={!editInfo}
-            />
-          </InfoItem>
-          <InfoItem>
-            <Label>키</Label>
-            <Input
-              type="text"
-              name="height"
-              value={editInfo ? `${info.height} cm` : info.height}
-              readOnly={editInfo}
-              onChange={handleInputChange}
-              $editMode={!editInfo}
-            />
-          </InfoItem>
-          <InfoItem>
-            <Label>목표 설정</Label>
-            {editInfo ? (
-              <Input
-                type="text"
-                value={info.targetType}
-                readOnly
-                $editMode={!editInfo}
-              />
-            ) : (
-              <Select
-                name="targetType"
-                value={info.targetType}
-                onChange={handleSelectChange}
-                $editMode={!editInfo}
+              <EditButton
+                $editMode={editInfo}
+                onClick={() => setEditInfo(false)}
               >
-                <option value="몸무게">몸무게</option>
-                <option value="체지방률">체지방률</option>
-                <option value="근골격량">근골격량</option>
-              </Select>
+                정보 수정
+              </EditButton>
+            ) : (
+              <EditButton
+                $editMode={editInfo}
+                onClick={() => setEditInfo(true)}
+              >
+                정보 저장
+              </EditButton>
             )}
-          </InfoItem>
-          <InfoItem>
-            <Label>목표 수치</Label>
-            <Input
-              type="text"
-              name="targetValue"
-              value={
-                editInfo
-                  ? `${info.targetValue} ${getUnit(info.targetType)}`
-                  : `${info.targetValue}`
-              }
-              readOnly={editInfo}
-              onChange={handleInputChange}
-              $unit={getUnit(info.targetType)}
-              $editMode={!editInfo}
-            />
-          </InfoItem>
-          <InfoItem>
-            <Label>목표 보상</Label>
-            <TextArea
-              name="targetReward"
-              value={info.targetReward}
-              readOnly={editInfo}
-              onChange={handleTextAreaChange}
-              $editMode={!editInfo}
-            ></TextArea>
-          </InfoItem>
-        </InfoGroup>
-      </Section>
-      <Divider />
-      <Section>
-        <SectionHeader>
-          <SectionTitle>인바디 정보</SectionTitle>
-          <EditButton onClick={() => openModal('inbodyModal')}>
-            인바디 추가
-          </EditButton>
-        </SectionHeader>
-        <InfoGroup>
-          <InfoItem>
-            <Label>
-              <span>
-                <img src={weight} alt="weight icon" />
-              </span>
-              몸무게
-            </Label>
-            <Input type="text" value={`${info.weight} kg`} readOnly />
-          </InfoItem>
-          <InfoItem>
-            <Label>
-              <span>
-                <img src={bodyFat} alt="bodyFat icon" />
-              </span>
-              체지방률
-            </Label>
-            <Input type="text" value={`${info.bodyFatPercentage} %`} readOnly />
-          </InfoItem>
-          <InfoItem>
-            <Label>
-              <span>
-                <img src={muscleMass} alt="muscleMass icon" />
-              </span>
-              근골격량
-            </Label>
-            <Input type="text" value={`${info.muscleMass} kg`} readOnly />
-          </InfoItem>
-        </InfoGroup>
-      </Section>
-      <Graph>{/* TODO : Graph 구현 */}</Graph>
+          </SectionHeader>
+          <InfoGroup>
+            <InfoItem>
+              <Label>잔여 횟수</Label>
+              <Input
+                type="text"
+                name="remainingSessions"
+                value={info.remainingSessions}
+                readOnly={editInfo}
+                onChange={handleInputChange}
+                $editMode={!editInfo}
+              />
+            </InfoItem>
+            <InfoItem>
+              <Label>나이</Label>
+              {editInfo ? (
+                <Input
+                  type="text"
+                  name="age"
+                  value={`${info.age} 세`}
+                  readOnly
+                  $editMode={!editInfo}
+                />
+              ) : (
+                <Calendar
+                  selectedDate={selectedDate}
+                  onDateChange={handleDateChange}
+                />
+              )}
+            </InfoItem>
+            <InfoItem>
+              <Label>성별</Label>
+              <Input
+                type="text"
+                name="gender"
+                value={info.gender}
+                readOnly={editInfo}
+                onChange={handleInputChange}
+                $editMode={!editInfo}
+              />
+            </InfoItem>
+            <InfoItem>
+              <Label>키</Label>
+              <Input
+                type="text"
+                name="height"
+                value={editInfo ? `${info.height} cm` : info.height}
+                readOnly={editInfo}
+                onChange={handleInputChange}
+                $editMode={!editInfo}
+              />
+            </InfoItem>
+            <InfoItem>
+              <Label>목표 설정</Label>
+              {editInfo ? (
+                <Input
+                  type="text"
+                  value={info.targetType}
+                  readOnly
+                  $editMode={!editInfo}
+                />
+              ) : (
+                <Select
+                  name="targetType"
+                  value={info.targetType}
+                  onChange={handleSelectChange}
+                  $editMode={!editInfo}
+                >
+                  <option value="몸무게">몸무게</option>
+                  <option value="체지방률">체지방률</option>
+                  <option value="근골격량">근골격량</option>
+                </Select>
+              )}
+            </InfoItem>
+            <InfoItem>
+              <Label>목표 수치</Label>
+              <Input
+                type="text"
+                name="targetValue"
+                value={
+                  editInfo
+                    ? `${info.targetValue} ${getUnit(info.targetType)}`
+                    : `${info.targetValue}`
+                }
+                readOnly={editInfo}
+                onChange={handleInputChange}
+                $unit={getUnit(info.targetType)}
+                $editMode={!editInfo}
+              />
+            </InfoItem>
+            <InfoItem>
+              <Label>목표 보상</Label>
+              <TextArea
+                name="targetReward"
+                value={info.targetReward}
+                readOnly={editInfo}
+                onChange={handleTextAreaChange}
+                $editMode={!editInfo}
+              ></TextArea>
+            </InfoItem>
+          </InfoGroup>
+        </Section>
+        <Divider />
+        <Section>
+          <SectionHeader>
+            <SectionTitle>인바디 정보</SectionTitle>
+            <EditButton onClick={() => openModal('inbodyModal')}>
+              인바디 추가
+            </EditButton>
+          </SectionHeader>
+          <InfoGroup>
+            <InfoItem>
+              <Label>
+                <span>
+                  <img src={weight} alt="weight icon" />
+                </span>
+                몸무게
+              </Label>
+              <Input type="text" value={`${info.weight} kg`} readOnly />
+            </InfoItem>
+            <InfoItem>
+              <Label>
+                <span>
+                  <img src={bodyFat} alt="bodyFat icon" />
+                </span>
+                체지방률
+              </Label>
+              <Input
+                type="text"
+                value={`${info.bodyFatPercentage} %`}
+                readOnly
+              />
+            </InfoItem>
+            <InfoItem>
+              <Label>
+                <span>
+                  <img src={muscleMass} alt="muscleMass icon" />
+                </span>
+                근골격량
+              </Label>
+              <Input type="text" value={`${info.muscleMass} kg`} readOnly />
+            </InfoItem>
+          </InfoGroup>
+        </Section>
+        <Graph>{/* TODO : Graph 구현 */}</Graph>
 
-      <InbodyModal
-        isOpen={isOpen('inbodyModal')}
-        onClose={() => closeModal('inbodyModal')}
-        onSave={handleSaveModal}
-        inbodyData={inbodyData}
-        handleDateChange={(date) =>
-          setInbodyData((prevData) => ({
-            ...prevData,
-            date: date || new Date(),
-          }))
-        }
-        handleInputChange={handleInbodyInputChange}
-      />
-    </Wrapper>
+        <InbodyModal
+          isOpen={isOpen('inbodyModal')}
+          onClose={() => closeModal('inbodyModal')}
+          onSave={handleSaveModal}
+          inbodyData={inbodyData}
+          handleDateChange={date =>
+            setInbodyData(prevData => ({
+              ...prevData,
+              date: date || new Date(),
+            }))
+          }
+          handleInputChange={handleInbodyInputChange}
+        />
+      </Wrapper>
+    </SectionWrapper>
   );
 };
 
