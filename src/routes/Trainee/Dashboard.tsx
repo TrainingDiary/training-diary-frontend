@@ -533,11 +533,22 @@ const Dashboard: React.FC = () => {
                 legend: {
                   position: 'bottom',
                   align: 'start',
-                  maxWidth: 100,
+                  fullSize: true,
+                  labels: {
+                    boxWidth: 5,
+                    boxHeight: 5,
+                    usePointStyle: true,
+                    pointStyle: 'dot',
+                    font: {
+                      size: 12,
+                      family: 'NanumSquare',
+                    },
+                  },
                 },
                 title: {
                   display: true,
                   text: '인바디 차트',
+                  align: 'start',
                 },
               },
             }}
