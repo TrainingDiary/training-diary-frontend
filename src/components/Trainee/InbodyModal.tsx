@@ -4,7 +4,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import Modal from '@components/Common/Modal/Modal';
-import { InbodyData } from './Dashboard';
+import { InbodyData } from '../../pages/Trainee/Dashboard';
 
 interface InbodyModalProps {
   isOpen: boolean;

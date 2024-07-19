@@ -7,8 +7,8 @@ import useModals from 'src/hooks/useModals';
 import weight from '@icons/dashboard/weight.svg';
 import bodyFat from '@icons/dashboard/bodyFat.svg';
 import muscleMass from '@icons/dashboard/muscleMass.svg';
-import InbodyModal from './InbodyModal';
-import Calendar from './Calendar';
+import InbodyModal from '@components/Trainee/InbodyModal';
+import Calendar from '@components/Trainee/Calendar';
 
 const Wrapper = styled.div`
   display: flex;
@@ -211,7 +211,7 @@ const Dashboard: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setInfo((prevInfo) => ({
+    setInfo(prevInfo => ({
       ...prevInfo,
       [name]: value,
     }));
@@ -219,7 +219,7 @@ const Dashboard: React.FC = () => {
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setInfo((prevInfo) => ({
+    setInfo(prevInfo => ({
       ...prevInfo,
       [name]: value,
     }));
@@ -227,7 +227,7 @@ const Dashboard: React.FC = () => {
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setInfo((prevInfo) => ({
+    setInfo(prevInfo => ({
       ...prevInfo,
       [name]: value,
     }));
@@ -235,7 +235,7 @@ const Dashboard: React.FC = () => {
 
   const handleInbodyInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setInbodyData((prevData) => ({
+    setInbodyData(prevData => ({
       ...prevData,
       [name]: value,
     }));
@@ -244,7 +244,7 @@ const Dashboard: React.FC = () => {
   const handleDateChange = (date: Date | null) => {
     if (date) {
       const calculatedAge = differenceInYears(new Date(), date);
-      setInfo((prevInfo) => ({
+      setInfo(prevInfo => ({
         ...prevInfo,
         age: calculatedAge,
       }));
@@ -254,7 +254,7 @@ const Dashboard: React.FC = () => {
 
   const handleSaveModal = () => {
     // 인바디 데이터 저장 로직 추가
-    setInfo((prevInfo) => ({
+    setInfo(prevInfo => ({
       ...prevInfo,
       weight: parseFloat(inbodyData.weight) || 0,
       bodyFatPercentage: parseFloat(inbodyData.bodyFatPercentage) || 0,
@@ -436,8 +436,8 @@ const Dashboard: React.FC = () => {
         onClose={() => closeModal('inbodyModal')}
         onSave={handleSaveModal}
         inbodyData={inbodyData}
-        handleDateChange={(date) =>
-          setInbodyData((prevData) => ({
+        handleDateChange={date =>
+          setInbodyData(prevData => ({
             ...prevData,
             date: date || new Date(),
           }))
