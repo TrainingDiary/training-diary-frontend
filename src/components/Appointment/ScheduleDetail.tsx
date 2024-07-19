@@ -44,7 +44,7 @@ const Dot = styled.span`
 `;
 
 const InfoBox = styled.div<{
-  status: ScheduleStatus;
+  $status: ScheduleStatus;
 }>`
   display: flex;
   align-items: center;
@@ -54,8 +54,8 @@ const InfoBox = styled.div<{
   padding: 0 10px;
   border-radius: 5px;
   border: 1px solid
-    ${({ theme, status }) => {
-      switch (status) {
+    ${({ theme, $status }) => {
+      switch ($status) {
         case 'PAST':
           return theme.colors.gray400;
         case 'EMPTY':
@@ -66,8 +66,8 @@ const InfoBox = styled.div<{
           return theme.colors.gray200;
       }
     }};
-  background-color: ${({ theme, status }) => {
-    switch (status) {
+  background-color: ${({ theme, $status }) => {
+    switch ($status) {
       case 'PAST':
         return theme.colors.gray300;
       case 'EMPTY':
@@ -81,12 +81,12 @@ const InfoBox = styled.div<{
 `;
 
 const Detail = styled.span<{
-  status: ScheduleStatus;
+  $status: ScheduleStatus;
 }>`
   font-size: 1.4rem;
   font-family: 'NanumSquareBold';
-  color: ${({ theme, status }) => {
-    switch (status) {
+  color: ${({ theme, $status }) => {
+    switch ($status) {
       case 'PAST':
         return theme.colors.gray600;
       case 'EMPTY':
@@ -109,7 +109,7 @@ const ButtonBox = styled.div`
   }
 `;
 
-const StatusButton = styled.button<{ status: ScheduleStatus }>`
+const StatusButton = styled.button<{ $status: ScheduleStatus }>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -120,8 +120,8 @@ const StatusButton = styled.button<{ status: ScheduleStatus }>`
   width: 100%;
   max-width: 80px;
   white-space: nowrap;
-  background-color: ${({ theme, status }) => {
-    switch (status) {
+  background-color: ${({ theme, $status }) => {
+    switch ($status) {
       case 'PAST':
         return;
       case 'EMPTY':
@@ -134,8 +134,8 @@ const StatusButton = styled.button<{ status: ScheduleStatus }>`
         return theme.colors.gray100;
     }
   }};
-  color: ${({ theme, status }) => {
-    switch (status) {
+  color: ${({ theme, $status }) => {
+    switch ($status) {
       case 'PAST':
         return;
       case 'EMPTY':
@@ -146,8 +146,8 @@ const StatusButton = styled.button<{ status: ScheduleStatus }>`
         return theme.colors.gray600;
     }
   }};
-  border: ${({ theme, status }) => {
-    switch (status) {
+  border: ${({ theme, $status }) => {
+    switch ($status) {
       case 'PAST':
         return;
       case 'EMPTY':
@@ -160,8 +160,8 @@ const StatusButton = styled.button<{ status: ScheduleStatus }>`
   }};
 
   &:active {
-    background-color: ${({ theme, status }) => {
-      switch (status) {
+    background-color: ${({ theme, $status }) => {
+      switch ($status) {
         case 'PAST':
           return;
         case 'EMPTY':
@@ -215,12 +215,12 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
 
   const getScheduleDetail = (
     time: string
-  ): { status: ScheduleStatus; detailText: string } => {
-    let status: ScheduleStatus = 'EMPTY';
+  ): { $status: ScheduleStatus; detailText: string } => {
+    let $status: ScheduleStatus = 'EMPTY';
     let detailText: string = '';
 
     const schedule = schedules[0]?.details.find(
-      (detail) => detail.startTime === time
+      detail => detail.startTime === time
     );
 
     const timeDate = new Date(
@@ -228,23 +228,23 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
     );
 
     if (schedule) {
-      status = schedule.status;
+      $status = schedule.status;
       detailText =
         schedule.status === 'OPEN'
           ? '-'
           : `${schedule.trainerName} - ${schedule.traineeName}`;
     }
 
-    if (timeDate <= now) status = 'PAST';
+    if (timeDate <= now) $status = 'PAST';
 
     return {
-      status,
+      $status,
       detailText,
     };
   };
 
-  const getButtonText = (status: ScheduleStatus) => {
-    switch (status) {
+  const getButtonText = ($status: ScheduleStatus) => {
+    switch ($status) {
       case 'PAST':
         return;
       case 'EMPTY':
@@ -259,7 +259,7 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
   };
 
   const handleModal = (
-    status: ScheduleStatus,
+    $status: ScheduleStatus,
     action: 'open' | 'close' | 'save'
   ) => {
     const modalTypeMap: Record<ScheduleStatus, string> = {
@@ -270,7 +270,7 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
       RESERVED: 'cancelModal',
     };
 
-    const modalType = modalTypeMap[status];
+    const modalType = modalTypeMap[$status];
 
     if (modalType) {
       switch (action) {
@@ -291,26 +291,26 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
   return (
     <Wrapper>
       {times.map((time, idx) => {
-        const { status, detailText } = getScheduleDetail(time.shortTime);
+        const { $status, detailText } = getScheduleDetail(time.shortTime);
         return (
           <ScheduleTable key={idx}>
             <TimeBox>
               <Time>{time.fullTime}</Time>
               <Dot />
             </TimeBox>
-            <InfoBox status={status}>
-              <Detail status={status}>{detailText}</Detail>
-              {status !== 'PAST' && (
+            <InfoBox $status={$status}>
+              <Detail $status={$status}>{detailText}</Detail>
+              {$status !== 'PAST' && (
                 <ButtonBox>
                   <StatusButton
-                    status={status}
-                    onClick={() => handleModal(status, 'open')}
+                    $status={$status}
+                    onClick={() => handleModal($status, 'open')}
                   >
-                    {getButtonText(status)}
+                    {getButtonText($status)}
                   </StatusButton>
-                  {status === 'RESERVE_APPLIED' && (
+                  {$status === 'RESERVE_APPLIED' && (
                     <RejectButton
-                      status={status}
+                      $status={$status}
                       onClick={() => openModal('rejectModal')}
                     >
                       거절
