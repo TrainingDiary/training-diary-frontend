@@ -21,6 +21,7 @@ import muscleMass from '@icons/dashboard/muscleMass.svg';
 import InbodyModal from './InbodyModal';
 import Calendar from './Calendar';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
+import Alert from '@components/Common/Alert/Alert';
 
 Chart.register(
   CategoryScale,
@@ -264,6 +265,7 @@ const Dashboard: React.FC = () => {
       },
     ],
   });
+  const [errorAlert, setErrorAlert] = useState<string>('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -309,6 +311,23 @@ const Dashboard: React.FC = () => {
   };
 
   const handleSaveModal = () => {
+    // 필수 값 검증 로직 추가
+    const requiredFields = ['weight', 'bodyFatPercentage', 'muscleMass'];
+    for (const field of requiredFields) {
+      if (!inbodyData[field as keyof InbodyData]) {
+        switch (field) {
+          case 'weight':
+            return setErrorAlert(`몸무게를 입력해주세요`);
+          case 'bodyFatPercentage':
+            return setErrorAlert(`체지방을 입력해주세요`);
+          case 'muscleMass':
+            return setErrorAlert(`근골격량을 입력해주세요`);
+          default:
+            return '';
+        }
+      }
+    }
+
     const formattedDate = format(inbodyData.date, 'MM.dd');
     setChartData(prevData => ({
       ...prevData,
@@ -338,15 +357,53 @@ const Dashboard: React.FC = () => {
         return dataset;
       }),
     }));
+
     setInfo(prevInfo => ({
       ...prevInfo,
-      weight: parseFloat(inbodyData.weight) || 0,
-      bodyFatPercentage: parseFloat(inbodyData.bodyFatPercentage) || 0,
-      muscleMass: parseFloat(inbodyData.muscleMass) || 0,
+      weight: parseFloat(inbodyData.weight),
+      bodyFatPercentage: parseFloat(inbodyData.bodyFatPercentage),
+      muscleMass: parseFloat(inbodyData.muscleMass),
     }));
 
     closeModal('inbodyModal');
   };
+
+  const handleSaveInfo = () => {
+    // 필수 값 검증 로직 추가
+    const requiredFields = [
+      'remainingSessions',
+      'age',
+      'gender',
+      'height',
+      'targetValue',
+      'targetReward',
+    ];
+    for (const field of requiredFields) {
+      if (!info[field as keyof InfoData]) {
+        switch (field) {
+          case 'remainingSessions':
+            return setErrorAlert(`잔여 횟수를 입력해주세요`);
+          case 'age':
+            return setErrorAlert(`생년월일을 입력해주세요`);
+          case 'gender':
+            return setErrorAlert(`성별을 입력해주세요`);
+          case 'height':
+            return setErrorAlert(`키를 입력해주세요`);
+          case 'targetType':
+            return setErrorAlert(`목표 설정을 선택해주세요`);
+          case 'targetValue':
+            return setErrorAlert(`목표 수치를 입력해주세요`);
+          case 'targetReward':
+            return setErrorAlert(`목표 보상을 입력해주세요`);
+          default:
+            return '';
+        }
+      }
+    }
+    setEditInfo(true);
+  };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
 
   const getUnit = (targetType: string) => {
     switch (targetType) {
@@ -374,10 +431,7 @@ const Dashboard: React.FC = () => {
                 정보 수정
               </EditButton>
             ) : (
-              <EditButton
-                $editMode={editInfo}
-                onClick={() => setEditInfo(true)}
-              >
+              <EditButton $editMode={editInfo} onClick={handleSaveInfo}>
                 정보 저장
               </EditButton>
             )}
@@ -570,6 +624,9 @@ const Dashboard: React.FC = () => {
           handleInputChange={handleInbodyInputChange}
         />
       </Wrapper>
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
     </SectionWrapper>
   );
 };
