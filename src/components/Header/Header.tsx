@@ -7,6 +7,7 @@ import bellIcon from '@icons/header/bell.svg';
 import hamBtnIcon from '@icons/header/hamBtn.svg';
 import Drawer from './Drawer';
 import { hexToRgba } from 'src/utils/hexToRgba';
+import { user } from 'src/stores/userStore';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -76,16 +77,30 @@ const Header: React.FC = () => {
     console.log('Logged out');
   };
 
+  const shouldHideBackButton = () => {
+    if (user?.role === 'TRAINER' && location.pathname === '/trainer/trainees') {
+      return true;
+    }
+
+    if (
+      user?.role === 'TRAINEE' &&
+      location.pathname === `/trainee/${user.id}/dashboard`
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
   return (
     <React.Fragment>
       <HeaderWrapper>
         <IconWrapper>
-          <BackIcon onClick={handleBackClick}>
-            {location.pathname !== '/' &&
-              location.pathname !== '/appointment' && (
-                <img src={backIcon} alt="Back" />
-              )}
-          </BackIcon>
+          {!shouldHideBackButton() && (
+            <BackIcon onClick={handleBackClick}>
+              <img src={backIcon} alt="Back" />
+            </BackIcon>
+          )}
         </IconWrapper>
         <Link to={'/'}>
           <h1>트.다</h1>

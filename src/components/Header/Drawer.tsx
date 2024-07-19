@@ -128,7 +128,7 @@ const Drawer: React.FC<DrawerProps> = ({ $isOpen, onClose, onLogout }) => {
           <img src={homeIcon} alt="Home" />
           Home
         </DrawerItem>
-        <DrawerItem to="/appointment" onClick={onClose}>
+        <DrawerItem to="/appointment/monthly" onClick={onClose}>
           <img src={appointmentIcon} alt="Appointment" />
           Appointment
         </DrawerItem>
