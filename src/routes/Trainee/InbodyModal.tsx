@@ -59,6 +59,89 @@ const Input = styled.input<{ $unit?: string }>`
 const DatePickerWrapper = styled.div`
   width: 100%;
   max-width: 220px;
+  position: relative;
+
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+
+  .datePicker {
+    border: 1px solid ${({ theme }) => theme.colors.main500};
+    background-color: ${({ theme }) => theme.colors.white};
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 1.4rem;
+    color: ${({ theme }) => theme.colors.gray900};
+    width: 100%;
+    text-align: right;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .react-datepicker-popper[data-placement^='bottom']
+    .react-datepicker__triangle {
+    fill: #d2f1e7;
+    color: #d2f1e7;
+  }
+
+  .react-datepicker-popper {
+    width: 100%;
+  }
+
+  .react-datepicker {
+    font-family: 'NanumSquare';
+    width: 100%;
+    border-radius: 5px;
+    border: solid 1px ${({ theme }) => theme.colors.gray400};
+
+    .react-datepicker__month-container {
+      width: 100%;
+
+      .react-datepicker__header {
+        background-color: ${({ theme }) => theme.colors.main300};
+        padding: 8px;
+
+        .react-datepicker__day-names {
+          margin: 8px 0 0;
+          display: flex;
+          justify-content: space-between;
+          font-size: 1.2rem;
+        }
+      }
+
+      .react-datepicker__month {
+        margin: 10px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .react-datepicker__day--outside-month {
+          color: ${({ theme }) => theme.colors.gray500};
+        }
+
+        .react-datepicker__week {
+          display: flex;
+          justify-content: space-between;
+
+          .react-datepicker__day--today {
+            color: ${({ theme }) => theme.colors.main900};
+          }
+
+          .react-datepicker__day {
+            font-size: 1.2rem;
+            padding: 3px;
+            line-height: 1;
+            display: flex;
+            justify-content: center;
+          }
+
+          .react-datepicker__day--selected {
+            color: ${({ theme }) => theme.colors.white} !important;
+          }
+        }
+      }
+    }
+  }
 
   .react-datepicker__calendar-icon {
     fill: ${({ theme }) => theme.colors.main600};

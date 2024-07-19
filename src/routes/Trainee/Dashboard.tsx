@@ -394,7 +394,8 @@ const Dashboard: React.FC = () => {
               />
             </InfoItem>
             <InfoItem>
-              <Label>나이</Label>
+              {editInfo ? <Label>나이</Label> : <Label>생년월일</Label>}
+
               {editInfo ? (
                 <Input
                   type={editInfo ? 'text' : 'number'}
