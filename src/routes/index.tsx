@@ -1,38 +1,60 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import Home from './Home';
-import Login from './Login';
-import Signup from './Signup';
-import Layout from './Layout';
-import Appointment from './Appointment/Appointment';
-import TraineeInfo from './Trainee/TraineeInfo';
+import ProtectedRoute from './ProtectedRoute';
+import HomeRedirect from './HomeRedirect';
+import PublicRoute from './PublicRoute';
+import Layout from '@components/Layout';
+import Login from '@pages/Login/Login';
+import Signup from '@pages/Signup/Signup';
+import TrainerHome from '@pages/Trainer/TrainerHome';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Layout />,
+    element: <ProtectedRoute />,
     children: [
       {
-        path: '',
-        element: <Home />,
-      },
-      {
-        path: 'appointment',
-        element: <Appointment />,
-      },
-      {
-        path: 'trainee/:id',
-        element: <TraineeInfo />,
+        element: <Layout />,
+        children: [
+          {
+            path: '/',
+            element: <HomeRedirect />,
+          },
+          {
+            path: 'trainer/*',
+            element: <TrainerHome />,
+          },
+          // {
+          //   path: 'trainee/:traineeId/*',
+          //   element: <TraineeHome />,
+          // },
+          // {
+          //   path: 'appointment/*',
+          //   element: <AppointmentHome />,
+          // },
+        ],
       },
     ],
   },
   {
-    path: 'login',
-    element: <Login />,
+    path: '/login',
+    element: <PublicRoute />,
+    children: [
+      {
+        path: '/login',
+        element: <Login />,
+      },
+    ],
   },
   {
-    path: 'signup',
-    element: <Signup />,
+    path: '/signup',
+    element: <PublicRoute />,
+    children: [
+      {
+        path: '/signup',
+        element: <Signup />,
+      },
+    ],
   },
 ]);
 
