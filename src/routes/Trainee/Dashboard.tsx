@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { differenceInYears, format } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -188,7 +188,6 @@ const Divider = styled.div`
 const Graph = styled.div`
   position: relative;
   width: 100%;
-  max-width: min-content;
 `;
 
 export interface InbodyData {
@@ -258,7 +257,7 @@ const Dashboard: React.FC = () => {
         fill: false,
       },
       {
-        label: '목표수치',
+        label: `목표수치(${info.targetType})`,
         data: [70],
         borderColor: '#89DAC1',
         pointBackgroundColor: '#89DAC1',
@@ -267,6 +266,22 @@ const Dashboard: React.FC = () => {
     ],
   });
   const [errorAlert, setErrorAlert] = useState<string>('');
+
+  useEffect(() => {
+    setChartData(prevData => ({
+      ...prevData,
+      datasets: prevData.datasets.map(dataset => {
+        if (dataset.label.startsWith('목표수치')) {
+          return {
+            ...dataset,
+            label: `목표수치(${info.targetType})`,
+            data: Array(prevData.labels.length).fill(info.targetValue),
+          };
+        }
+        return dataset;
+      }),
+    }));
+  }, [info.targetType, info.targetValue]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -312,19 +327,18 @@ const Dashboard: React.FC = () => {
   };
 
   const handleSaveModal = () => {
-    // 필수 값 검증 로직 추가
     const requiredFields = ['weight', 'bodyFatPercentage', 'muscleMass'];
     for (const field of requiredFields) {
       if (!inbodyData[field as keyof InbodyData]) {
         switch (field) {
           case 'weight':
-            return setErrorAlert(`몸무게를 입력해주세요`);
+            return setErrorAlert('몸무게를 입력해주세요');
           case 'bodyFatPercentage':
-            return setErrorAlert(`체지방을 입력해주세요`);
+            return setErrorAlert('체지방을 입력해주세요');
           case 'muscleMass':
-            return setErrorAlert(`근골격량을 입력해주세요`);
+            return setErrorAlert('근골격량을 입력해주세요');
           default:
-            return '';
+            return;
         }
       }
     }
@@ -352,8 +366,11 @@ const Dashboard: React.FC = () => {
             data: [...dataset.data, parseFloat(inbodyData.muscleMass)],
           };
         }
-        if (dataset.label === '목표수치') {
-          return { ...dataset, data: [...dataset.data, info.targetValue] };
+        if (dataset.label.startsWith('목표수치')) {
+          return {
+            ...dataset,
+            data: [...dataset.data, info.targetValue],
+          };
         }
         return dataset;
       }),
@@ -370,7 +387,6 @@ const Dashboard: React.FC = () => {
   };
 
   const handleSaveInfo = () => {
-    // 필수 값 검증 로직 추가
     const requiredFields = [
       'remainingSessions',
       'age',
@@ -383,21 +399,21 @@ const Dashboard: React.FC = () => {
       if (!info[field as keyof InfoData]) {
         switch (field) {
           case 'remainingSessions':
-            return setErrorAlert(`잔여 횟수를 입력해주세요`);
+            return setErrorAlert('잔여 횟수를 입력해주세요');
           case 'age':
-            return setErrorAlert(`생년월일을 입력해주세요`);
+            return setErrorAlert('생년월일을 입력해주세요');
           case 'gender':
-            return setErrorAlert(`성별을 입력해주세요`);
+            return setErrorAlert('성별을 입력해주세요');
           case 'height':
-            return setErrorAlert(`키를 입력해주세요`);
+            return setErrorAlert('키를 입력해주세요');
           case 'targetType':
-            return setErrorAlert(`목표 설정을 선택해주세요`);
+            return setErrorAlert('목표 설정을 선택해주세요');
           case 'targetValue':
-            return setErrorAlert(`목표 수치를 입력해주세요`);
+            return setErrorAlert('목표 수치를 입력해주세요');
           case 'targetReward':
-            return setErrorAlert(`목표 보상을 입력해주세요`);
+            return setErrorAlert('목표 보상을 입력해주세요');
           default:
-            return '';
+            return;
         }
       }
     }
@@ -591,7 +607,6 @@ const Dashboard: React.FC = () => {
         </Section>
         <Graph>
           <Line
-            style={{ maxWidth: 'max-content' }}
             data={chartData}
             options={{
               responsive: true,
