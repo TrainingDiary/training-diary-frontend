@@ -25,6 +25,7 @@ const InfoItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 `;
 
 const Label = styled.label`
@@ -59,7 +60,6 @@ const Input = styled.input<{ $unit?: string }>`
 const DatePickerWrapper = styled.div`
   width: 100%;
   max-width: 220px;
-  position: relative;
 
   .react-datepicker-wrapper {
     width: 100%;
@@ -82,10 +82,13 @@ const DatePickerWrapper = styled.div`
     .react-datepicker__triangle {
     fill: #d2f1e7;
     color: #d2f1e7;
+    left: 80% !important;
   }
 
   .react-datepicker-popper {
     width: 100%;
+    transform: none !important;
+    top: calc(100% + 15px) !important;
   }
 
   .react-datepicker {
