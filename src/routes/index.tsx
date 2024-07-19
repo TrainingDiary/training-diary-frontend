@@ -17,6 +17,9 @@ import TraineeHome from '@pages/Trainee/TraineeHome';
 import Dashboard from '@pages/Trainee/Dashboard';
 import Session from '@pages/Trainee/Session';
 import Diet from '@pages/Trainee/Diet';
+import AppointmentHome from '@pages/Appointment/AppointmentHome';
+import MonthlyContent from '@pages/Appointment/MonthlyContent';
+import WeeklyContent from '@pages/Appointment/WeeklyContent';
 import NotFound from '@pages/NotFound';
 
 const router = createBrowserRouter([
@@ -71,10 +74,24 @@ const router = createBrowserRouter([
               },
             ],
           },
-          // {
-          //   path: 'appointment/*',
-          //   element: <AppointmentHome />,
-          // },
+          {
+            path: 'appointment',
+            element: <AppointmentHome />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to="monthly" />,
+              },
+              {
+                path: 'monthly',
+                element: <MonthlyContent />,
+              },
+              {
+                path: 'weekly/:date',
+                element: <WeeklyContent />,
+              },
+            ],
+          },
         ],
       },
     ],

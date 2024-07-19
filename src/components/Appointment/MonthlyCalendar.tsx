@@ -155,7 +155,6 @@ interface MonthlyCalendarProps {
   };
   selectedButton: string | null;
   selectedDates: string[];
-  initialDate: Date | null;
   onDateClick: (date: Date) => void;
 }
 
@@ -163,15 +162,12 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   data,
   selectedButton,
   selectedDates,
-  initialDate,
   onDateClick,
 }) => {
-  const [currentDate, setCurrentDate] = useState<Date>(
-    initialDate || new Date()
-  );
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
   const { scheduledDates, reservedDates } = data;
-  const formattedSelectedDates = selectedDates.map((date) =>
+  const formattedSelectedDates = selectedDates.map(date =>
     format(date, 'yyyy-MM-dd')
   );
 
@@ -202,7 +198,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         fixedWeekCount={false}
         height="auto"
         dayHeaderContent={dayHeaderContent}
-        dayCellDidMount={(info) =>
+        dayCellDidMount={info =>
           updateDayCell(
             info,
             selectedButton,

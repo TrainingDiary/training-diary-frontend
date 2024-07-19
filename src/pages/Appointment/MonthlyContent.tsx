@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { format } from 'date-fns';
 
@@ -43,15 +44,8 @@ const CompleteButton = styled.button`
   }
 `;
 
-interface MonthlyContentProps {
-  onDateSelect: (date: Date) => void;
-  initialDate: Date | null;
-}
-
-const MonthlyContent: React.FC<MonthlyContentProps> = ({
-  onDateSelect,
-  initialDate,
-}) => {
+const MonthlyContent: React.FC = () => {
+  const navigate = useNavigate();
   const { data, isLoading, error } = useSchedules();
   const { openModal, closeModal, isOpen } = useModals();
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
@@ -71,22 +65,22 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
   const onButtonClick = (buttonType: string) => {
     setSelectedDates([]);
 
-    setSelectedButton((prevSelectedButton) =>
+    setSelectedButton(prevSelectedButton =>
       prevSelectedButton === buttonType ? null : buttonType
     );
   };
 
   const onDateClick = (date: Date) => {
+    const formattedDate = format(date, 'yyyy-MM-dd');
+
     if (!selectedButton) {
-      onDateSelect(date);
+      navigate(`/appointment/weekly/${formattedDate}`);
       return;
     }
 
-    const formattedDate = format(date, 'yyyy-MM-dd');
-
-    setSelectedDates((prevDates) =>
+    setSelectedDates(prevDates =>
       prevDates.includes(formattedDate)
-        ? prevDates.filter((date) => date !== formattedDate)
+        ? prevDates.filter(date => date !== formattedDate)
         : [...prevDates, formattedDate]
     );
   };
@@ -97,9 +91,9 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
       return;
     }
 
-    setSelectedTimes((prevTimes) =>
+    setSelectedTimes(prevTimes =>
       prevTimes.includes(time)
-        ? prevTimes.filter((t) => t !== time)
+        ? prevTimes.filter(t => t !== time)
         : [...prevTimes, time]
     );
   };
@@ -148,7 +142,7 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
         data={data}
         selectedButton={selectedButton}
         selectedDates={selectedDates}
-        initialDate={initialDate}
+        // initialDate={initialDate}
         onDateClick={onDateClick}
       />
       <ButtonContainer
