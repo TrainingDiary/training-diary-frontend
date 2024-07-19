@@ -188,6 +188,7 @@ const Divider = styled.div`
 const Graph = styled.div`
   position: relative;
   width: 100%;
+  max-width: min-content;
 `;
 
 export interface InbodyData {
@@ -403,6 +404,16 @@ const Dashboard: React.FC = () => {
     setEditInfo(true);
   };
 
+  const handleAddInbody = () => {
+    setInbodyData({
+      date: new Date(),
+      weight: '0',
+      bodyFatPercentage: '0',
+      muscleMass: '0',
+    });
+    openModal('inbodyModal');
+  };
+
   const onCloseErrorAlert = () => setErrorAlert('');
 
   const getUnit = (targetType: string) => {
@@ -542,9 +553,7 @@ const Dashboard: React.FC = () => {
         <Section>
           <SectionHeader>
             <SectionTitle>인바디 정보</SectionTitle>
-            <EditButton onClick={() => openModal('inbodyModal')}>
-              인바디 추가
-            </EditButton>
+            <EditButton onClick={handleAddInbody}>인바디 추가</EditButton>
           </SectionHeader>
           <InfoGroup>
             <InfoItem>
@@ -582,6 +591,7 @@ const Dashboard: React.FC = () => {
         </Section>
         <Graph>
           <Line
+            style={{ maxWidth: 'max-content' }}
             data={chartData}
             options={{
               responsive: true,
