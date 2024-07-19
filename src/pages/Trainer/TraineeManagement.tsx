@@ -228,7 +228,7 @@ const TraineeManagement: React.FC = () => {
             {traineeData.length > 0 ? (
               traineeData.map(trainee => (
                 <TraineeItem key={trainee.ptContractId}>
-                  <Link to={`/trainee/${trainee.traineeId}`}>
+                  <Link to={`/trainee/${trainee.traineeId}/dashboard`}>
                     <Avatar>
                       <img src={avatar} alt="user avatar" />
                     </Avatar>

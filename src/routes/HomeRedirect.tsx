@@ -10,7 +10,7 @@ const HomeRedirect: React.FC = () => {
   if (user.role === 'TRAINER') {
     return <Navigate to="/trainer/trainees" />;
   } else if (user.role === 'TRAINEE') {
-    return <Navigate to={`/trainee/${user.id}`} />;
+    return <Navigate to={`/trainee/${user.id}/dashboard`} />;
   } else {
     return <Navigate to="/login" />;
   }
