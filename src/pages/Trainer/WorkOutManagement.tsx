@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import axios from 'axios';
 
 import addBtn from '@icons/home/addbtn.svg';
-import { AddButton } from './TraineeManagement';
 import Modal from '@components/Common/Modal/Modal';
-import Card from './Card';
+import { AddButton } from '@components/Common/AddButton';
+import Card from '@components/Trainer/Card';
+import AddWorkOutModal from '@components/Trainer/AddWorkOutModal';
 import useModals from 'src/hooks/useModals';
-import AddWorkOutModal from './AddWorkOutModal';
 
 const Wrapper = styled.div`
   display: flex;
@@ -134,8 +134,8 @@ const WorkOutManagement: React.FC = () => {
   // TODO : delete api 추후 적용
   const handleDeleteConfirm = () => {
     if (selectedWorkoutId !== null) {
-      setWorkouts((prevWorkouts) =>
-        prevWorkouts.filter((workout) => workout.id !== selectedWorkoutId)
+      setWorkouts(prevWorkouts =>
+        prevWorkouts.filter(workout => workout.id !== selectedWorkoutId)
       );
     }
     closeModal('deleteModal');
@@ -143,13 +143,13 @@ const WorkOutManagement: React.FC = () => {
 
   const getWorkoutName = (id: number | null) => {
     if (id === null) return '';
-    const workout = workouts.find((workout) => workout.id === id);
+    const workout = workouts.find(workout => workout.id === id);
     return workout ? workout.name : '';
   };
 
   return (
     <Wrapper>
-      {workouts.map((workout) => (
+      {workouts.map(workout => (
         <Card
           key={workout.id}
           workout={workout}

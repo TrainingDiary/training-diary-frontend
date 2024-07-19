@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import addBtn from '@icons/home/addbtn.svg';
 import avatar from '@icons/home/avatar.svg';
 import Modal from '@components/Common/Modal/Modal';
+import { AddButton } from '@components/Common/AddButton';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import formatDate from 'src/utils/formatDate';
 import useModals from 'src/hooks/useModals';
@@ -70,31 +71,6 @@ const TraineeItem = styled.li`
     width: 100%;
     text-decoration: none;
     flex: 1;
-  }
-`;
-
-export const AddButton = styled.button`
-  background-color: ${({ theme }) => theme.colors.main400};
-  padding: 15px 17px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  transition: 0.1s;
-  opacity: 0.8;
-  line-height: 1;
-
-  position: sticky;
-  bottom: 80px;
-  right: 30px;
-  margin-left: auto;
-
-  &:active {
-    background-color: ${({ theme }) => theme.colors.main600};
-    opacity: 1;
-  }
-
-  &:hover {
-    opacity: 1;
   }
 `;
 
@@ -197,8 +173,8 @@ const TraineeManagement: React.FC = () => {
 
   // 삭제 버튼 로직
   const handleDelete = (id: number) => {
-    setTraineeData((prevData) =>
-      prevData.filter((trainee) => trainee.ptContractId !== id)
+    setTraineeData(prevData =>
+      prevData.filter(trainee => trainee.ptContractId !== id)
     );
   };
 
@@ -240,7 +216,7 @@ const TraineeManagement: React.FC = () => {
           {/* Dropdown for sorting options */}
           <DropDownWrapper>
             <select
-              onChange={(e) => handleSort(e.target.value)}
+              onChange={e => handleSort(e.target.value)}
               value={sortOption}
             >
               <option value="name">이름순</option>
@@ -250,7 +226,7 @@ const TraineeManagement: React.FC = () => {
           {/* Trainee list */}
           <TraineeList>
             {traineeData.length > 0 ? (
-              traineeData.map((trainee) => (
+              traineeData.map(trainee => (
                 <TraineeItem key={trainee.ptContractId}>
                   <Link to={`/trainee/${trainee.traineeId}`}>
                     <Avatar>
