@@ -87,6 +87,12 @@ export const AddButton = styled.button`
   right: 30px;
   margin-left: auto;
 
+  @media (max-width: 450px) {
+    position: fixed;
+    bottom: 80px;
+    right: 30px;
+  }
+
   &:active {
     background-color: ${({ theme }) => theme.colors.main600};
     opacity: 1;
