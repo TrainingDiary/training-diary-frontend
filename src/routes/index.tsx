@@ -1,4 +1,8 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from 'react-router-dom';
 
 import ProtectedRoute from './ProtectedRoute';
 import HomeRedirect from './HomeRedirect';
@@ -7,6 +11,8 @@ import Layout from '@components/Layout';
 import Login from '@pages/Login/Login';
 import Signup from '@pages/Signup/Signup';
 import TrainerHome from '@pages/Trainer/TrainerHome';
+import TraineeManagement from '@pages/Trainer/TraineeManagement';
+import WorkOutManagement from '@pages/Trainer/WorkOutManagement';
 
 const router = createBrowserRouter([
   {
@@ -17,16 +23,31 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
           {
-            path: '/',
+            index: true,
             element: <HomeRedirect />,
           },
           {
-            path: 'trainer/*',
+            path: 'trainer',
             element: <TrainerHome />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to="trainees" />,
+              },
+              {
+                path: 'trainees',
+                element: <TraineeManagement />,
+              },
+              {
+                path: 'workouts',
+                element: <WorkOutManagement />,
+              },
+            ],
           },
           // {
           //   path: 'trainee/:traineeId/*',
           //   element: <TraineeHome />,
+
           // },
           // {
           //   path: 'appointment/*',
