@@ -1,12 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
+import addBtn from '@icons/home/addbtn.svg';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
+import { AddButton } from '@components/Common/AddButton';
+import { user } from 'src/stores/userStore';
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 30px;
+  position: relative;
+  margin-bottom: 30px;
 `;
 
 const PhotoBox = styled.div`
@@ -22,9 +28,9 @@ const RecordBox = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #0d1b2a;
+  font-size: 1.6rem;
+  font-family: 'NanumSquareBold';
+  color: ${({ theme }) => theme.colors.gray900};
 `;
 
 const ImageContainer = styled.div`
@@ -38,11 +44,11 @@ const ImageContainer = styled.div`
 
 const ImageLayout = styled.div`
   min-width: 250px;
-  background-color: #f0f0f0;
+  max-height: 150px;
+  background-color: ${({ theme }) => theme.colors.white};
   display: flex;
   justify-content: center;
   align-items: center;
-  max-height: 150px;
 `;
 
 const Image = styled.img`
@@ -51,7 +57,13 @@ const Image = styled.img`
 `;
 
 const RecordList = styled.div`
-  border-top: 1px solid #000;
+  border-top: solid 2px ${({ theme }) => theme.colors.main500};
+  font-size: 1.4rem;
+
+  a {
+    text-decoration: none;
+    color: ${({ theme }) => theme.colors.gray900};
+  }
 `;
 
 const RecordItem = styled.div`
@@ -62,14 +74,15 @@ const RecordItem = styled.div`
 `;
 
 interface Session {
-  date: string;
-  count: number;
+  sessionDate: string;
+  sessionNumber: number;
+  sessionId: number;
 }
 
 const sessions: Session[] = [
-  { date: '2024. 00. 00', count: 3 },
-  { date: '2024. 00. 00', count: 2 },
-  { date: '2024. 00. 00', count: 1 },
+  { sessionDate: '2024. 00. 00', sessionNumber: 3, sessionId: 3 },
+  { sessionDate: '2024. 00. 00', sessionNumber: 2, sessionId: 2 },
+  { sessionDate: '2024. 00. 00', sessionNumber: 1, sessionId: 1 },
 ];
 
 const Session: React.FC = () => {
@@ -160,14 +173,21 @@ const Session: React.FC = () => {
           <SectionTitle>운동 기록 목록</SectionTitle>
           <RecordList>
             {sessions.map((session, index) => (
-              <RecordItem key={index}>
-                <div>{session.date}</div>
-                <div>{session.count}회차</div>
-              </RecordItem>
+              <Link to={`${session.sessionId}`}>
+                <RecordItem key={index}>
+                  <div>{session.sessionDate}</div>
+                  <div>{session.sessionNumber}회차</div>
+                </RecordItem>
+              </Link>
             ))}
           </RecordList>
         </RecordBox>
       </Wrapper>
+      {user?.role === 'TRAINER' ? (
+        <AddButton>
+          <img src={addBtn} alt="add button" />
+        </AddButton>
+      ) : null}
     </SectionWrapper>
   );
 };

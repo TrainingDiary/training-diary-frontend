@@ -22,6 +22,7 @@ import InbodyModal from '@components/Trainee/InbodyModal';
 import Calendar from '@components/Trainee/Calendar';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import useModals from 'src/hooks/useModals';
+import { user } from 'src/stores/userStore';
 
 Chart.register(
   CategoryScale,
@@ -462,18 +463,19 @@ const Dashboard: React.FC = () => {
         <Section>
           <SectionHeader>
             <SectionTitle>회원 이름</SectionTitle>
-            {editInfo ? (
-              <EditButton
-                $editMode={editInfo}
-                onClick={() => setEditInfo(false)}
-              >
-                정보 수정
-              </EditButton>
-            ) : (
-              <EditButton $editMode={editInfo} onClick={handleSaveInfo}>
-                정보 저장
-              </EditButton>
-            )}
+            {user?.role === 'TRAINER' &&
+              (editInfo ? (
+                <EditButton
+                  $editMode={editInfo}
+                  onClick={() => setEditInfo(false)}
+                >
+                  정보 수정
+                </EditButton>
+              ) : (
+                <EditButton $editMode={editInfo} onClick={handleSaveInfo}>
+                  정보 저장
+                </EditButton>
+              ))}
           </SectionHeader>
           <InfoGroup>
             <InfoItem>
@@ -581,7 +583,9 @@ const Dashboard: React.FC = () => {
         <Section>
           <SectionHeader>
             <SectionTitle>인바디 정보</SectionTitle>
-            <EditButton onClick={handleAddInbody}>인바디 추가</EditButton>
+            {user?.role === 'TRAINER' ? (
+              <EditButton onClick={handleAddInbody}>인바디 추가</EditButton>
+            ) : null}
           </SectionHeader>
           <InfoGroup>
             <InfoItem>
