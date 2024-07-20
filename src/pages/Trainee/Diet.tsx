@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
@@ -12,11 +13,17 @@ const Gallery = styled.div`
   grid-template-columns: repeat(3, 1fr);
 `;
 
-const Image = styled.img`
+const ImageWrapper = styled.div`
   width: calc(100vw / 3);
   height: calc(100vw / 3);
   max-width: 150px;
   max-height: 150px;
+  cursor: pointer;
+`;
+
+const Image = styled.img`
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 `;
 
@@ -33,6 +40,8 @@ const getMoreImages = (count = 9) => {
 };
 
 const Diet: React.FC = () => {
+  const navigate = useNavigate();
+  const { traineeId } = useParams<{ traineeId: string }>();
   const [images, setImages] = useState<string[]>([]);
   const [isLoading, setLoading] = useState<boolean>(false);
 
@@ -42,6 +51,10 @@ const Diet: React.FC = () => {
 
     setImages(prevImages => [...prevImages, ...getMoreImages()]);
     setLoading(false);
+  };
+
+  const onClickDiet = (dietId: number) => {
+    navigate(`/trainee/${traineeId}/diet/${dietId}`);
   };
 
   useEffect(() => setImages(getMoreImages(24)), []);
@@ -57,7 +70,9 @@ const Diet: React.FC = () => {
       >
         <Gallery>
           {images.map((src, index) => (
-            <Image key={index} src={src} alt={`image ${index}`} />
+            <ImageWrapper key={index} onClick={() => onClickDiet(index)}>
+              <Image src={src} alt={`image ${index}`} />
+            </ImageWrapper>
           ))}
         </Gallery>
       </InfiniteScroll>

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 // Wrapper 전체 wrap 스타일 정의
@@ -57,28 +58,24 @@ const TabPanel = styled.div`
 // TabItem 타입 정의
 interface TabItem {
   label: string;
-  content: React.ReactNode;
+  path: string;
 }
 
 // TabsProps 타입 정의
 interface TabsProps {
   tabs: TabItem[];
-  currentIndex?: number;
-  onTabChange?: (index: number) => void;
 }
 
-const Tabs: React.FC<TabsProps> = ({ tabs, currentIndex = 0, onTabChange }) => {
-  const [activeIndex, setActiveIndex] = useState(currentIndex);
+const Tabs: React.FC<TabsProps> = ({ tabs }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const activeIndex = tabs.findIndex(tab => {
+    const regex = new RegExp(`^${tab.path}(/|$)`);
+    return regex.test(location.pathname);
+  });
 
-  useEffect(() => {
-    setActiveIndex(currentIndex);
-  }, [currentIndex]);
-
-  const handleTabClick = (index: number) => {
-    setActiveIndex(index);
-    if (onTabChange) {
-      onTabChange(index);
-    }
+  const onClickTab = (path: string) => {
+    navigate(path);
   };
 
   return (
@@ -88,13 +85,15 @@ const Tabs: React.FC<TabsProps> = ({ tabs, currentIndex = 0, onTabChange }) => {
           <Tab
             key={index}
             $isActive={activeIndex === index}
-            onClick={() => handleTabClick(index)}
+            onClick={() => onClickTab(tab.path)}
           >
             {tab.label}
           </Tab>
         ))}
       </TabWrapper>
-      <TabPanel>{tabs[activeIndex].content}</TabPanel>
+      <TabPanel>
+        <Outlet />
+      </TabPanel>
     </Wrapper>
   );
 };

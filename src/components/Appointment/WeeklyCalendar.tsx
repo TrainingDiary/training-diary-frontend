@@ -97,19 +97,19 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
       }
 
       newDates.reverse();
-      setWeek((prevWeek) => [...newDates, ...prevWeek]);
+      setWeek(prevWeek => [...newDates, ...prevWeek]);
 
       if (calendarRef.current) {
         calendarRef.current.scrollLeft += newDates.length * 60;
       }
     }
 
-    if (scrollLeft + clientWidth >= scrollWidth) {
+    if (scrollLeft + clientWidth + 1 >= scrollWidth) {
       const newDates: Date[] = [];
       for (let i = 1; i <= 15; i++) {
         newDates.push(addDays(week[week.length - 1], i));
       }
-      setWeek((prevWeek) => [...prevWeek, ...newDates]);
+      setWeek(prevWeek => [...prevWeek, ...newDates]);
     }
   };
 
@@ -134,7 +134,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
 
   return (
     <CalendarWrapper ref={calendarRef} onScroll={onInfiniteScroll}>
-      {week.map((day) => {
+      {week.map(day => {
         const isSelected =
           format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd');
         return (

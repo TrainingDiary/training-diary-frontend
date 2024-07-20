@@ -13,15 +13,15 @@ import {
   Legend,
 } from 'chart.js';
 
-import { hexToRgba } from 'src/utils/hexToRgba';
-import useModals from 'src/hooks/useModals';
 import weight from '@icons/dashboard/weight.svg';
 import bodyFat from '@icons/dashboard/bodyFat.svg';
 import muscleMass from '@icons/dashboard/muscleMass.svg';
-import InbodyModal from './InbodyModal';
-import Calendar from './Calendar';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
 import Alert from '@components/Common/Alert/Alert';
+import InbodyModal from '@components/Trainee/InbodyModal';
+import Calendar from '@components/Trainee/Calendar';
+import { hexToRgba } from 'src/utils/hexToRgba';
+import useModals from 'src/hooks/useModals';
 
 Chart.register(
   CategoryScale,

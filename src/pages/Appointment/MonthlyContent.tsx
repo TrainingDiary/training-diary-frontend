@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { format } from 'date-fns';
 
@@ -44,15 +45,8 @@ const CompleteButton = styled.button`
   }
 `;
 
-interface MonthlyContentProps {
-  onDateSelect: (date: Date) => void;
-  initialDate: Date | null;
-}
-
-const MonthlyContent: React.FC<MonthlyContentProps> = ({
-  onDateSelect,
-  initialDate,
-}) => {
+const MonthlyContent: React.FC = () => {
+  const navigate = useNavigate();
   const { data, isLoading, error } = useSchedules();
   const { openModal, closeModal, isOpen } = useModals();
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
@@ -78,12 +72,12 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
   };
 
   const onDateClick = (date: Date) => {
+    const formattedDate = format(date, 'yyyy-MM-dd');
+
     if (!selectedButton) {
-      onDateSelect(date);
+      navigate(`/appointment/weekly/${formattedDate}`);
       return;
     }
-
-    const formattedDate = format(date, 'yyyy-MM-dd');
 
     setSelectedDates(prevDates =>
       prevDates.includes(formattedDate)
@@ -150,7 +144,6 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
           data={data}
           selectedButton={selectedButton}
           selectedDates={selectedDates}
-          initialDate={initialDate}
           onDateClick={onDateClick}
         />
         <ButtonContainer

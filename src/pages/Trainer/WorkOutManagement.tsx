@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import axios from 'axios';
 
 import addBtn from '@icons/home/addbtn.svg';
-import { AddButton } from './TraineeManagement';
 import Modal from '@components/Common/Modal/Modal';
-import Card from './Card';
-import useModals from 'src/hooks/useModals';
-import AddWorkOutModal from './AddWorkOutModal';
+import { AddButton } from '@components/Common/AddButton';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
+import Card from '@components/Trainer/Card';
+import AddWorkOutModal from '@components/Trainer/AddWorkOutModal';
+import useModals from 'src/hooks/useModals';
 
 const Wrapper = styled.div`
   display: flex;

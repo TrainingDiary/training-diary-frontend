@@ -10,6 +10,7 @@ export default {
     'src/(.*)$': '<rootDir>/src/$1',
     '^@icons/(.*)$': '<rootDir>/src/assets/icons/$1',
     '^@components/(.*)$': '<rootDir>/src/components/$1',
+    '^@pages/(.*)$': '<rootDir>/src/pages/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 };
