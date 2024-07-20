@@ -15,6 +15,9 @@ export const handlers = [
       return;
     }
   ),
+  http.get('https://via.placeholder.com/:file', () => {
+    return;
+  }),
 
   http.get('/api/pt-contracts', () => {
     return HttpResponse.json(traineeList);

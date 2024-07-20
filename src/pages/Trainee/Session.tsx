@@ -173,8 +173,8 @@ const Session: React.FC = () => {
           <SectionTitle>운동 기록 목록</SectionTitle>
           <RecordList>
             {sessions.map((session, index) => (
-              <Link to={`${session.sessionId}`}>
-                <RecordItem key={index}>
+              <Link to={`${session.sessionId}`} key={index}>
+                <RecordItem>
                   <div>{session.sessionDate}</div>
                   <div>{session.sessionNumber}회차</div>
                 </RecordItem>
