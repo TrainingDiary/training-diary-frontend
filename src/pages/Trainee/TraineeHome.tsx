@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import Tabs from '@components/Tabs/Tabs';
+import Tabs from '@components/Common/Tabs/Tabs';
 
 const TraineeHome: React.FC = () => {
   const { traineeId } = useParams<{ traineeId: string }>();

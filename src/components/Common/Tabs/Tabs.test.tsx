@@ -5,7 +5,7 @@ import { ThemeProvider } from 'styled-components';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 import Tabs from './Tabs';
-import theme from '../../styles/theme';
+import theme from '../../../styles/theme';
 
 // Mock data for tabs
 const tabs = [

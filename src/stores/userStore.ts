@@ -5,9 +5,17 @@ interface User {
   role: string;
 }
 
-// 로그인 하지 않은 유저 상태 테스트하려면 user에 null 할당
-// 트레이니 유저 테스트하려면 role에 'TRAINEE' 할당
+// 로그인 하지 않은 유저 상태 테스트하려면 주석해제
+// export const user: User | null = null;
+
+// 트레이너 유저 테스트하려면 주석해제
 export const user: User | null = {
   id: '1',
   role: 'TRAINER',
 };
+
+// 트레이니 유저 테스트하려면 주석해제
+// export const user: User | null = {
+//   id: '1',
+//   role: 'TRAINEE',
+// };

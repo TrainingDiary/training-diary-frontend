@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { format, isValid, parse } from 'date-fns';
 
-import Tabs from '@components/Tabs/Tabs';
+import Tabs from '@components/Common/Tabs/Tabs';
 
 const AppointmentHome: React.FC = () => {
   const { date } = useParams<{ date: string }>();
