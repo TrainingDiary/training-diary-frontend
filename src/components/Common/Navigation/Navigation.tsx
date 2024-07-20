@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
 import homeIcon from '@icons/navigation/home.svg';
@@ -37,6 +37,7 @@ const NavItem = styled.div<{ $isActive?: boolean }>`
   align-items: center;
   width: 100%;
   transition: background-color 0.3s;
+  pointer-events: ${({ $isActive }) => ($isActive ? 'none' : 'auto')};
 
   a {
     display: flex;
@@ -81,47 +82,36 @@ const LogOutBtn = styled.img``;
 
 const Navigation: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // 로그인 상태 관리
-  const { id } = useParams<{ id: string }>();
 
   const handleLogout = () => {
     // TODO : 로그아웃 로직 구현
-    setIsLoggedIn(false);
-    navigate('login');
+    // 현재 publicRoute 때문에 동작하지 않음
+    console.log('Logged out');
   };
+
+  const isHomeActive = !location.pathname.startsWith('/appointment');
+  const isAppointmentActive = location.pathname.startsWith('/appointment');
 
   return (
     <React.Fragment>
       <Nav>
-        <NavItem
-          $isActive={
-            location.pathname === '/' || location.pathname === `/trainee/${id}`
-          }
-        >
+        <NavItem $isActive={isHomeActive}>
           <Link to={''}>
             <span>
               <HomeBtn
-                src={
-                  location.pathname === '/' ||
-                  location.pathname === `/trainee/${id}`
-                    ? activeHomeIcon
-                    : homeIcon
-                }
+                src={isHomeActive ? activeHomeIcon : homeIcon}
                 alt="home link button"
               />
             </span>
             Home
           </Link>
         </NavItem>
-        <NavItem $isActive={location.pathname === '/appointment'}>
-          <Link to={'appointment'}>
+        <NavItem $isActive={isAppointmentActive}>
+          <Link to={'appointment/monthly'}>
             <span>
               <AppointmentIconBtn
                 src={
-                  location.pathname === '/appointment'
-                    ? activeAppointmentIcon
-                    : appointmentIcon
+                  isAppointmentActive ? activeAppointmentIcon : appointmentIcon
                 }
                 alt="appointment link button"
               />
@@ -130,14 +120,14 @@ const Navigation: React.FC = () => {
           </Link>
         </NavItem>
         <NavItem>
-          {isLoggedIn && (
+          {
             <LogOutNav onClick={handleLogout}>
               <span>
                 <LogOutBtn src={logOutIcon} alt="logout button" />
               </span>
               Logout
             </LogOutNav>
-          )}
+          }
         </NavItem>
       </Nav>
     </React.Fragment>

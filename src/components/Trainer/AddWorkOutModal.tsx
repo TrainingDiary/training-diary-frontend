@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import Modal from '@components/Common/Modal/Modal';
-import { WorkoutDataType } from './WorkOutManagement';
+import { WorkoutDataType } from '@pages/Trainer/WorkOutManagement';
 
 // 스타일 정의
 const FormGroup = styled.div`
@@ -31,9 +31,20 @@ const TextArea = styled.textarea`
   border-radius: 5px;
   outline: none;
   width: 100%;
-  font-family: 'NanumSquare', 'NotoSans KR', system-ui, -apple-system,
-    BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-    'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    'NanumSquare',
+    'NotoSans KR',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Open Sans',
+    'Helvetica Neue',
+    sans-serif;
   resize: none;
 `;
 
@@ -103,14 +114,14 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
   setFormState,
 }) => {
   const handleInputChange = (field: string, value: string) => {
-    setFormState((prev) => ({
+    setFormState(prev => ({
       ...prev,
       [field]: value,
     }));
   };
 
   const handleAttributeChange = (attr: keyof typeof formState.attributes) => {
-    setFormState((prev) => ({
+    setFormState(prev => ({
       ...prev,
       attributes: {
         ...prev.attributes,
@@ -149,7 +160,7 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
         <Input
           type="text"
           value={formState.name}
-          onChange={(e) => handleInputChange('name', e.target.value)}
+          onChange={e => handleInputChange('name', e.target.value)}
         />
       </FormGroup>
       <FormGroup>
@@ -157,20 +168,20 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
         <Input
           type="text"
           value={formState.targetMuscle}
-          onChange={(e) => handleInputChange('targetMuscle', e.target.value)}
+          onChange={e => handleInputChange('targetMuscle', e.target.value)}
         />
       </FormGroup>
       <FormGroup>
         <Label>주의사항 노트:</Label>
         <TextArea
           value={formState.remark}
-          onChange={(e) => handleInputChange('remark', e.target.value)}
+          onChange={e => handleInputChange('remark', e.target.value)}
         ></TextArea>
       </FormGroup>
       <FormGroup>
         <Label>속성 값:</Label>
         <CheckboxGroup>
-          {Object.keys(formState.attributes).map((attr) => (
+          {Object.keys(formState.attributes).map(attr => (
             <CheckboxLabel
               key={attr}
               className={
