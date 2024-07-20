@@ -93,7 +93,7 @@ const Session: React.FC = () => {
   };
 
   useEffect(() => {
-    setImages(getMoreImages(5));
+    setImages(getMoreImages(20));
 
     const observer = new IntersectionObserver(
       entries => {
@@ -102,8 +102,8 @@ const Session: React.FC = () => {
         }
       },
       {
-        root: null,
-        rootMargin: '0px',
+        root: imageContainerRef.current,
+        rootMargin: '100px',
         threshold: 1.0,
       }
     );
