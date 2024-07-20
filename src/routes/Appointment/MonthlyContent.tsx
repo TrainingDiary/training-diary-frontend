@@ -11,6 +11,7 @@ import TraineeList from '@components/Appointment/TraineeList';
 import useSchedules from 'src/hooks/useSchedules';
 import useModals from 'src/hooks/useModals';
 import { traineeList } from 'src/mocks/data/traineeList';
+import { SectionWrapper } from '@components/Common/SectionWrapper';
 
 const Wrapper = styled.div`
   display: flex;
@@ -71,7 +72,7 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
   const onButtonClick = (buttonType: string) => {
     setSelectedDates([]);
 
-    setSelectedButton((prevSelectedButton) =>
+    setSelectedButton(prevSelectedButton =>
       prevSelectedButton === buttonType ? null : buttonType
     );
   };
@@ -84,9 +85,9 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
 
     const formattedDate = format(date, 'yyyy-MM-dd');
 
-    setSelectedDates((prevDates) =>
+    setSelectedDates(prevDates =>
       prevDates.includes(formattedDate)
-        ? prevDates.filter((date) => date !== formattedDate)
+        ? prevDates.filter(date => date !== formattedDate)
         : [...prevDates, formattedDate]
     );
   };
@@ -97,9 +98,9 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
       return;
     }
 
-    setSelectedTimes((prevTimes) =>
+    setSelectedTimes(prevTimes =>
       prevTimes.includes(time)
-        ? prevTimes.filter((t) => t !== time)
+        ? prevTimes.filter(t => t !== time)
         : [...prevTimes, time]
     );
   };
@@ -143,63 +144,65 @@ const MonthlyContent: React.FC<MonthlyContentProps> = ({
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <Wrapper>
-      <MonthlyCalendar
-        data={data}
-        selectedButton={selectedButton}
-        selectedDates={selectedDates}
-        initialDate={initialDate}
-        onDateClick={onDateClick}
-      />
-      <ButtonContainer
-        onButtonClick={onButtonClick}
-        selectedButton={selectedButton}
-      />
-
-      {selectedButton && (
-        <Fragment>
-          <Divider />
-          <TimeTableContainer
-            reservedAndAppliedDates={data.reservedAndAppliedDates}
-            selectedButton={selectedButton}
-            selectedDates={selectedDates}
-            selectedTimes={selectedTimes}
-            onTimeClick={onTimeClick}
-          />
-          <CompleteButton onClick={onCompleteClick}>
-            시간 선택 완료
-          </CompleteButton>
-        </Fragment>
-      )}
-      {errorAlert && (
-        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
-      )}
-      <Modal
-        title="수업 일괄 오픈"
-        type="confirm"
-        isOpen={isOpen('openModal')}
-        onClose={() => onCloseModal('openModal')}
-        onSave={() => onSaveModal('openModal')}
-        btnConfirm="저장"
-      >
-        선택한 일자, 시간에 수업을 일괄 오픈할까요?
-      </Modal>
-      <Modal
-        title="수업 일괄 등록"
-        type="custom"
-        isOpen={isOpen('registerModal')}
-        onClose={() => onCloseModal('registerModal')}
-        onSave={() => onSaveModal('registerModal')}
-        btnConfirm="저장"
-      >
-        <TraineeList
-          items={traineeList}
-          selectedTraineeId={selectedTraineeId}
-          onClick={onClickTrainee}
+    <SectionWrapper>
+      <Wrapper>
+        <MonthlyCalendar
+          data={data}
+          selectedButton={selectedButton}
+          selectedDates={selectedDates}
+          initialDate={initialDate}
+          onDateClick={onDateClick}
         />
-        저장 시 바로 적용됩니다.
-      </Modal>
-    </Wrapper>
+        <ButtonContainer
+          onButtonClick={onButtonClick}
+          selectedButton={selectedButton}
+        />
+
+        {selectedButton && (
+          <Fragment>
+            <Divider />
+            <TimeTableContainer
+              reservedAndAppliedDates={data.reservedAndAppliedDates}
+              selectedButton={selectedButton}
+              selectedDates={selectedDates}
+              selectedTimes={selectedTimes}
+              onTimeClick={onTimeClick}
+            />
+            <CompleteButton onClick={onCompleteClick}>
+              시간 선택 완료
+            </CompleteButton>
+          </Fragment>
+        )}
+        {errorAlert && (
+          <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+        )}
+        <Modal
+          title="수업 일괄 오픈"
+          type="confirm"
+          isOpen={isOpen('openModal')}
+          onClose={() => onCloseModal('openModal')}
+          onSave={() => onSaveModal('openModal')}
+          btnConfirm="저장"
+        >
+          선택한 일자, 시간에 수업을 일괄 오픈할까요?
+        </Modal>
+        <Modal
+          title="수업 일괄 등록"
+          type="custom"
+          isOpen={isOpen('registerModal')}
+          onClose={() => onCloseModal('registerModal')}
+          onSave={() => onSaveModal('registerModal')}
+          btnConfirm="저장"
+        >
+          <TraineeList
+            items={traineeList}
+            selectedTraineeId={selectedTraineeId}
+            onClick={onClickTrainee}
+          />
+          저장 시 바로 적용됩니다.
+        </Modal>
+      </Wrapper>
+    </SectionWrapper>
   );
 };
 
