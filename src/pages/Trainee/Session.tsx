@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
@@ -89,6 +89,7 @@ const Session: React.FC = () => {
   const [images, setImages] = useState<string[]>([]);
   const observerRef = useRef<HTMLDivElement | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
+  const touchStartXRef = useRef<number | null>(null);
 
   const getMoreImages = (count = 9) => {
     const newImages = [];
@@ -144,13 +145,31 @@ const Session: React.FC = () => {
       }
     };
 
+    const handleTouchStart = (event: TouchEvent) => {
+      touchStartXRef.current = event.touches[0].clientX;
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (container && touchStartXRef.current !== null) {
+        const touchCurrentX = event.touches[0].clientX;
+        const touchDeltaX = touchStartXRef.current - touchCurrentX;
+        container.scrollLeft += touchDeltaX;
+        touchStartXRef.current = touchCurrentX;
+        event.preventDefault();
+      }
+    };
+
     if (container) {
       container.addEventListener('wheel', handleWheel);
+      container.addEventListener('touchstart', handleTouchStart);
+      container.addEventListener('touchmove', handleTouchMove);
     }
 
     return () => {
       if (container) {
         container.removeEventListener('wheel', handleWheel);
+        container.removeEventListener('touchstart', handleTouchStart);
+        container.removeEventListener('touchmove', handleTouchMove);
       }
     };
   }, []);
