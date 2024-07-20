@@ -417,6 +417,18 @@ const Dashboard: React.FC = () => {
         }
       }
     }
+
+    if (info.gender !== '남' && info.gender !== '여') {
+      return setErrorAlert('성별을 "남" 또는 "여"로 입력해주세요');
+    }
+
+    const genderForServer = info.gender === '남' ? 'MALE' : 'FEMALE';
+
+    // 서버로 데이터를 보낼 때 genderForServer 변수를 사용
+    console.log({
+      ...info,
+      gender: genderForServer,
+    });
     setEditInfo(true);
   };
 
