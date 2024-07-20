@@ -49,10 +49,10 @@ const Tab = styled.button<{ $isActive: boolean }>`
   }
 `;
 
-// TabPanel 컴포넌트 스타일 정의
+// TabPanel 컴포넌트 스타일 정의(콘텐츠 레이아웃 정의)
 const TabPanel = styled.div`
   width: 100%;
-  margin: 20px auto 90px;
+  margin: 20px auto 120px;
 `;
 
 // TabItem 타입 정의

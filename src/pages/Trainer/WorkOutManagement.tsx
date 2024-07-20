@@ -5,6 +5,7 @@ import axios from 'axios';
 import addBtn from '@icons/home/addbtn.svg';
 import Modal from '@components/Common/Modal/Modal';
 import { AddButton } from '@components/Common/AddButton';
+import { SectionWrapper } from '@components/Common/SectionWrapper';
 import Card from '@components/Trainer/Card';
 import AddWorkOutModal from '@components/Trainer/AddWorkOutModal';
 import useModals from 'src/hooks/useModals';
@@ -148,38 +149,40 @@ const WorkOutManagement: React.FC = () => {
   };
 
   return (
-    <Wrapper>
-      {workouts.map(workout => (
-        <Card
-          key={workout.id}
-          workout={workout}
-          onDelete={handleOpenDeleteModal}
-          onEdit={() => handleOpenEditModal(workout)}
+    <SectionWrapper>
+      <Wrapper>
+        {workouts.map(workout => (
+          <Card
+            key={workout.id}
+            workout={workout}
+            onDelete={handleOpenDeleteModal}
+            onEdit={() => handleOpenEditModal(workout)}
+          />
+        ))}
+        {/* Add button 추가 */}
+        <AddButton onClick={handleOpenAddModal}>
+          <img src={addBtn} alt="add button" />
+        </AddButton>
+        <Modal
+          title="운동 종류 삭제"
+          type="confirm"
+          isOpen={isOpen('deleteModal')}
+          onClose={handleCloseDeleteModal}
+          onSave={handleDeleteConfirm}
+          btnConfirm="삭제"
+        >
+          {selectedWorkoutId &&
+            `'${getWorkoutName(selectedWorkoutId)}' 를(을) 삭제하겠습니까?`}
+        </Modal>
+        <AddWorkOutModal
+          isOpen={isOpen('addModal')}
+          onClose={handleCloseAddModal}
+          onSave={handleSaveInput}
+          formState={formState}
+          setFormState={setFormState}
         />
-      ))}
-      {/* Add button 추가 */}
-      <AddButton onClick={handleOpenAddModal}>
-        <img src={addBtn} alt="add button" />
-      </AddButton>
-      <Modal
-        title="운동 종류 삭제"
-        type="confirm"
-        isOpen={isOpen('deleteModal')}
-        onClose={handleCloseDeleteModal}
-        onSave={handleDeleteConfirm}
-        btnConfirm="삭제"
-      >
-        {selectedWorkoutId &&
-          `'${getWorkoutName(selectedWorkoutId)}' 를(을) 삭제하겠습니까?`}
-      </Modal>
-      <AddWorkOutModal
-        isOpen={isOpen('addModal')}
-        onClose={handleCloseAddModal}
-        onSave={handleSaveInput}
-        formState={formState}
-        setFormState={setFormState}
-      />
-    </Wrapper>
+      </Wrapper>
+    </SectionWrapper>
   );
 };
 

@@ -10,10 +10,9 @@ import { AddButton } from '@components/Common/AddButton';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import formatDate from 'src/utils/formatDate';
 import useModals from 'src/hooks/useModals';
+import { SectionWrapper } from '@components/Common/SectionWrapper';
 
 // Styled components
-const HomeWrapper = styled.div``;
-
 const HomeLayout = styled.div`
   display: flex;
   flex-direction: column;
@@ -211,7 +210,7 @@ const TraineeManagement: React.FC = () => {
 
   return (
     <React.Fragment>
-      <HomeWrapper>
+      <SectionWrapper>
         <HomeLayout>
           {/* Dropdown for sorting options */}
           <DropDownWrapper>
@@ -275,7 +274,7 @@ const TraineeManagement: React.FC = () => {
         >
           트레이니를 삭제하겠습니까?
         </Modal>
-      </HomeWrapper>
+      </SectionWrapper>
     </React.Fragment>
   );
 };

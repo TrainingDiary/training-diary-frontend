@@ -5,6 +5,7 @@ import { format, parse } from 'date-fns';
 
 import WeeklyCalendar from '@components/Appointment/WeeklyCalendar';
 import ScheduleDetail from '@components/Appointment/ScheduleDetail';
+import { SectionWrapper } from '@components/Common/SectionWrapper';
 
 const Wrapper = styled.div`
   display: flex;
@@ -26,10 +27,15 @@ const WeeklyContent: React.FC = () => {
   };
 
   return (
-    <Wrapper>
-      <WeeklyCalendar selectedDate={selectedDate} onDateChange={onDateChange} />
-      <ScheduleDetail selectedDate={selectedDate} />
-    </Wrapper>
+    <SectionWrapper>
+      <Wrapper>
+        <WeeklyCalendar
+          selectedDate={selectedDate}
+          onDateChange={onDateChange}
+        />
+        <ScheduleDetail selectedDate={selectedDate} />
+      </Wrapper>
+    </SectionWrapper>
   );
 };
 
