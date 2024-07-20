@@ -3,6 +3,7 @@ import React from 'react';
 import Tabs from '@components/Tabs/Tabs';
 import Dashboard from './Dashboard';
 import Diet from './Diet';
+import Session from './Session';
 
 const TraineeInfo: React.FC = () => {
   const tabs = [
@@ -12,7 +13,7 @@ const TraineeInfo: React.FC = () => {
     },
     {
       label: '운동 기록',
-      content: <div>Tab 2 Content</div>,
+      content: <Session />,
     },
     {
       label: '식단 관리',
