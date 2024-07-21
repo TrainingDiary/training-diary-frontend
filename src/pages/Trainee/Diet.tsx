@@ -5,6 +5,10 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 
 import addBtn from '@icons/home/addbtn.svg';
 import { AddButton } from '@components/Common/AddButton';
+import Modal from '@components/Common/Modal/Modal';
+import Alert from '@components/Common/Alert/Alert';
+import DietUploadModal from '@components/Trainee/DietUploadModal';
+import useModals from 'src/hooks/useModals';
 
 const Wrapper = styled.div`
   height: calc(100vh - 150px);
@@ -45,8 +49,14 @@ const getMoreImages = (count = 9) => {
 const Diet: React.FC = () => {
   const navigate = useNavigate();
   const { traineeId } = useParams<{ traineeId: string }>();
+  const { openModal, closeModal, isOpen } = useModals();
   const [images, setImages] = useState<string[]>([]);
+  const [formData, setFormData] = useState<{
+    photo: FileList | null;
+    content: string;
+  }>({ photo: null, content: '' });
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [errorAlert, setErrorAlert] = useState<string>('');
 
   const fetchMoreImages = async () => {
     if (isLoading) return;
@@ -59,6 +69,34 @@ const Diet: React.FC = () => {
   const onClickDiet = (dietId: number) => {
     navigate(`/trainee/${traineeId}/diet/${dietId}`);
   };
+
+  const onClickAddButton = () => {
+    setFormData({ photo: null, content: '' });
+    openModal('addModal');
+  };
+
+  const onSaveAddModal = () => {
+    if (!formData.photo) {
+      return setErrorAlert('식단 사진을 추가해주세요.');
+    }
+
+    if (!formData.content) {
+      return setErrorAlert('식단 내용을 입력해주세요.');
+    }
+
+    // 식단 추가 API 요청 단계 추가
+    console.log(formData);
+
+    closeModal('addModal');
+  };
+
+  const onChangeFormData = (
+    data: React.SetStateAction<{ photo: FileList | null; content: string }>
+  ) => {
+    setFormData(data);
+  };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
 
   useEffect(() => setImages(getMoreImages(24)), []);
 
@@ -79,9 +117,25 @@ const Diet: React.FC = () => {
           ))}
         </Gallery>
       </InfiniteScroll>
-      <AddButton>
+      <AddButton onClick={onClickAddButton}>
         <img src={addBtn} alt="add button" />
       </AddButton>
+      <Modal
+        title="식단 올리기"
+        type="custom"
+        isOpen={isOpen('addModal')}
+        onClose={() => closeModal('addModal')}
+        onSave={() => onSaveAddModal()}
+        btnConfirm="등록"
+      >
+        <DietUploadModal
+          onChangeFormData={onChangeFormData}
+          formData={formData}
+        />
+      </Modal>
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
     </Wrapper>
   );
 };
