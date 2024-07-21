@@ -24,7 +24,8 @@ export const AddButton = styled.button`
     opacity: 1;
   }
 
-  @media (max-width: 450px) {
+  @media ${({ theme }) => theme.media.tablet},
+    ${({ theme }) => theme.media.mobile} {
     right: 30px;
   }
 `;
