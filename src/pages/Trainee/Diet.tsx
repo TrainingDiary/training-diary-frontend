@@ -55,6 +55,7 @@ const Diet: React.FC = () => {
     photo: FileList | null;
     content: string;
   }>({ photo: null, content: '' });
+  const [preview, setPreview] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [errorAlert, setErrorAlert] = useState<string>('');
 
@@ -72,6 +73,7 @@ const Diet: React.FC = () => {
 
   const onClickAddButton = () => {
     setFormData({ photo: null, content: '' });
+    setPreview(null);
     openModal('addModal');
   };
 
@@ -88,12 +90,6 @@ const Diet: React.FC = () => {
     console.log(formData);
 
     closeModal('addModal');
-  };
-
-  const onChangeFormData = (
-    data: React.SetStateAction<{ photo: FileList | null; content: string }>
-  ) => {
-    setFormData(data);
   };
 
   const onCloseErrorAlert = () => setErrorAlert('');
@@ -129,8 +125,10 @@ const Diet: React.FC = () => {
         btnConfirm="등록"
       >
         <DietUploadModal
-          onChangeFormData={onChangeFormData}
           formData={formData}
+          setFormData={setFormData}
+          preview={preview}
+          setPreview={setPreview}
         />
       </Modal>
       {errorAlert && (

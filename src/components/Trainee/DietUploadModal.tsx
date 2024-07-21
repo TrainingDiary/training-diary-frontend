@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
-import { useForm } from 'react-hook-form';
 
 import addImg from '@icons/diet/addImg.svg';
 
@@ -94,50 +93,44 @@ interface FormData {
 }
 
 interface DietUploadModalProps {
-  onChangeFormData: (data: FormData) => void;
   formData: FormData;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+  preview: string | null;
+  setPreview: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const DietUploadModal: React.FC<DietUploadModalProps> = ({
-  onChangeFormData,
   formData,
+  setFormData,
+  preview,
+  setPreview,
 }) => {
-  const { register, watch, setValue, reset } = useForm<FormData>({
-    defaultValues: formData,
-  });
-  const [preview, setPreview] = useState<string | null>(null);
-  const [photoMessage, setPhotoMessage] = useState<string | null>(
-    '사진을 등록해주세요'
-  );
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const photo = watch('photo');
-  const content = watch('content');
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = e.target;
 
-  const onRemoveImage = () => {
-    setValue('photo', null);
-    setPreview(null);
-    setPhotoMessage('사진을 등록해주세요');
-  };
-
-  useEffect(() => {
-    onChangeFormData({ photo, content });
-
-    if (photo && photo.length > 0) {
-      const file = photo[0];
+    if (e.target instanceof HTMLInputElement && e.target.files?.length) {
+      const files = e.target.files;
+      const file = files[0];
+      setFormData({ ...formData, photo: files });
       const previewUrl = URL.createObjectURL(file);
       setPreview(previewUrl);
-      setPhotoMessage(null);
 
       return () => URL.revokeObjectURL(previewUrl);
-    } else {
-      setPreview(null);
-      setPhotoMessage('사진을 등록해주세요');
     }
-  }, [photo, content]);
 
-  useEffect(() => {
-    reset(formData);
-  }, [formData]);
+    if (e.target instanceof HTMLTextAreaElement) {
+      setFormData({ ...formData, content: value });
+    }
+  };
+
+  const onRemoveImage = () => {
+    setFormData({ ...formData, photo: null });
+    setPreview(null);
+  };
 
   return (
     <Form>
@@ -145,10 +138,11 @@ const DietUploadModal: React.FC<DietUploadModalProps> = ({
         <span>사진첨부 :</span>
         <FileInputWrapper>
           <Input
+            ref={inputRef}
             type="file"
             id="photo"
             accept="image/*"
-            {...register('photo')}
+            onChange={handleChange}
           />
           <CustomFileLabel htmlFor="photo">
             <img src={addImg} alt="upload image" />
@@ -159,12 +153,12 @@ const DietUploadModal: React.FC<DietUploadModalProps> = ({
               <Preview src={preview} alt="preview" />
             </PreviewWrapper>
           )}{' '}
-          <Message>{photoMessage}</Message>
+          {!preview && <Message>사진을 등록해주세요.</Message>}
         </FileInputWrapper>
       </Label>
       <Label>
         <span>내용 :</span>
-        <TextArea {...register('content')} />
+        <TextArea value={formData.content} onChange={handleChange} />
       </Label>
     </Form>
   );
