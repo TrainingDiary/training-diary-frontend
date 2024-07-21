@@ -10,9 +10,9 @@ export const AddButton = styled.button`
   opacity: 0.8;
   line-height: 1;
 
-  position: sticky;
+  position: fixed;
   bottom: 80px;
-  right: 30px;
+  right: calc(50% - 225px + 30px);
   margin-left: auto;
 
   &:active {
@@ -22,5 +22,9 @@ export const AddButton = styled.button`
 
   &:hover {
     opacity: 1;
+  }
+
+  @media (max-width: 450px) {
+    right: 30px;
   }
 `;
