@@ -118,8 +118,6 @@ const DietUploadModal: React.FC<DietUploadModalProps> = ({
       setFormData({ ...formData, photo: files });
       const previewUrl = URL.createObjectURL(file);
       setPreview(previewUrl);
-
-      return () => URL.revokeObjectURL(previewUrl);
     }
 
     if (e.target instanceof HTMLTextAreaElement) {
