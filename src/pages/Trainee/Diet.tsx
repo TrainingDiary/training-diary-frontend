@@ -3,8 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
+import addBtn from '@icons/home/addbtn.svg';
+import { AddButton } from '@components/Common/AddButton';
+
 const Wrapper = styled.div`
-  height: 100vh;
+  height: calc(100vh - 150px);
   overflow: auto;
 `;
 
@@ -71,11 +74,14 @@ const Diet: React.FC = () => {
         <Gallery>
           {images.map((src, index) => (
             <ImageWrapper key={index} onClick={() => onClickDiet(index)}>
-              <Image src={src} alt={`image ${index}`} />
+              <Image src={src} alt={`image ${index}`} loading="lazy" />
             </ImageWrapper>
           ))}
         </Gallery>
       </InfiniteScroll>
+      <AddButton>
+        <img src={addBtn} alt="add button" />
+      </AddButton>
     </Wrapper>
   );
 };
