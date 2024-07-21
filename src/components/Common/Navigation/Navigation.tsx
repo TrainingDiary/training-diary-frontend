@@ -37,7 +37,6 @@ const NavItem = styled.div<{ $isActive?: boolean }>`
   align-items: center;
   width: 100%;
   transition: background-color 0.3s;
-  pointer-events: ${({ $isActive }) => ($isActive ? 'none' : 'auto')};
 
   a {
     display: flex;
