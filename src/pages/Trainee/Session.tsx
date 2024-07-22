@@ -40,6 +40,7 @@ const ImageContainer = styled.div`
   overflow-x: auto;
   width: 100%;
   position: relative;
+  cursor: grab;
 `;
 
 const ImageLayout = styled.div`
@@ -49,11 +50,13 @@ const ImageLayout = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  user-select: none;
 `;
 
 const Image = styled.img`
   display: block;
   width: 100%;
+  pointer-events: none;
 `;
 
 const RecordList = styled.div`
@@ -90,6 +93,9 @@ const Session: React.FC = () => {
   const observerRef = useRef<HTMLDivElement | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const touchStartXRef = useRef<number | null>(null);
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
 
   const getMoreImages = (count = 9) => {
     const newImages = [];
@@ -136,6 +142,26 @@ const Session: React.FC = () => {
   useEffect(() => {
     const container = imageContainerRef.current;
 
+    const handleMouseDown = (event: MouseEvent) => {
+      isDraggingRef.current = true;
+      startXRef.current = event.pageX - container!.offsetLeft;
+      scrollLeftRef.current = container!.scrollLeft;
+      container!.style.cursor = 'grabbing';
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+      event.preventDefault();
+      const x = event.pageX - container!.offsetLeft;
+      const walk = x - startXRef.current;
+      container!.scrollLeft = scrollLeftRef.current - walk;
+    };
+
+    const handleMouseUpOrLeave = () => {
+      isDraggingRef.current = false;
+      container!.style.cursor = 'grab';
+    };
+
     const handleWheel = (event: WheelEvent) => {
       if (container) {
         if (event.deltaY !== 0) {
@@ -152,7 +178,7 @@ const Session: React.FC = () => {
     const handleTouchMove = (event: TouchEvent) => {
       if (container && touchStartXRef.current !== null) {
         const touchCurrentX = event.touches[0].clientX;
-        const touchDeltaX = touchStartXRef.current - touchCurrentX;
+        const touchDeltaX = (touchStartXRef.current - touchCurrentX) * 2;
         container.scrollLeft += touchDeltaX;
         touchStartXRef.current = touchCurrentX;
         event.preventDefault();
@@ -160,6 +186,10 @@ const Session: React.FC = () => {
     };
 
     if (container) {
+      container.addEventListener('mousedown', handleMouseDown);
+      container.addEventListener('mousemove', handleMouseMove);
+      container.addEventListener('mouseup', handleMouseUpOrLeave);
+      container.addEventListener('mouseleave', handleMouseUpOrLeave);
       container.addEventListener('wheel', handleWheel);
       container.addEventListener('touchstart', handleTouchStart);
       container.addEventListener('touchmove', handleTouchMove);
@@ -167,6 +197,10 @@ const Session: React.FC = () => {
 
     return () => {
       if (container) {
+        container.removeEventListener('mousedown', handleMouseDown);
+        container.removeEventListener('mousemove', handleMouseMove);
+        container.removeEventListener('mouseup', handleMouseUpOrLeave);
+        container.removeEventListener('mouseleave', handleMouseUpOrLeave);
         container.removeEventListener('wheel', handleWheel);
         container.removeEventListener('touchstart', handleTouchStart);
         container.removeEventListener('touchmove', handleTouchMove);
