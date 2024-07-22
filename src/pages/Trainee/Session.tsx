@@ -6,6 +6,9 @@ import addBtn from '@icons/home/addbtn.svg';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
 import { AddButton } from '@components/Common/AddButton';
 import { user } from 'src/stores/userStore';
+import AddSessionModal, {
+  SessionDataType,
+} from '@components/Trainee/AddSessionModal';
 
 const Wrapper = styled.div`
   display: flex;
@@ -96,6 +99,15 @@ const Session: React.FC = () => {
   const isDraggingRef = useRef(false);
   const startXRef = useRef(0);
   const scrollLeftRef = useRef(0);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [formState, setFormState] = useState<SessionDataType>({
+    date: new Date(),
+    count: '',
+    remark: '',
+    exercises: [
+      { type: '', weight: '', speed: '', time: '', set: '', count: '' },
+    ],
+  });
 
   const getMoreImages = (count = 9) => {
     const newImages = [];
@@ -208,6 +220,11 @@ const Session: React.FC = () => {
     };
   }, []);
 
+  const handleSaveSession = (session: SessionDataType) => {
+    console.log(session);
+    // Handle the save logic
+  };
+
   return (
     <SectionWrapper>
       <Wrapper>
@@ -237,10 +254,17 @@ const Session: React.FC = () => {
         </RecordBox>
       </Wrapper>
       {user?.role === 'TRAINER' ? (
-        <AddButton>
+        <AddButton onClick={() => setModalOpen(true)}>
           <img src={addBtn} alt="add button" />
         </AddButton>
       ) : null}
+      <AddSessionModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSaveSession}
+        formState={formState}
+        setFormState={setFormState}
+      />
     </SectionWrapper>
   );
 };
