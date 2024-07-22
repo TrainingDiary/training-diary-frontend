@@ -165,7 +165,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
   workoutTypes,
 }) => {
   const initialFormState: SessionDataType = {
-    date: null,
+    date: new Date() || null,
     count: '',
     remark: '',
     exercises: [

@@ -6,10 +6,10 @@ import axios from 'axios';
 import addBtn from '@icons/home/addbtn.svg';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
 import { AddButton } from '@components/Common/AddButton';
-import { user } from 'src/stores/userStore';
 import AddSessionModal, {
   SessionDataType,
 } from '@components/Trainee/AddSessionModal';
+import { user } from 'src/stores/userStore';
 
 const Wrapper = styled.div`
   display: flex;
@@ -127,7 +127,6 @@ const Session: React.FC = () => {
         `https://via.placeholder.com/250?text=Image${Math.floor(Math.random() * 100)}`
       );
     }
-
     return newImages;
   };
 
@@ -137,7 +136,6 @@ const Session: React.FC = () => {
 
   useEffect(() => {
     setImages(getMoreImages(20));
-
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting) {
@@ -238,7 +236,6 @@ const Session: React.FC = () => {
         console.error('Failed to fetch workout types', error);
       }
     };
-
     fetchWorkoutTypes();
   }, []);
 
