@@ -78,19 +78,27 @@ const ExerciseRow = styled.div`
   align-items: center;
 `;
 
-const Select = styled.select``;
+const Select = styled.select`
+  padding: 5px;
+  border: solid 1px ${({ theme }) => theme.colors.gray500};
+  border-radius: 5px;
+  outline: none;
+`;
 
 const AttributeGroup = styled.div`
   display: flex;
   gap: 15px;
 `;
 
-const AttributeTab = styled.div`
+const AttributeTabInput = styled.input`
   display: flex;
   padding: 5px 10px;
-  background-color: ${({ theme }) => theme.colors.gray300};
+  background-color: ${({ theme }) => theme.colors.white};
+  border: solid 1px ${({ theme }) => theme.colors.gray500};
   line-height: 1;
   border-radius: 3px;
+  width: 100%;
+  outline: none;
 `;
 
 const AddExerciseButton = styled.button`
@@ -157,6 +165,22 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
     }));
   };
 
+  const handleExerciseChange = (
+    index: number,
+    field: keyof ExerciseType,
+    value: string
+  ) => {
+    const newExercises = [...formState.exercises];
+    newExercises[index] = {
+      ...newExercises[index],
+      [field]: value,
+    };
+    setFormState(prev => ({
+      ...prev,
+      exercises: newExercises,
+    }));
+  };
+
   const handleWorkoutTypeChange = (index: number, workoutTypeId: string) => {
     const selectedWorkout = workoutTypes.find(
       workout => workout.id === parseInt(workoutTypeId)
@@ -201,7 +225,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       onSave={handleSave}
-      btnConfirm="추가"
+      btnConfirm="저장"
     >
       <FormGroup>
         <Label>날짜:</Label>
@@ -252,19 +276,54 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
                 {selectedWorkout && (
                   <AttributeGroup>
                     {selectedWorkout.weightInputRequired && (
-                      <AttributeTab>무게</AttributeTab>
-                    )}
-                    {selectedWorkout.setInputRequired && (
-                      <AttributeTab>세트</AttributeTab>
-                    )}
-                    {selectedWorkout.repInputRequired && (
-                      <AttributeTab>횟수</AttributeTab>
-                    )}
-                    {selectedWorkout.timeInputRequired && (
-                      <AttributeTab>시간</AttributeTab>
+                      <AttributeTabInput
+                        type="number"
+                        placeholder="무게"
+                        value={exercise.weight}
+                        onChange={e =>
+                          handleExerciseChange(index, 'weight', e.target.value)
+                        }
+                      />
                     )}
                     {selectedWorkout.speedInputRequired && (
-                      <AttributeTab>속도</AttributeTab>
+                      <AttributeTabInput
+                        type="number"
+                        placeholder="속도"
+                        value={exercise.speed}
+                        onChange={e =>
+                          handleExerciseChange(index, 'speed', e.target.value)
+                        }
+                      />
+                    )}
+                    {selectedWorkout.timeInputRequired && (
+                      <AttributeTabInput
+                        type="number"
+                        placeholder="시간"
+                        value={exercise.time}
+                        onChange={e =>
+                          handleExerciseChange(index, 'time', e.target.value)
+                        }
+                      />
+                    )}
+                    {selectedWorkout.setInputRequired && (
+                      <AttributeTabInput
+                        type="number"
+                        placeholder="세트"
+                        value={exercise.set}
+                        onChange={e =>
+                          handleExerciseChange(index, 'set', e.target.value)
+                        }
+                      />
+                    )}
+                    {selectedWorkout.repInputRequired && (
+                      <AttributeTabInput
+                        type="number"
+                        placeholder="횟수"
+                        value={exercise.count}
+                        onChange={e =>
+                          handleExerciseChange(index, 'count', e.target.value)
+                        }
+                      />
                     )}
                   </AttributeGroup>
                 )}
