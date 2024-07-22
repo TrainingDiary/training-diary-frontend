@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Modal from '@components/Common/Modal/Modal';
 import DatePicker from 'react-datepicker';
@@ -11,6 +11,8 @@ const FormGroup = styled.div`
   gap: 10px;
   align-items: flex-start;
   position: relative;
+  max-height: 30vh;
+  overflow-y: scroll;
 
   .dateWrap {
     max-width: 100%;
@@ -75,7 +77,8 @@ const ExerciseGroup = styled.div`
 const ExerciseRow = styled.div`
   display: flex;
   gap: 10px;
-  align-items: center;
+  align-items: flex-start;
+  flex-direction: column;
 `;
 
 const Select = styled.select`
@@ -91,7 +94,6 @@ const AttributeGroup = styled.div`
 `;
 
 const AttributeTabInput = styled.input`
-  display: flex;
   padding: 5px 10px;
   background-color: ${({ theme }) => theme.colors.white};
   border: solid 1px ${({ theme }) => theme.colors.gray500};
