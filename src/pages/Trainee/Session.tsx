@@ -49,7 +49,7 @@ const ImageContainer = styled.div`
 const ImageLayout = styled.div`
   min-width: 250px;
   max-height: 150px;
-  background-color: ${({ theme }) => theme.colors.black};
+  background-color: ${({ theme }) => theme.colors.gray800};
   display: flex;
   justify-content: center;
   user-select: none;
