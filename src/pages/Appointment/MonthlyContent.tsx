@@ -5,14 +5,14 @@ import { format } from 'date-fns';
 
 import Alert from '@components/Common/Alert/Alert';
 import Modal from '@components/Common/Modal/Modal';
+import { SectionWrapper } from '@components/Common/SectionWrapper';
 import MonthlyCalendar from '@components/Appointment/MonthlyCalendar';
 import ButtonContainer from '@components/Appointment/ButtonContainer';
 import TimeTableContainer from '@components/Appointment/TimeTableContainer';
-import TraineeList from '@components/Appointment/TraineeList';
+import TraineeRegisterModal from '@components/Appointment/TraineeRegisterModal';
 import useSchedules from 'src/hooks/useSchedules';
 import useModals from 'src/hooks/useModals';
 import { traineeList } from 'src/mocks/data/traineeList';
-import { SectionWrapper } from '@components/Common/SectionWrapper';
 
 const Wrapper = styled.div`
   display: flex;
@@ -43,6 +43,11 @@ const CompleteButton = styled.button`
   &:active {
     background-color: ${({ theme }) => theme.colors.gray900};
   }
+`;
+
+const TraineeRegisterModalText = styled.span`
+  color: ${({ theme }) => theme.colors.red300};
+  text-align: right;
 `;
 
 const MonthlyContent: React.FC = () => {
@@ -187,12 +192,14 @@ const MonthlyContent: React.FC = () => {
           onSave={() => onSaveModal('registerModal')}
           btnConfirm="저장"
         >
-          <TraineeList
+          <TraineeRegisterModal
             items={traineeList}
             selectedTraineeId={selectedTraineeId}
             onClick={onClickTrainee}
           />
-          저장 시 바로 적용됩니다.
+          <TraineeRegisterModalText>
+            저장 시 바로 적용됩니다.
+          </TraineeRegisterModalText>
         </Modal>
       </Wrapper>
     </SectionWrapper>

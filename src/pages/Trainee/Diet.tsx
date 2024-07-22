@@ -3,8 +3,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
+import addBtn from '@icons/home/addbtn.svg';
+import { AddButton } from '@components/Common/AddButton';
+import Modal from '@components/Common/Modal/Modal';
+import Alert from '@components/Common/Alert/Alert';
+import DietUploadModal from '@components/Trainee/DietUploadModal';
+import useModals from 'src/hooks/useModals';
+
 const Wrapper = styled.div`
-  height: 100vh;
+  height: calc(100vh - 150px);
   overflow: auto;
 `;
 
@@ -42,8 +49,15 @@ const getMoreImages = (count = 9) => {
 const Diet: React.FC = () => {
   const navigate = useNavigate();
   const { traineeId } = useParams<{ traineeId: string }>();
+  const { openModal, closeModal, isOpen } = useModals();
   const [images, setImages] = useState<string[]>([]);
+  const [formData, setFormData] = useState<{
+    photo: FileList | null;
+    content: string;
+  }>({ photo: null, content: '' });
+  const [preview, setPreview] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [errorAlert, setErrorAlert] = useState<string>('');
 
   const fetchMoreImages = async () => {
     if (isLoading) return;
@@ -56,6 +70,29 @@ const Diet: React.FC = () => {
   const onClickDiet = (dietId: number) => {
     navigate(`/trainee/${traineeId}/diet/${dietId}`);
   };
+
+  const onClickAddButton = () => {
+    setFormData({ photo: null, content: '' });
+    setPreview(null);
+    openModal('addModal');
+  };
+
+  const onSaveAddModal = () => {
+    if (!formData.photo) {
+      return setErrorAlert('식단 사진을 추가해주세요.');
+    }
+
+    if (!formData.content) {
+      return setErrorAlert('식단 내용을 입력해주세요.');
+    }
+
+    // 식단 추가 API 요청 단계 추가
+    console.log(formData);
+
+    closeModal('addModal');
+  };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
 
   useEffect(() => setImages(getMoreImages(24)), []);
 
@@ -71,11 +108,32 @@ const Diet: React.FC = () => {
         <Gallery>
           {images.map((src, index) => (
             <ImageWrapper key={index} onClick={() => onClickDiet(index)}>
-              <Image src={src} alt={`image ${index}`} />
+              <Image src={src} alt={`image ${index}`} loading="lazy" />
             </ImageWrapper>
           ))}
         </Gallery>
       </InfiniteScroll>
+      <AddButton onClick={onClickAddButton}>
+        <img src={addBtn} alt="add button" />
+      </AddButton>
+      <Modal
+        title="식단 올리기"
+        type="custom"
+        isOpen={isOpen('addModal')}
+        onClose={() => closeModal('addModal')}
+        onSave={() => onSaveAddModal()}
+        btnConfirm="등록"
+      >
+        <DietUploadModal
+          formData={formData}
+          setFormData={setFormData}
+          preview={preview}
+          setPreview={setPreview}
+        />
+      </Modal>
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
     </Wrapper>
   );
 };

@@ -12,17 +12,12 @@ export const AddButton = styled.button`
   opacity: 0.8;
   line-height: 1;
 
-  position: sticky;
+  position: fixed;
   bottom: 80px;
-  right: 30px;
+  right: calc(50% - 225px + 30px);
   margin-left: auto;
   box-shadow: 0 4px 4px ${({ theme }) => hexToRgba(theme.colors.black, 0.35)};
-  display: block;
   z-index: 99;
-
-  @media (max-width: 450px) {
-    position: fixed;
-  }
 
   &:active {
     background-color: ${({ theme }) => theme.colors.main600};
@@ -31,5 +26,10 @@ export const AddButton = styled.button`
 
   &:hover {
     opacity: 1;
+  }
+
+  @media ${({ theme }) => theme.media.tablet},
+    ${({ theme }) => theme.media.mobile} {
+    right: 30px;
   }
 `;

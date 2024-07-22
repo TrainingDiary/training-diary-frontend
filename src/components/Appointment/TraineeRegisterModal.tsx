@@ -67,20 +67,20 @@ interface TraineeDataType {
   traineeName: string;
 }
 
-interface TraineeListProps {
+interface TraineeRegisterModalProps {
   items: TraineeDataType[];
   selectedTraineeId: number | null;
   onClick: (id: number) => void;
 }
 
-const TraineeList: React.FC<TraineeListProps> = ({
+const TraineeRegisterModal: React.FC<TraineeRegisterModalProps> = ({
   items,
   selectedTraineeId,
   onClick,
 }) => {
   return (
     <TraineeListWrapper>
-      {items.map((trainee) => (
+      {items.map(trainee => (
         <TraineeItem
           key={trainee.traineeId}
           $isSelected={trainee.traineeId === selectedTraineeId}
@@ -99,4 +99,4 @@ const TraineeList: React.FC<TraineeListProps> = ({
   );
 };
 
-export default TraineeList;
+export default TraineeRegisterModal;

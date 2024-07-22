@@ -91,8 +91,7 @@ const ModalCustomWrapper = styled.div`
   flex-direction: column;
   gap: 10px;
   font-size: 1.4rem;
-  color: ${({ theme }) => theme.colors.red300};
-  text-align: right;
+  color: ${({ theme }) => theme.colors.gray900};
 `;
 
 const ButtonGroup = styled.div`
