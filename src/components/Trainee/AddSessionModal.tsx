@@ -13,6 +13,12 @@ const FormGroup = styled.div`
   align-items: stretch;
   position: relative;
 
+  .react-datepicker
+    .react-datepicker__month-container
+    .react-datepicker__header {
+    background-color: ${({ theme }) => theme.colors.main600};
+  }
+
   .dateWrap {
     max-width: 100%;
   }
@@ -24,6 +30,9 @@ const FormGroup = styled.div`
   .react-datepicker-popper[data-placement^='bottom']
     .react-datepicker__triangle {
     left: 10% !important;
+    fill: ${({ theme }) => theme.colors.main600};
+    stroke: ${({ theme }) => theme.colors.main600};
+    color: ${({ theme }) => theme.colors.main600};
   }
 
   h2.react-datepicker__current-month {
@@ -34,6 +43,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   font-size: 1.4rem;
   color: ${({ theme }) => theme.colors.gray900};
+  font-weight: bold;
 `;
 
 const Input = styled.input`
