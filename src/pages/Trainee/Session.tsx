@@ -49,16 +49,16 @@ const ImageContainer = styled.div`
 const ImageLayout = styled.div`
   min-width: 250px;
   max-height: 150px;
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme }) => theme.colors.black};
   display: flex;
   justify-content: center;
-  align-items: center;
   user-select: none;
 `;
 
 const Image = styled.img`
   display: block;
-  width: 100%;
+  object-fit: cover;
+  object-position: center;
   pointer-events: none;
 `;
 
@@ -76,7 +76,7 @@ const RecordItem = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray300};
 `;
 
 interface Session {
@@ -124,7 +124,7 @@ const Session: React.FC = () => {
     const newImages = [];
     for (let i = 0; i < count; i++) {
       newImages.push(
-        `https://via.placeholder.com/250?text=Image${Math.floor(Math.random() * 100)}`
+        `https://via.placeholder.com/200x250?text=Image${Math.floor(Math.random() * 100)}`
       );
     }
     return newImages;
