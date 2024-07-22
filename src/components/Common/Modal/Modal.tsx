@@ -41,6 +41,8 @@ const Title = styled.h2`
 const TitleGroup = styled.div`
   display: flex;
   justify-content: space-between;
+  border-bottom: solid 2px ${({ theme }) => theme.colors.main400};
+  padding-bottom: 3px;
 `;
 
 const CloseButton = styled.button`
