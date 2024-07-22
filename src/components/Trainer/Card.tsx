@@ -91,11 +91,11 @@ interface CardProps {
     name: string;
     target_muscle: string;
     remark: string;
-    weight_input_required: boolean;
-    set_input_required: boolean;
-    rep_input_required: boolean;
-    time_input_required: boolean;
-    speed_input_required: boolean;
+    weightInputRequired: boolean;
+    setInputRequired: boolean;
+    repInputRequired: boolean;
+    timeInputRequired: boolean;
+    speedInputRequired: boolean;
   };
   onDelete: (id: number) => void;
   onEdit: (id: number) => void;
@@ -121,11 +121,11 @@ const Card: React.FC<CardProps> = ({ workout, onDelete, onEdit }) => {
       <Divider />
       <CardBody>{workout.remark}</CardBody>
       <Tags>
-        {workout.weight_input_required && <Tag>#무게</Tag>}
-        {workout.set_input_required && <Tag>#세트횟수</Tag>}
-        {workout.rep_input_required && <Tag>#반복횟수</Tag>}
-        {workout.time_input_required && <Tag>#시간</Tag>}
-        {workout.speed_input_required && <Tag>#속도</Tag>}
+        {workout.weightInputRequired && <Tag>#무게</Tag>}
+        {workout.setInputRequired && <Tag>#세트횟수</Tag>}
+        {workout.repInputRequired && <Tag>#반복횟수</Tag>}
+        {workout.timeInputRequired && <Tag>#시간</Tag>}
+        {workout.speedInputRequired && <Tag>#속도</Tag>}
       </Tags>
     </CardWrapper>
   );

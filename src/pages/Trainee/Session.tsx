@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 import addBtn from '@icons/home/addbtn.svg';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
@@ -43,7 +44,6 @@ const ImageContainer = styled.div`
   overflow-x: auto;
   width: 100%;
   position: relative;
-  cursor: grab;
 `;
 
 const ImageLayout = styled.div`
@@ -108,6 +108,17 @@ const Session: React.FC = () => {
       { type: '', weight: '', speed: '', time: '', set: '', count: '' },
     ],
   });
+  const [workoutTypes, setWorkoutTypes] = useState<
+    {
+      id: number;
+      name: string;
+      weightInputRequired: boolean;
+      setInputRequired: boolean;
+      repInputRequired: boolean;
+      timeInputRequired: boolean;
+      speedInputRequired: boolean;
+    }[]
+  >([]);
 
   const getMoreImages = (count = 9) => {
     const newImages = [];
@@ -158,7 +169,6 @@ const Session: React.FC = () => {
       isDraggingRef.current = true;
       startXRef.current = event.pageX - container!.offsetLeft;
       scrollLeftRef.current = container!.scrollLeft;
-      container!.style.cursor = 'grabbing';
     };
 
     const handleMouseMove = (event: MouseEvent) => {
@@ -171,7 +181,6 @@ const Session: React.FC = () => {
 
     const handleMouseUpOrLeave = () => {
       isDraggingRef.current = false;
-      container!.style.cursor = 'grab';
     };
 
     const handleWheel = (event: WheelEvent) => {
@@ -220,6 +229,19 @@ const Session: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchWorkoutTypes = async () => {
+      try {
+        const response = await axios.get('/api/workout-types');
+        setWorkoutTypes(response.data);
+      } catch (error) {
+        console.error('Failed to fetch workout types', error);
+      }
+    };
+
+    fetchWorkoutTypes();
+  }, []);
+
   const handleSaveSession = (session: SessionDataType) => {
     console.log(session);
     // Handle the save logic
@@ -264,6 +286,7 @@ const Session: React.FC = () => {
         onSave={handleSaveSession}
         formState={formState}
         setFormState={setFormState}
+        workoutTypes={workoutTypes}
       />
     </SectionWrapper>
   );

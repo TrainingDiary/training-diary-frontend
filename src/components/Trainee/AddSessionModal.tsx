@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-
 import Modal from '@components/Common/Modal/Modal';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -79,6 +78,21 @@ const ExerciseRow = styled.div`
   align-items: center;
 `;
 
+const Select = styled.select``;
+
+const AttributeGroup = styled.div`
+  display: flex;
+  gap: 15px;
+`;
+
+const AttributeTab = styled.div`
+  display: flex;
+  padding: 5px 10px;
+  background-color: ${({ theme }) => theme.colors.gray300};
+  line-height: 1;
+  border-radius: 3px;
+`;
+
 const AddExerciseButton = styled.button`
   padding: 5px 10px;
   background-color: ${({ theme }) => theme.colors.main400};
@@ -110,6 +124,15 @@ interface AddSessionModalProps {
   onSave: (session: SessionDataType) => void;
   formState: SessionDataType;
   setFormState: React.Dispatch<React.SetStateAction<SessionDataType>>;
+  workoutTypes: {
+    id: number;
+    name: string;
+    weightInputRequired: boolean;
+    setInputRequired: boolean;
+    repInputRequired: boolean;
+    timeInputRequired: boolean;
+    speedInputRequired: boolean;
+  }[];
 }
 
 const AddSessionModal: React.FC<AddSessionModalProps> = ({
@@ -118,6 +141,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
   onSave,
   formState,
   setFormState,
+  workoutTypes,
 }) => {
   const handleInputChange = (field: keyof SessionDataType, value: string) => {
     setFormState(prev => ({
@@ -133,20 +157,26 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
     }));
   };
 
-  const handleExerciseChange = (
-    index: number,
-    field: keyof ExerciseType,
-    value: string
-  ) => {
-    const newExercises = [...formState.exercises];
-    newExercises[index] = {
-      ...newExercises[index],
-      [field]: value,
-    };
-    setFormState(prev => ({
-      ...prev,
-      exercises: newExercises,
-    }));
+  const handleWorkoutTypeChange = (index: number, workoutTypeId: string) => {
+    const selectedWorkout = workoutTypes.find(
+      workout => workout.id === parseInt(workoutTypeId)
+    );
+    if (selectedWorkout) {
+      const newExercises = [...formState.exercises];
+      newExercises[index] = {
+        ...newExercises[index],
+        type: selectedWorkout.name,
+        weight: '',
+        speed: '',
+        time: '',
+        set: '',
+        count: '',
+      };
+      setFormState(prev => ({
+        ...prev,
+        exercises: newExercises,
+      }));
+    }
   };
 
   const addExercise = () => {
@@ -201,24 +231,47 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
       </FormGroup>
       <FormGroup>
         <Label>운동 종류 기록:</Label>
-        {formState.exercises.map((exercise, index) => (
-          <ExerciseGroup key={index}>
-            <ExerciseRow>
-              <select
-                value={exercise.type}
-                onChange={e =>
-                  handleExerciseChange(index, 'type', e.target.value)
-                }
-              >
-                <option value="">운동 종류</option>
-                <option value="Squat">Squat</option>
-                <option value="Deadlift">Deadlift</option>
-                <option value="Bench Press">Bench Press</option>
-                {/* Add other exercise types as needed */}
-              </select>
-            </ExerciseRow>
-          </ExerciseGroup>
-        ))}
+        {formState.exercises.map((exercise, index) => {
+          const selectedWorkout = workoutTypes.find(
+            workout => workout.name === exercise.type
+          );
+          return (
+            <ExerciseGroup key={index}>
+              <ExerciseRow>
+                <Select
+                  value={selectedWorkout ? selectedWorkout.id : ''}
+                  onChange={e => handleWorkoutTypeChange(index, e.target.value)}
+                >
+                  <option value="">운동 종류</option>
+                  {workoutTypes.map(workout => (
+                    <option key={workout.id} value={workout.id}>
+                      {workout.name}
+                    </option>
+                  ))}
+                </Select>
+                {selectedWorkout && (
+                  <AttributeGroup>
+                    {selectedWorkout.weightInputRequired && (
+                      <AttributeTab>무게</AttributeTab>
+                    )}
+                    {selectedWorkout.setInputRequired && (
+                      <AttributeTab>세트</AttributeTab>
+                    )}
+                    {selectedWorkout.repInputRequired && (
+                      <AttributeTab>횟수</AttributeTab>
+                    )}
+                    {selectedWorkout.timeInputRequired && (
+                      <AttributeTab>시간</AttributeTab>
+                    )}
+                    {selectedWorkout.speedInputRequired && (
+                      <AttributeTab>속도</AttributeTab>
+                    )}
+                  </AttributeGroup>
+                )}
+              </ExerciseRow>
+            </ExerciseGroup>
+          );
+        })}
         <AddExerciseButton onClick={addExercise}>운동 추가</AddExerciseButton>
       </FormGroup>
     </Modal>
