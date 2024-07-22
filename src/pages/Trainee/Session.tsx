@@ -252,7 +252,7 @@ const Session: React.FC = () => {
           <ImageContainer ref={imageContainerRef}>
             {images.map((src, index) => (
               <ImageLayout key={index}>
-                <Image src={src} alt={`image ${index}`} />
+                <Image src={src} alt={`image ${index}`} loading="lazy" />
               </ImageLayout>
             ))}
             <div ref={observerRef} />
