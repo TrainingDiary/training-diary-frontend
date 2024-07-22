@@ -17,12 +17,7 @@ export const AddButton = styled.button`
   right: calc(50% - 225px + 30px);
   margin-left: auto;
   box-shadow: 0 4px 4px ${({ theme }) => hexToRgba(theme.colors.black, 0.35)};
-  display: block;
   z-index: 99;
-
-  @media (max-width: 450px) {
-    position: fixed;
-  }
 
   &:active {
     background-color: ${({ theme }) => theme.colors.main600};
