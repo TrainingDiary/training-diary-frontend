@@ -21,8 +21,8 @@ export const workoutList = [
     weightInputRequired: true,
     setInputRequired: true,
     repInputRequired: true,
-    timeInputRequired: false,
-    speedInputRequired: false,
+    timeInputRequired: true,
+    speedInputRequired: true,
   },
   {
     id: 3,
@@ -32,7 +32,7 @@ export const workoutList = [
     weightInputRequired: true,
     setInputRequired: true,
     repInputRequired: true,
-    timeInputRequired: false,
+    timeInputRequired: true,
     speedInputRequired: false,
   },
   {
