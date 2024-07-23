@@ -10,6 +10,7 @@ import AddSessionModal, {
   SessionDataType,
 } from '@components/Trainee/AddSessionModal';
 import { user } from 'src/stores/userStore';
+import useModals from 'src/hooks/useModals';
 
 const Wrapper = styled.div`
   display: flex;
@@ -99,12 +100,12 @@ const Session: React.FC = () => {
   const isDraggingRef = useRef(false);
   const startXRef = useRef(0);
   const scrollLeftRef = useRef(0);
-  const [isModalOpen, setModalOpen] = useState(false);
+  const { openModal, closeModal, isOpen } = useModals();
   const [formState, setFormState] = useState<SessionDataType>({
-    date: new Date(),
-    count: '',
-    remark: '',
-    exercises: [
+    sessionDate: new Date(),
+    sessionNumber: 0,
+    specialNote: '',
+    workouts: [
       { type: '', weight: '', speed: '', time: '', set: '', count: '' },
     ],
   });
@@ -273,13 +274,13 @@ const Session: React.FC = () => {
         </RecordBox>
       </Wrapper>
       {user?.role === 'TRAINER' ? (
-        <AddButton onClick={() => setModalOpen(true)}>
+        <AddButton onClick={() => openModal('addSessionModal')}>
           <img src={addBtn} alt="add button" />
         </AddButton>
       ) : null}
       <AddSessionModal
-        isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
+        isOpen={isOpen('addSessionModal')}
+        onClose={() => closeModal('addSessionModal')}
         onSave={handleSaveSession}
         formState={formState}
         setFormState={setFormState}
