@@ -184,6 +184,7 @@ const SessionDetail: React.FC = () => {
     {
       id: number;
       name: string;
+      targetMuscle: string;
       weightInputRequired: boolean;
       setInputRequired: boolean;
       repInputRequired: boolean;
