@@ -106,7 +106,7 @@ const Session: React.FC = () => {
     sessionNumber: 0,
     specialNote: '',
     workouts: [
-      { type: '', weight: '', speed: '', time: '', set: '', count: '' },
+      { type: '', weight: '', speed: '', time: '', sets: '', count: '' },
     ],
   });
   const [workoutTypes, setWorkoutTypes] = useState<
