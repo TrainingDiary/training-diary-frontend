@@ -22,7 +22,7 @@ const Wrapper = styled.div`
 export interface WorkoutDataType {
   id: number;
   name: string;
-  target_muscle: string;
+  targetMuscle: string;
   remark: string;
   weightInputRequired: boolean;
   setInputRequired: boolean;
@@ -69,7 +69,7 @@ const WorkOutManagement: React.FC = () => {
     if (data) {
       setFormState({
         name: data.name,
-        targetMuscle: data.target_muscle,
+        targetMuscle: data.targetMuscle,
         remark: data.remark,
         attributes: {
           weight: data.weightInputRequired,

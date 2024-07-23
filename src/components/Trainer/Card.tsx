@@ -89,7 +89,7 @@ interface CardProps {
   workout: {
     id: number;
     name: string;
-    target_muscle: string;
+    targetMuscle: string;
     remark: string;
     weightInputRequired: boolean;
     setInputRequired: boolean;
@@ -107,7 +107,7 @@ const Card: React.FC<CardProps> = ({ workout, onDelete, onEdit }) => {
       <CardHeader>
         <TitleGroup>
           <CardTitle>{workout.name}</CardTitle>
-          <CardSubtitle>{workout.target_muscle}</CardSubtitle>
+          <CardSubtitle>{workout.targetMuscle}</CardSubtitle>
         </TitleGroup>
         <ButtonGroup>
           <Button $size="small" onClick={() => onDelete(workout.id)}>

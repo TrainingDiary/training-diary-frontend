@@ -134,7 +134,7 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
     const newWorkout: WorkoutDataType = {
       id: Date.now(), // 임시 ID 할당
       name: formState.name,
-      target_muscle: formState.targetMuscle,
+      targetMuscle: formState.targetMuscle,
       remark: formState.remark,
       weightInputRequired: formState.attributes.weight,
       setInputRequired: formState.attributes.set,

@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
+
 import { SectionWrapper } from '@components/Common/SectionWrapper';
+import Button from '@components/Common/Button/Button';
+import PhotoUploadModal from '@components/Trainee/PhotoUploadModal';
+import VideoUploadModal from '@components/Trainee/VideoUploadModal';
+import EditSessionModal from '@components/Trainee/EditSessionModal';
+import { hexToRgba } from 'src/utils/hexToRgba';
+import useModals from 'src/hooks/useModals';
 import {
   sessionDetails,
   SessionDetailType,
 } from 'src/mocks/data/workoutSessionList';
-import { hexToRgba } from 'src/utils/hexToRgba';
-import Button from '@components/Common/Button/Button';
-import PhotoUploadModal from '@components/Trainee/PhotoUploadModal';
-import VideoUploadModal from '@components/Trainee/VideoUploadModal';
-import useModals from 'src/hooks/useModals';
 
 const DetailWrapper = styled.div`
   display: flex;
@@ -177,24 +180,35 @@ const SessionDetail: React.FC = () => {
     null
   );
   const { openModal, closeModal, isOpen } = useModals();
+  const [workoutTypes, setWorkoutTypes] = useState<
+    {
+      id: number;
+      name: string;
+      weightInputRequired: boolean;
+      setInputRequired: boolean;
+      repInputRequired: boolean;
+      timeInputRequired: boolean;
+      speedInputRequired: boolean;
+    }[]
+  >([]);
+  const [formState, setFormState] = useState<SessionDetailType | null>(null);
 
   useEffect(() => {
-    // const fetchSessionData = async () => {
-    //   try {
-    //     const response = await axios.get(
-    //       `/api/trainee/${traineeId}/session/${sessionId}`
-    //     );
-    //     setSessionData(response.data);
-    //   } catch (error) {
-    //     console.error('Failed to fetch session data', error);
-    //   }
-    // };
+    // Fetch workout types
+    const fetchWorkoutTypes = async () => {
+      try {
+        const response = await axios.get('/api/workout-types');
+        setWorkoutTypes(response.data);
+      } catch (error) {
+        console.error('Failed to fetch workout types', error);
+      }
+    };
+    fetchWorkoutTypes();
 
-    // fetchSessionData();
-
-    // 테스트 데이터 연동
-    if (sessionId === undefined) return;
-    setSessionData(sessionDetails[+sessionId - 1]);
+    // Fetch session data
+    if (sessionId !== undefined) {
+      setSessionData(sessionDetails[+sessionId - 1]);
+    }
   }, [traineeId, sessionId]);
 
   if (!sessionData) {
@@ -202,15 +216,26 @@ const SessionDetail: React.FC = () => {
   }
 
   const handlePhotoUpload = (photos: string[]) => {
-    // 업로드된 사진 처리 로직 추가
+    // Handle uploaded photos
     console.log('Uploaded Photos:', photos);
     closeModal('photoUpload');
   };
 
   const handleVideoUpload = (video: string) => {
-    // 업로드된 비디오 처리 로직 추가
+    // Handle uploaded video
     console.log('Uploaded Video:', video);
     closeModal('videoUpload');
+  };
+
+  const handleEditSession = () => {
+    setFormState(sessionData);
+    openModal('editSessionModal');
+  };
+
+  const handleSaveSession = (updatedSession: SessionDetailType) => {
+    // Handle save logic
+    setSessionData(updatedSession);
+    closeModal('editSessionModal');
   };
 
   return (
@@ -221,16 +246,16 @@ const SessionDetail: React.FC = () => {
             {sessionData.sessionDate} / {sessionData.sessionNumber}회차
           </Title>
           <ButtonGroup>
-            <Button $size="small" type="button">
-              Edit
+            <Button $size="small" type="button" onClick={handleEditSession}>
+              수정
             </Button>
             <Button $size="small" type="button">
-              Delete
+              삭제
             </Button>
           </ButtonGroup>
         </Header>
         <Section>
-          <Label>특이사항</Label>
+          <Label>특이 사항</Label>
           <TextArea value={sessionData.specialNote} readOnly />
         </Section>
         <Section>
@@ -307,6 +332,14 @@ const SessionDetail: React.FC = () => {
         isOpen={isOpen('videoUpload')}
         onClose={() => closeModal('videoUpload')}
         onUpload={handleVideoUpload}
+      />
+      <EditSessionModal
+        isOpen={isOpen('editSessionModal')}
+        onClose={() => closeModal('editSessionModal')}
+        onSave={handleSaveSession}
+        formState={formState}
+        setFormState={setFormState}
+        workoutTypes={workoutTypes}
       />
     </SectionWrapper>
   );
