@@ -140,7 +140,7 @@ export interface WorkoutsType {
   speed: string;
   time: string;
   sets: string;
-  count: string;
+  rep: string;
 }
 
 export interface SessionDataType {
@@ -180,7 +180,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
     sessionNumber: 0,
     specialNote: '',
     workouts: [
-      { type: '', weight: '', speed: '', time: '', sets: '', count: '' },
+      { type: '', weight: '', speed: '', time: '', sets: '', rep: '' },
     ],
   };
 
@@ -227,7 +227,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
         speed: '',
         time: '',
         sets: '',
-        count: '',
+        rep: '',
       };
       setFormState(prev => ({
         ...prev,
@@ -241,7 +241,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
       ...prev,
       workouts: [
         ...prev.workouts,
-        { type: '', weight: '', speed: '', time: '', sets: '', count: '' },
+        { type: '', weight: '', speed: '', time: '', sets: '', rep: '' },
       ],
     }));
   };
@@ -280,8 +280,8 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
         return setErrorAlert(`세트를 입력해주세요.`);
       }
       if (
-        (selectedWorkout.repInputRequired && workout.count.trim() === '') ||
-        typeof workout.count === 'string'
+        (selectedWorkout.repInputRequired && workout.rep.trim() === '') ||
+        typeof workout.rep === 'string'
       ) {
         return setErrorAlert(`횟수를 입력해주세요.`);
       }
@@ -419,9 +419,9 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
                         <AttributeTabInput
                           type="number"
                           placeholder="횟수"
-                          value={exercise.count}
+                          value={exercise.rep}
                           onChange={e =>
-                            handleExerciseChange(index, 'count', e.target.value)
+                            handleExerciseChange(index, 'rep', e.target.value)
                           }
                         />
                       )}
