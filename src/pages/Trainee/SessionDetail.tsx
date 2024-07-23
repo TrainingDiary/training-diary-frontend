@@ -8,6 +8,7 @@ import {
   SessionDetailType,
 } from 'src/mocks/data/workoutSessionList';
 import { hexToRgba } from 'src/utils/hexToRgba';
+import Button from '@components/Common/Button/Button';
 
 const DetailWrapper = styled.div`
   display: flex;
@@ -32,17 +33,10 @@ const Title = styled.h2`
 const ButtonGroup = styled.div`
   display: flex;
   gap: 10px;
-`;
 
-const Button = styled.button`
-  padding: 5px 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  background-color: ${({ theme }) => theme.colors.main500};
-  color: ${({ theme }) => theme.colors.white};
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.main600};
+  button {
+    font-size: 1.4rem;
+    line-height: 1;
   }
 `;
 
@@ -50,6 +44,11 @@ const Section = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+
+  button {
+    font-size: 1.4rem;
+    line-height: 1;
+  }
 `;
 
 const Label = styled.label`
@@ -108,32 +107,47 @@ const TextArea = styled.textarea`
   resize: none;
   background-color: ${({ theme }) => theme.colors.white};
   box-shadow: 0 4px 4px ${({ theme }) => hexToRgba(theme.colors.gray900, 0.2)};
+  cursor: default;
+`;
+
+const ImageTitle = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const ImageContainer = styled.div`
   display: flex;
-  flex-direction: column;
   gap: 10px;
-`;
-
-const ImageUploadGroup = styled.div`
-  display: flex;
-  gap: 10px;
-  align-items: center;
+  overflow-x: auto;
 `;
 
 const ImagePreview = styled.div`
-  width: 100px;
-  height: 100px;
+  max-width: 360px;
+  width: 90%;
+  height: 23vh;
   background-color: ${({ theme }) => theme.colors.gray200};
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 5px;
-  overflow: hidden;
+  flex: 0 0 auto;
 
   img {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const VideoContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  width: 100%;
+  height: 23vh;
+
+  video {
+    width: 90%;
     height: 100%;
     object-fit: cover;
   }
@@ -179,8 +193,12 @@ const SessionDetail: React.FC = () => {
             {sessionData.sessionDate} / {sessionData.sessionNumber}회차
           </Title>
           <ButtonGroup>
-            <Button>Edit</Button>
-            <Button>Delete</Button>
+            <Button $size="small" type="button">
+              Edit
+            </Button>
+            <Button $size="small" type="button">
+              Delete
+            </Button>
           </ButtonGroup>
         </Header>
         <Section>
@@ -207,27 +225,35 @@ const SessionDetail: React.FC = () => {
           ))}
         </Section>
         <Section>
-          <Label>자세 사진</Label>
+          <ImageTitle>
+            <Label>자세 사진</Label>
+            <Button $size="small" $variant="primary">
+              업로드
+            </Button>
+          </ImageTitle>
           <ImageContainer>
             {sessionData.photoUrls.map((photo, index) => (
               <ImagePreview key={index}>
                 <img src={photo} alt={`자세 사진 ${index}`} />
               </ImagePreview>
             ))}
-            <Button>업로드</Button>
           </ImageContainer>
         </Section>
         <Section>
-          <Label>운동 영상</Label>
-          <ImageContainer>
+          <ImageTitle>
+            <Label>운동 영상</Label>
+            <Button $size="small" $variant="primary">
+              업로드
+            </Button>
+          </ImageTitle>
+          <VideoContainer>
             {sessionData.videoUrls.map((video, index) => (
               <video key={index} controls>
                 <source src={video} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             ))}
-            <Button>업로드</Button>
-          </ImageContainer>
+          </VideoContainer>
         </Section>
       </DetailWrapper>
     </SectionWrapper>

@@ -52,8 +52,15 @@ export const sessionDetails: SessionDetailType[] = [
         speed: 0,
       },
     ],
-    photoUrls: ['https://example.com/photo1.jpg'],
-    videoUrls: ['https://example.com/video1.mp4'],
+    photoUrls: [
+      'https://example.com/photo1.jpg',
+      'https://example.com/photo2.jpg',
+      'https://example.com/photo3.jpg',
+    ],
+    videoUrls: [
+      'https://example.com/video1.mp4',
+      'https://example.com/video2.mp4',
+    ],
   },
   {
     sessionId: 2,
