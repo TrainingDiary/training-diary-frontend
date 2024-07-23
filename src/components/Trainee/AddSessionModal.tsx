@@ -267,19 +267,34 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
       if (!selectedWorkout) {
         return setErrorAlert(`${i + 1}번째 운동 종류를 선택해주세요.`);
       }
-      if (selectedWorkout.weightInputRequired && workout.weight.trim() === '') {
+      if (
+        (selectedWorkout.weightInputRequired && workout.weight.trim() === '') ||
+        typeof workout.weight === 'string'
+      ) {
         return setErrorAlert(`무게를 입력해주세요.`);
       }
-      if (selectedWorkout.setInputRequired && workout.sets.trim() === '') {
+      if (
+        (selectedWorkout.setInputRequired && workout.sets.trim() === '') ||
+        typeof workout.sets === 'string'
+      ) {
         return setErrorAlert(`세트를 입력해주세요.`);
       }
-      if (selectedWorkout.repInputRequired && workout.count.trim() === '') {
+      if (
+        (selectedWorkout.repInputRequired && workout.count.trim() === '') ||
+        typeof workout.count === 'string'
+      ) {
         return setErrorAlert(`횟수를 입력해주세요.`);
       }
-      if (selectedWorkout.timeInputRequired && workout.time.trim() === '') {
+      if (
+        (selectedWorkout.timeInputRequired && workout.time.trim() === '') ||
+        typeof workout.time === 'string'
+      ) {
         return setErrorAlert(`시간을 입력해주세요.`);
       }
-      if (selectedWorkout.speedInputRequired && workout.speed.trim() === '') {
+      if (
+        (selectedWorkout.speedInputRequired && workout.speed.trim() === '') ||
+        typeof workout.speed === 'string'
+      ) {
         return setErrorAlert(`속도를 입력해주세요.`);
       }
     }
