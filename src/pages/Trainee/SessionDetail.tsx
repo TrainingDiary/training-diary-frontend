@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import { SectionWrapper } from '@components/Common/SectionWrapper';
@@ -14,6 +14,7 @@ import {
   sessionDetails,
   SessionDetailType,
 } from 'src/mocks/data/workoutSessionList';
+import Modal from '@components/Common/Modal/Modal';
 
 const DetailWrapper = styled.div`
   display: flex;
@@ -134,10 +135,11 @@ const LabelWrap = styled.div`
   }
 `;
 
-const ImageContainer = styled.div`
+const ScrollContainer = styled.div`
   display: flex;
   gap: 10px;
   overflow-x: auto;
+  user-select: none;
 `;
 
 const ImagePreview = styled.div`
@@ -149,19 +151,17 @@ const ImagePreview = styled.div`
   justify-content: center;
   align-items: center;
   flex: 0 0 auto;
+  user-select: none;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    pointer-events: none;
   }
 `;
 
-const VideoContainer = styled.div`
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  width: 100%;
+const VideoContainer = styled(ScrollContainer)`
   height: 23vh;
 
   video {
@@ -193,6 +193,10 @@ const SessionDetail: React.FC = () => {
     }[]
   >([]);
   const [formState, setFormState] = useState<SessionDetailType | null>(null);
+  const navigate = useNavigate();
+
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Fetch workout types
@@ -211,6 +215,69 @@ const SessionDetail: React.FC = () => {
       setSessionData(sessionDetails[+sessionId - 1]);
     }
   }, [traineeId, sessionId]);
+
+  const handleHorizontalScroll = (container: HTMLDivElement | null) => {
+    if (!container) return;
+
+    let startX: number;
+    let scrollLeft: number;
+    let isDown = false;
+
+    const mouseDownHandler = (e: MouseEvent) => {
+      isDown = true;
+      startX = e.pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+    };
+
+    const mouseLeaveHandler = () => {
+      isDown = false;
+    };
+
+    const mouseUpHandler = () => {
+      isDown = false;
+    };
+
+    const mouseMoveHandler = (e: MouseEvent) => {
+      if (!isDown) return;
+
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const walk = (x - startX) * 2;
+      container.scrollLeft = scrollLeft - walk;
+    };
+
+    const wheelHandler = (e: WheelEvent) => {
+      container.scrollLeft += e.deltaY;
+      e.preventDefault();
+    };
+
+    container.addEventListener('mousedown', mouseDownHandler);
+    container.addEventListener('mouseleave', mouseLeaveHandler);
+    container.addEventListener('mouseup', mouseUpHandler);
+    container.addEventListener('mousemove', mouseMoveHandler);
+    container.addEventListener('wheel', wheelHandler);
+
+    return () => {
+      container.removeEventListener('mousedown', mouseDownHandler);
+      container.removeEventListener('mouseleave', mouseLeaveHandler);
+      container.removeEventListener('mouseup', mouseUpHandler);
+      container.removeEventListener('mousemove', mouseMoveHandler);
+      container.removeEventListener('wheel', wheelHandler);
+    };
+  };
+
+  useEffect(() => {
+    const imageContainer = imageContainerRef.current;
+    const videoContainer = videoContainerRef.current;
+
+    const cleanupImageScroll = handleHorizontalScroll(imageContainer);
+    const cleanupVideoScroll = handleHorizontalScroll(videoContainer);
+
+    return () => {
+      cleanupImageScroll?.();
+      cleanupVideoScroll?.();
+    };
+  }, [imageContainerRef.current, videoContainerRef.current]);
 
   if (!sessionData) {
     return <div>Loading...</div>;
@@ -234,9 +301,19 @@ const SessionDetail: React.FC = () => {
   };
 
   const handleSaveSession = (updatedSession: SessionDetailType) => {
-    // Handle save logic
     setSessionData(updatedSession);
     closeModal('editSessionModal');
+  };
+
+  const handleDeleteSession = async () => {
+    // TODO : 삭제 api 연동
+    // await axios.delete(`/api/sessions/${sessionId}`);
+    navigate(`/trainee/${traineeId}/session`);
+  };
+
+  const handleConfirmDelete = () => {
+    // Show confirmation modal
+    openModal('deleteSessionModal');
   };
 
   return (
@@ -250,7 +327,7 @@ const SessionDetail: React.FC = () => {
             <Button $size="small" type="button" onClick={handleEditSession}>
               수정
             </Button>
-            <Button $size="small" type="button">
+            <Button $size="small" type="button" onClick={handleConfirmDelete}>
               삭제
             </Button>
           </ButtonGroup>
@@ -292,13 +369,13 @@ const SessionDetail: React.FC = () => {
               업로드
             </Button>
           </ImageTitle>
-          <ImageContainer>
+          <ScrollContainer ref={imageContainerRef}>
             {sessionData.photoUrls.map((photo, index) => (
               <ImagePreview key={index}>
                 <img src={photo} alt={`자세 사진 ${index}`} />
               </ImagePreview>
             ))}
-          </ImageContainer>
+          </ScrollContainer>
         </Section>
         <Section>
           <ImageTitle>
@@ -314,7 +391,7 @@ const SessionDetail: React.FC = () => {
               업로드
             </Button>
           </ImageTitle>
-          <VideoContainer>
+          <VideoContainer ref={videoContainerRef}>
             {sessionData.videoUrls.map((video, index) => (
               <video key={index} controls>
                 <source src={video} type="video/mp4" />
@@ -342,6 +419,16 @@ const SessionDetail: React.FC = () => {
         setFormState={setFormState}
         workoutTypes={workoutTypes}
       />
+      <Modal
+        title="운동 기록 삭제"
+        type="confirm"
+        isOpen={isOpen('deleteSessionModal')}
+        onClose={() => closeModal('deleteSessionModal')}
+        onSave={handleDeleteSession}
+        btnConfirm="삭제"
+      >
+        운동 기록을 삭제하시겠습니까?
+      </Modal>
     </SectionWrapper>
   );
 };
