@@ -85,6 +85,10 @@ const TextArea = styled.textarea`
     'Helvetica Neue',
     sans-serif;
   resize: none;
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.gray500};
+  }
 `;
 
 interface FormData {
@@ -156,7 +160,11 @@ const DietUploadModal: React.FC<DietUploadModalProps> = ({
       </Label>
       <Label>
         <span>내용 :</span>
-        <TextArea value={formData.content} onChange={handleChange} />
+        <TextArea
+          value={formData.content}
+          onChange={handleChange}
+          placeholder="Content"
+        />
       </Label>
     </Form>
   );
