@@ -5,13 +5,13 @@ importScripts(
 );
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_APP_API_KEY,
-  authDomain: import.meta.env.VITE_APP_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_APP_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_APP_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_APP_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_APP_APP_ID,
-  measurementId: import.meta.env.VITE_APP_MEASUREMENT_ID,
+  apiKey: 'AIzaSyAxLUWYFvRn67L9yLk2TnMDO6VUkXKXSKk',
+  authDomain: 'training-diary-e5a05.firebaseapp.com',
+  projectId: 'training-diary-e5a05',
+  storageBucket: 'training-diary-e5a05.appspot.com',
+  messagingSenderId: '628687093769',
+  appId: '1:628687093769:web:bb43a2c93262e6a0c278d8',
+  measurementId: 'G-6ED7JVWWP4',
 };
 
 firebase.initializeApp(firebaseConfig);
