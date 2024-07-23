@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import Modal from '@components/Common/Modal/Modal';
+import Alert from '@components/Common/Alert/Alert';
 import { DatePickerWrapper } from './Calendar';
 
 const FormGroup = styled.div`
@@ -133,20 +134,20 @@ const AddExerciseButton = styled.button`
   cursor: pointer;
 `;
 
-export interface ExerciseType {
+export interface WorkoutsType {
   type: string;
   weight: string;
   speed: string;
   time: string;
-  set: string;
+  sets: string;
   count: string;
 }
 
 export interface SessionDataType {
-  date: Date | null;
-  count: string;
-  remark: string;
-  exercises: ExerciseType[];
+  sessionDate: Date | null;
+  sessionNumber: number;
+  specialNote: string;
+  workouts: WorkoutsType[];
 }
 
 interface AddSessionModalProps {
@@ -175,11 +176,11 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
   workoutTypes,
 }) => {
   const initialFormState: SessionDataType = {
-    date: new Date() || null,
-    count: '',
-    remark: '',
-    exercises: [
-      { type: '', weight: '', speed: '', time: '', set: '', count: '' },
+    sessionDate: new Date() || null,
+    sessionNumber: 0,
+    specialNote: '',
+    workouts: [
+      { type: '', weight: '', speed: '', time: '', sets: '', count: '' },
     ],
   };
 
@@ -199,17 +200,17 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
 
   const handleExerciseChange = (
     index: number,
-    field: keyof ExerciseType,
+    field: keyof WorkoutsType,
     value: string
   ) => {
-    const newExercises = [...formState.exercises];
-    newExercises[index] = {
-      ...newExercises[index],
+    const newWorkouts = [...formState.workouts];
+    newWorkouts[index] = {
+      ...newWorkouts[index],
       [field]: value,
     };
     setFormState(prev => ({
       ...prev,
-      exercises: newExercises,
+      workouts: newWorkouts,
     }));
   };
 
@@ -218,19 +219,19 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
       workout => workout.id === parseInt(workoutTypeId)
     );
     if (selectedWorkout) {
-      const newExercises = [...formState.exercises];
-      newExercises[index] = {
-        ...newExercises[index],
+      const newWorkouts = [...formState.workouts];
+      newWorkouts[index] = {
+        ...newWorkouts[index],
         type: selectedWorkout.name,
         weight: '',
         speed: '',
         time: '',
-        set: '',
+        sets: '',
         count: '',
       };
       setFormState(prev => ({
         ...prev,
-        exercises: newExercises,
+        workouts: newWorkouts,
       }));
     }
   };
@@ -238,14 +239,51 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
   const addExercise = () => {
     setFormState(prev => ({
       ...prev,
-      exercises: [
-        ...prev.exercises,
-        { type: '', weight: '', speed: '', time: '', set: '', count: '' },
+      workouts: [
+        ...prev.workouts,
+        { type: '', weight: '', speed: '', time: '', sets: '', count: '' },
       ],
     }));
   };
 
+  const [errorAlert, setErrorAlert] = useState<string>('');
+
   const handleSave = () => {
+    if (formState.sessionDate === null)
+      return setErrorAlert('날짜를 입력해주세요.');
+
+    if (formState.sessionNumber === null || formState.sessionNumber === 0)
+      return setErrorAlert('회차를 입력해주세요.');
+
+    if (formState.specialNote.trim() === '')
+      return setErrorAlert('특이사항을 입력해주세요.');
+
+    // 운동 종류 기록 유효성 검사 로직
+    for (let i = 0; i < formState.workouts.length; i++) {
+      const workout = formState.workouts[i];
+      const selectedWorkout = workoutTypes.find(
+        type => type.name === workout.type
+      );
+      if (!selectedWorkout) {
+        return setErrorAlert(`${i + 1}번째 운동 종류를 선택해주세요.`);
+      }
+      if (selectedWorkout.weightInputRequired && workout.weight.trim() === '') {
+        return setErrorAlert(`무게를 입력해주세요.`);
+      }
+      if (selectedWorkout.setInputRequired && workout.sets.trim() === '') {
+        return setErrorAlert(`세트를 입력해주세요.`);
+      }
+      if (selectedWorkout.repInputRequired && workout.count.trim() === '') {
+        return setErrorAlert(`횟수를 입력해주세요.`);
+      }
+      if (selectedWorkout.timeInputRequired && workout.time.trim() === '') {
+        return setErrorAlert(`시간을 입력해주세요.`);
+      }
+      if (selectedWorkout.speedInputRequired && workout.speed.trim() === '') {
+        return setErrorAlert(`속도를 입력해주세요.`);
+      }
+    }
+
     onSave(formState);
     setFormState(initialFormState);
     onClose();
@@ -255,6 +293,8 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
     setFormState(initialFormState);
     onClose();
   };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
 
   return (
     <Modal
@@ -269,7 +309,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
         <Label>날짜:</Label>
         <DatePickerWrapper className="dateWrap">
           <DatePicker
-            selected={formState.date}
+            selected={formState.sessionDate}
             onChange={handleDateChange}
             dateFormat="yyyy. MM. dd"
             customInput={<Input />}
@@ -280,21 +320,21 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
         <Label>회차:</Label>
         <Input
           type="number"
-          value={formState.count}
-          onChange={e => handleInputChange('count', e.target.value)}
+          value={formState.sessionNumber}
+          onChange={e => handleInputChange('sessionNumber', e.target.value)}
         />
       </FormGroup>
       <FormGroup>
         <Label>특이사항:</Label>
         <TextArea
-          value={formState.remark}
-          onChange={e => handleInputChange('remark', e.target.value)}
+          value={formState.specialNote}
+          onChange={e => handleInputChange('specialNote', e.target.value)}
         ></TextArea>
       </FormGroup>
       <FormGroup>
         <WorkoutSection>
           <Label>운동 종류 기록:</Label>
-          {formState.exercises.map((exercise, index) => {
+          {formState.workouts.map((exercise, index) => {
             const selectedWorkout = workoutTypes.find(
               workout => workout.name === exercise.type
             );
@@ -354,9 +394,9 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
                         <AttributeTabInput
                           type="number"
                           placeholder="세트"
-                          value={exercise.set}
+                          value={exercise.sets}
                           onChange={e =>
-                            handleExerciseChange(index, 'set', e.target.value)
+                            handleExerciseChange(index, 'sets', e.target.value)
                           }
                         />
                       )}
@@ -379,6 +419,9 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
           <AddExerciseButton onClick={addExercise}>운동 추가</AddExerciseButton>
         </WorkoutSection>
       </FormGroup>
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
     </Modal>
   );
 };
