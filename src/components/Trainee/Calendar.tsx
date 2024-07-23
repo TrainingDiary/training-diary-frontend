@@ -8,7 +8,7 @@ interface CalendarProps {
   onDateChange: (date: Date | null) => void;
 }
 
-const DatePickerWrapper = styled.div`
+export const DatePickerWrapper = styled.div`
   width: 100%;
   max-width: 220px;
   .react-datepicker-wrapper {

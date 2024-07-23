@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 import addBtn from '@icons/home/addbtn.svg';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
 import { AddButton } from '@components/Common/AddButton';
+import AddSessionModal, {
+  SessionDataType,
+} from '@components/Trainee/AddSessionModal';
 import { user } from 'src/stores/userStore';
+import useModals from 'src/hooks/useModals';
 
 const Wrapper = styled.div`
   display: flex;
@@ -45,15 +50,17 @@ const ImageContainer = styled.div`
 const ImageLayout = styled.div`
   min-width: 250px;
   max-height: 150px;
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme }) => theme.colors.gray800};
   display: flex;
   justify-content: center;
-  align-items: center;
+  user-select: none;
 `;
 
 const Image = styled.img`
   display: block;
-  width: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
 `;
 
 const RecordList = styled.div`
@@ -70,7 +77,7 @@ const RecordItem = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray300};
 `;
 
 interface Session {
@@ -90,15 +97,37 @@ const Session: React.FC = () => {
   const observerRef = useRef<HTMLDivElement | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const touchStartXRef = useRef<number | null>(null);
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
+  const { openModal, closeModal, isOpen } = useModals();
+  const [formState, setFormState] = useState<SessionDataType>({
+    sessionDate: new Date(),
+    sessionNumber: 0,
+    specialNote: '',
+    workouts: [
+      { type: '', weight: '', speed: '', time: '', sets: '', count: '' },
+    ],
+  });
+  const [workoutTypes, setWorkoutTypes] = useState<
+    {
+      id: number;
+      name: string;
+      weightInputRequired: boolean;
+      setInputRequired: boolean;
+      repInputRequired: boolean;
+      timeInputRequired: boolean;
+      speedInputRequired: boolean;
+    }[]
+  >([]);
 
   const getMoreImages = (count = 9) => {
     const newImages = [];
     for (let i = 0; i < count; i++) {
       newImages.push(
-        `https://via.placeholder.com/250?text=Image${Math.floor(Math.random() * 100)}`
+        `https://via.placeholder.com/200x250?text=Image${Math.floor(Math.random() * 100)}`
       );
     }
-
     return newImages;
   };
 
@@ -108,7 +137,6 @@ const Session: React.FC = () => {
 
   useEffect(() => {
     setImages(getMoreImages(20));
-
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting) {
@@ -136,6 +164,24 @@ const Session: React.FC = () => {
   useEffect(() => {
     const container = imageContainerRef.current;
 
+    const handleMouseDown = (event: MouseEvent) => {
+      isDraggingRef.current = true;
+      startXRef.current = event.pageX - container!.offsetLeft;
+      scrollLeftRef.current = container!.scrollLeft;
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+      event.preventDefault();
+      const x = event.pageX - container!.offsetLeft;
+      const walk = x - startXRef.current;
+      container!.scrollLeft = scrollLeftRef.current - walk;
+    };
+
+    const handleMouseUpOrLeave = () => {
+      isDraggingRef.current = false;
+    };
+
     const handleWheel = (event: WheelEvent) => {
       if (container) {
         if (event.deltaY !== 0) {
@@ -152,7 +198,7 @@ const Session: React.FC = () => {
     const handleTouchMove = (event: TouchEvent) => {
       if (container && touchStartXRef.current !== null) {
         const touchCurrentX = event.touches[0].clientX;
-        const touchDeltaX = touchStartXRef.current - touchCurrentX;
+        const touchDeltaX = (touchStartXRef.current - touchCurrentX) * 2;
         container.scrollLeft += touchDeltaX;
         touchStartXRef.current = touchCurrentX;
         event.preventDefault();
@@ -160,6 +206,10 @@ const Session: React.FC = () => {
     };
 
     if (container) {
+      container.addEventListener('mousedown', handleMouseDown);
+      container.addEventListener('mousemove', handleMouseMove);
+      container.addEventListener('mouseup', handleMouseUpOrLeave);
+      container.addEventListener('mouseleave', handleMouseUpOrLeave);
       container.addEventListener('wheel', handleWheel);
       container.addEventListener('touchstart', handleTouchStart);
       container.addEventListener('touchmove', handleTouchMove);
@@ -167,12 +217,33 @@ const Session: React.FC = () => {
 
     return () => {
       if (container) {
+        container.removeEventListener('mousedown', handleMouseDown);
+        container.removeEventListener('mousemove', handleMouseMove);
+        container.removeEventListener('mouseup', handleMouseUpOrLeave);
+        container.removeEventListener('mouseleave', handleMouseUpOrLeave);
         container.removeEventListener('wheel', handleWheel);
         container.removeEventListener('touchstart', handleTouchStart);
         container.removeEventListener('touchmove', handleTouchMove);
       }
     };
   }, []);
+
+  useEffect(() => {
+    const fetchWorkoutTypes = async () => {
+      try {
+        const response = await axios.get('/api/workout-types');
+        setWorkoutTypes(response.data);
+      } catch (error) {
+        console.error('Failed to fetch workout types', error);
+      }
+    };
+    fetchWorkoutTypes();
+  }, []);
+
+  const handleSaveSession = (session: SessionDataType) => {
+    console.log(session);
+    // Handle the save logic
+  };
 
   return (
     <SectionWrapper>
@@ -182,7 +253,7 @@ const Session: React.FC = () => {
           <ImageContainer ref={imageContainerRef}>
             {images.map((src, index) => (
               <ImageLayout key={index}>
-                <Image src={src} alt={`image ${index}`} />
+                <Image src={src} alt={`image ${index}`} loading="lazy" />
               </ImageLayout>
             ))}
             <div ref={observerRef} />
@@ -203,10 +274,18 @@ const Session: React.FC = () => {
         </RecordBox>
       </Wrapper>
       {user?.role === 'TRAINER' ? (
-        <AddButton>
+        <AddButton onClick={() => openModal('addSessionModal')}>
           <img src={addBtn} alt="add button" />
         </AddButton>
       ) : null}
+      <AddSessionModal
+        isOpen={isOpen('addSessionModal')}
+        onClose={() => closeModal('addSessionModal')}
+        onSave={handleSaveSession}
+        formState={formState}
+        setFormState={setFormState}
+        workoutTypes={workoutTypes}
+      />
     </SectionWrapper>
   );
 };

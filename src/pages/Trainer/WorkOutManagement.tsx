@@ -24,11 +24,11 @@ export interface WorkoutDataType {
   name: string;
   target_muscle: string;
   remark: string;
-  weight_input_required: boolean;
-  set_input_required: boolean;
-  rep_input_required: boolean;
-  time_input_required: boolean;
-  speed_input_required: boolean;
+  weightInputRequired: boolean;
+  setInputRequired: boolean;
+  repInputRequired: boolean;
+  timeInputRequired: boolean;
+  speedInputRequired: boolean;
 }
 
 const WorkOutManagement: React.FC = () => {
@@ -72,11 +72,11 @@ const WorkOutManagement: React.FC = () => {
         targetMuscle: data.target_muscle,
         remark: data.remark,
         attributes: {
-          weight: data.weight_input_required,
-          set: data.set_input_required,
-          rep: data.rep_input_required,
-          time: data.time_input_required,
-          speed: data.speed_input_required,
+          weight: data.weightInputRequired,
+          set: data.setInputRequired,
+          rep: data.repInputRequired,
+          time: data.timeInputRequired,
+          speed: data.speedInputRequired,
         },
       });
     } else {

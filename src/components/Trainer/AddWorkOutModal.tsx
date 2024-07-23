@@ -136,11 +136,11 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
       name: formState.name,
       target_muscle: formState.targetMuscle,
       remark: formState.remark,
-      weight_input_required: formState.attributes.weight,
-      set_input_required: formState.attributes.set,
-      rep_input_required: formState.attributes.rep,
-      time_input_required: formState.attributes.time,
-      speed_input_required: formState.attributes.speed,
+      weightInputRequired: formState.attributes.weight,
+      setInputRequired: formState.attributes.set,
+      repInputRequired: formState.attributes.rep,
+      timeInputRequired: formState.attributes.time,
+      speedInputRequired: formState.attributes.speed,
     };
     onSave(newWorkout);
     onClose();
