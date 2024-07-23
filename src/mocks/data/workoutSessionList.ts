@@ -53,9 +53,9 @@ export const sessionDetails: SessionDetailType[] = [
       },
     ],
     photoUrls: [
-      'https://example.com/photo1.jpg',
-      'https://example.com/photo2.jpg',
-      'https://example.com/photo3.jpg',
+      'https://dummyjson.com/image/360x300/282828',
+      'https://dummyjson.com/image/330x330/282828',
+      'https://dummyjson.com/image/300x250/282828',
     ],
     videoUrls: [
       'https://example.com/video1.mp4',

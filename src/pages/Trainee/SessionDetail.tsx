@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
-
 import { SectionWrapper } from '@components/Common/SectionWrapper';
 import {
   sessionDetails,
@@ -9,6 +8,9 @@ import {
 } from 'src/mocks/data/workoutSessionList';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import Button from '@components/Common/Button/Button';
+import PhotoUploadModal from '@components/Trainee/PhotoUploadModal';
+import VideoUploadModal from '@components/Trainee/VideoUploadModal';
+import useModals from 'src/hooks/useModals';
 
 const DetailWrapper = styled.div`
   display: flex;
@@ -161,6 +163,7 @@ const SessionDetail: React.FC = () => {
   const [sessionData, setSessionData] = useState<SessionDetailType | null>(
     null
   );
+  const { openModal, closeModal, isOpen } = useModals();
 
   useEffect(() => {
     // const fetchSessionData = async () => {
@@ -184,6 +187,18 @@ const SessionDetail: React.FC = () => {
   if (!sessionData) {
     return <div>Loading...</div>;
   }
+
+  const handlePhotoUpload = (photos: string[]) => {
+    // 업로드된 사진 처리 로직 추가
+    console.log('Uploaded Photos:', photos);
+    closeModal('photoUpload');
+  };
+
+  const handleVideoUpload = (video: string) => {
+    // 업로드된 비디오 처리 로직 추가
+    console.log('Uploaded Video:', video);
+    closeModal('videoUpload');
+  };
 
   return (
     <SectionWrapper>
@@ -227,7 +242,11 @@ const SessionDetail: React.FC = () => {
         <Section>
           <ImageTitle>
             <Label>자세 사진</Label>
-            <Button $size="small" $variant="primary">
+            <Button
+              $size="small"
+              $variant="primary"
+              onClick={() => openModal('photoUpload')}
+            >
               업로드
             </Button>
           </ImageTitle>
@@ -242,7 +261,11 @@ const SessionDetail: React.FC = () => {
         <Section>
           <ImageTitle>
             <Label>운동 영상</Label>
-            <Button $size="small" $variant="primary">
+            <Button
+              $size="small"
+              $variant="primary"
+              onClick={() => openModal('videoUpload')}
+            >
               업로드
             </Button>
           </ImageTitle>
@@ -256,6 +279,16 @@ const SessionDetail: React.FC = () => {
           </VideoContainer>
         </Section>
       </DetailWrapper>
+      <PhotoUploadModal
+        isOpen={isOpen('photoUpload')}
+        onClose={() => closeModal('photoUpload')}
+        onUpload={handlePhotoUpload}
+      />
+      <VideoUploadModal
+        isOpen={isOpen('videoUpload')}
+        onClose={() => closeModal('videoUpload')}
+        onUpload={handleVideoUpload}
+      />
     </SectionWrapper>
   );
 };
