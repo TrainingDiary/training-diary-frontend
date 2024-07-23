@@ -27,6 +27,19 @@ const PhotoUploadContainer = styled.div`
   }
 `;
 
+const LabelWrap = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+
+  span {
+    font-size: 1.2rem;
+    color: ${({ theme }) => theme.colors.red400};
+    flex: 1;
+  }
+`;
+
 const PhotoInput = styled.input`
   display: none;
 `;
@@ -132,11 +145,14 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({
       btnConfirm="업로드"
     >
       <PhotoUploadContainer>
-        <label htmlFor="photo-upload">사진 선택</label>
+        <LabelWrap>
+          <label htmlFor="photo-upload">사진 선택</label>
+          <span>사진은 최대 10장 까지 등록 가능합니다.</span>
+        </LabelWrap>
         <PhotoInput
           id="photo-upload"
           type="file"
-          accept="image/*"
+          accept="image/png, image/jpeg"
           multiple
           onChange={handlePhotoChange}
         />

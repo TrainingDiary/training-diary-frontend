@@ -118,6 +118,19 @@ const ImageTitle = styled.div`
   align-items: center;
 `;
 
+const LabelWrap = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+
+  span {
+    color: ${({ theme }) => theme.colors.red400};
+    font-size: 1rem;
+    flex: 1;
+  }
+`;
+
 const ImageContainer = styled.div`
   display: flex;
   gap: 10px;
@@ -241,7 +254,10 @@ const SessionDetail: React.FC = () => {
         </Section>
         <Section>
           <ImageTitle>
-            <Label>자세 사진</Label>
+            <LabelWrap>
+              <Label>자세 사진</Label>
+              <span>사진은 최대 10장 까지 등록 가능합니다.</span>
+            </LabelWrap>
             <Button
               $size="small"
               $variant="primary"
@@ -260,7 +276,10 @@ const SessionDetail: React.FC = () => {
         </Section>
         <Section>
           <ImageTitle>
-            <Label>운동 영상</Label>
+            <LabelWrap>
+              <Label>운동 영상</Label>
+              <span>동영상은 최대 10개 까지 등록 가능합니다.</span>
+            </LabelWrap>
             <Button
               $size="small"
               $variant="primary"
