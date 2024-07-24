@@ -5,6 +5,7 @@ import { NotificationPayload } from 'firebase/messaging';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 5px;
 `;
 
 const Wrapper = styled.div`
@@ -16,7 +17,7 @@ const Wrapper = styled.div`
 const ImageContainer = styled.div`
   display: flex;
   align-items: center;
-  width: 20px;
+  width: 30px;
   height: 30px;
 
   img {

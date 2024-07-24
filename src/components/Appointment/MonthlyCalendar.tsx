@@ -152,7 +152,12 @@ interface MonthlyCalendarProps {
   data: {
     scheduledDates: string[];
     reservedDates: string[];
+    reservedAndAppliedDates: {
+      startDate: string;
+      notAllowedTimes: string[];
+    }[];
   };
+
   selectedButton: string | null;
   selectedDates: string[];
   onDateClick: (date: Date) => void;
