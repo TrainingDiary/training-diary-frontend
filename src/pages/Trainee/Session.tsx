@@ -9,7 +9,7 @@ import { AddButton } from '@components/Common/AddButton';
 import AddSessionModal, {
   SessionDataType,
 } from '@components/Trainee/AddSessionModal';
-import { user } from 'src/stores/userStore';
+import useUserStore from 'src/stores/userStore';
 import useModals from 'src/hooks/useModals';
 
 const Wrapper = styled.div`
@@ -99,6 +99,7 @@ const sessions: Session[] = [
 ];
 
 const Session: React.FC = () => {
+  const user = useUserStore(state => state.user);
   const [images, setImages] = useState<ImageWithSession[]>([]);
   const observerRef = useRef<HTMLDivElement | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);

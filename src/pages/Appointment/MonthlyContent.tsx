@@ -10,9 +10,11 @@ import MonthlyCalendar from '@components/Appointment/MonthlyCalendar';
 import ButtonContainer from '@components/Appointment/ButtonContainer';
 import TimeTableContainer from '@components/Appointment/TimeTableContainer';
 import TraineeRegisterModal from '@components/Appointment/TraineeRegisterModal';
-import useSchedules from 'src/hooks/useSchedules';
 import useModals from 'src/hooks/useModals';
+import useFetchSchedules from 'src/hooks/useFetchSchedules';
+import useFetchUser from 'src/hooks/useFetchUser';
 import { traineeList } from 'src/mocks/data/traineeList';
+import { getMonthRange } from 'src/utils/getMonthRange';
 
 const Wrapper = styled.div`
   display: flex;
@@ -51,8 +53,11 @@ const TraineeRegisterModalText = styled.span`
 `;
 
 const MonthlyContent: React.FC = () => {
+  useFetchUser();
   const navigate = useNavigate();
-  const { data, isLoading, error } = useSchedules();
+  const [currentDate] = useState(new Date());
+  const { startDate, endDate } = getMonthRange(currentDate);
+  const { data, isLoading, error } = useFetchSchedules(startDate, endDate);
   const { openModal, closeModal, isOpen } = useModals();
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
@@ -140,7 +145,10 @@ const MonthlyContent: React.FC = () => {
   };
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (error || !data)
+    return (
+      <div>Error: {error?.message || '데이터를 불러오지 못했습니다.'}</div>
+    );
 
   return (
     <SectionWrapper>

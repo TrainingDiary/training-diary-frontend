@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import emailIcon from '@icons/auth/email.svg';
+import passwordIcon from '@icons/auth/password.svg';
 import Button from '@components/Common/Button/Button';
 import Alert from '@components/Common/Alert/Alert';
 import AuthSwitcher from '@components/Auth/AuthSwitcher';
@@ -10,8 +12,9 @@ import AuthInputBox from '@components/Auth/AuthInputBox/AuthInputBox';
 import { AuthWrapper } from '@components/Auth/styledComponents/AuthWrapper';
 import { AuthContainer } from '@components/Auth/styledComponents/AuthContainer';
 import { AuthForm } from '@components/Auth/styledComponents/AuthForm';
-import emailIcon from '@icons/auth/email.svg';
-import passwordIcon from '@icons/auth/password.svg';
+import requestPermission from '../../firebase/notificationPermission';
+import CreateAuthApi from 'src/api/auth';
+import useFetchUser from 'src/hooks/useFetchUser';
 
 interface FormState {
   email: string;
@@ -19,7 +22,9 @@ interface FormState {
 }
 
 const Login: React.FC = () => {
+  useFetchUser(); // 로그인 API response 변경 후 로직 수정
   const navigate = useNavigate();
+  const AuthApi = CreateAuthApi(navigate);
 
   const [isLoading, setLoading] = useState<boolean>(false);
   const [formState, setFormState] = useState<FormState>({
@@ -32,14 +37,14 @@ const Login: React.FC = () => {
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
-    setFormState((prev) => ({
+    setFormState(prev => ({
       ...prev,
       [name]: value,
     }));
   };
 
   const onToggleShowPassword = () => {
-    setShowPassword((prev) => !prev);
+    setShowPassword(prev => !prev);
   };
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -61,11 +66,12 @@ const Login: React.FC = () => {
     try {
       setLoading(true);
 
-      // 로그인 API 요청 단계 추가
+      await AuthApi.login(email, password);
 
-      navigate('/');
+      await requestPermission();
     } catch (error) {
       setErrorAlert('이메일과 비밀번호를 확인해주세요.');
+      console.error('로그인 에러: ', error);
     } finally {
       setLoading(false);
     }
