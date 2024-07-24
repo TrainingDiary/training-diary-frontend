@@ -74,10 +74,21 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
 }) => {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [errorAlert, setErrorAlert] = useState<string>('');
+  const MAX_VIDEO_SIZE_MB = 100; // 용량 회의 후 변경 예정
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedVideo(URL.createObjectURL(e.target.files[0]));
+      const file = e.target.files[0];
+      const fileSizeMB = file.size / 1024 / 1024;
+
+      if (fileSizeMB > MAX_VIDEO_SIZE_MB) {
+        setErrorAlert(
+          `동영상 용량은 ${MAX_VIDEO_SIZE_MB}MB 이하로 등록해주세요.`
+        );
+        return;
+      }
+
+      setSelectedVideo(URL.createObjectURL(file));
     }
   };
 
