@@ -4,7 +4,7 @@ export const workoutList = [
   {
     id: 1,
     name: '데드리프트',
-    target_muscle: '등',
+    targetMuscle: '등',
     remark: '허리가 아닌 다리로 들어 올리세요. 허리를 곧게 유지하세요.',
     weightInputRequired: true,
     setInputRequired: true,
@@ -15,7 +15,7 @@ export const workoutList = [
   {
     id: 2,
     name: '스쿼트',
-    target_muscle: '다리',
+    targetMuscle: '다리',
     remark:
       '무릎이 발끝을 넘지 않도록 하세요. 편하게 갈 수 있는 만큼 깊이 내려가세요.무릎이 발끝을 넘지 않도록 하세요. 편하게 갈 수 있는 만큼 깊이 내려가세요.무릎이 발끝을 넘지 않도록 하세요. 편하게 갈 수 있는 만큼 깊이 내려가세요.',
     weightInputRequired: true,
@@ -27,7 +27,7 @@ export const workoutList = [
   {
     id: 3,
     name: '벤치프레스',
-    target_muscle: '가슴',
+    targetMuscle: '가슴',
     remark: '바를 가슴까지 내리세요. 팔이 곧게 펴질 때까지 밀어 올리세요.',
     weightInputRequired: true,
     setInputRequired: true,
@@ -38,7 +38,7 @@ export const workoutList = [
   {
     id: 4,
     name: '달리기',
-    target_muscle: '다리',
+    targetMuscle: '다리',
     remark: '꾸준한 속도를 유지하세요. 허리를 곧게 펴세요.',
     weightInputRequired: false,
     setInputRequired: false,
@@ -49,7 +49,7 @@ export const workoutList = [
   {
     id: 5,
     name: '플랭크',
-    target_muscle: '코어',
+    targetMuscle: '코어',
     remark: '머리부터 발뒤꿈치까지 몸을 곧게 유지하세요.',
     weightInputRequired: false,
     setInputRequired: false,
