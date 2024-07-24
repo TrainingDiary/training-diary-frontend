@@ -17,6 +17,7 @@ import emailIcon from '@icons/auth/email.svg';
 import passwordIcon from '@icons/auth/password.svg';
 import nameIcon from '@icons/auth/name.svg';
 import CreateAuthApi from 'src/api/auth';
+import useUserStore from 'src/stores/userStore';
 
 interface FormState {
   email: string;
@@ -61,14 +62,23 @@ const Signup: React.FC = () => {
     try {
       setLoading(true);
 
-      // 회원가입 API 요청 단계 추가
-      console.log(data);
+      const response = await AuthApi.signup(
+        data.email,
+        data.password,
+        data.confirmPassword,
+        data.name,
+        data.role
+      );
 
-      setSuccessAlert('회원가입에 성공했습니다.');
+      const user = {
+        id: response.data.id,
+        role: response.data.role,
+        unreadNotification: response.data.unreadNotification,
+      };
 
-      setTimeout(() => navigate('/'), 2500);
+      useUserStore.getState().setUser(user);
     } catch (error) {
-      setErrorAlert('회원가입에 실패했습니다.');
+      console.error('회원가입 에러: ', error);
     } finally {
       setLoading(false);
     }

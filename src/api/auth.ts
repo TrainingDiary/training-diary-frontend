@@ -11,6 +11,21 @@ const CreateAuthApi = (navigate: NavigateFunction) => {
   }
 
   return {
+    signup: (
+      email: string,
+      password: string,
+      confirmPassword: string,
+      name: string,
+      role: 'TRAINEE' | 'TRAINER'
+    ) =>
+      axiosInstance.post('/users/sign-up', {
+        email,
+        password,
+        confirmPassword,
+        name,
+        role,
+      }),
+
     login: (email: string, password: string) =>
       axiosInstance.post('/users/sign-in', { email, password }),
 
