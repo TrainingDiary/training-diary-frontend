@@ -6,7 +6,6 @@ import CreateAuthApi from 'src/api/auth';
 
 const useFetchUser = () => {
   const navigate = useNavigate();
-  const setUser = useUserStore(state => state.setUser);
   const AuthApi = CreateAuthApi(navigate);
 
   useEffect(() => {
@@ -20,7 +19,7 @@ const useFetchUser = () => {
           unreadNotification: userData.unreadNotification,
         };
 
-        setUser(user);
+        useUserStore.getState().setUser(user);
       } catch (error) {
         throw error;
       }

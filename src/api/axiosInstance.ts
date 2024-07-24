@@ -13,8 +13,7 @@ const createInterceptor = (navigate: NavigateFunction): void => {
     (response: AxiosResponse) => response,
     (error: AxiosError) => {
       if (error.response?.status === 401) {
-        const setUser = useUserStore.getState().setUser;
-        setUser(null);
+        useUserStore.getState().clearUser();
 
         navigate('/login');
       } else if (error.response?.status === 404) {
