@@ -49,6 +49,7 @@ const Input = styled.input`
   border-radius: 5px;
   outline: none;
   width: 100%;
+  /*  */
 `;
 
 const TextArea = styled.textarea`
