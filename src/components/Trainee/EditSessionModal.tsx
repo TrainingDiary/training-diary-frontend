@@ -100,6 +100,13 @@ const WorkoutSection = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.gray300};
 `;
 
+const SelectWrap = styled.div`
+  display: flex;
+  gap: 10px;
+  flex-direction: row;
+  align-items: center;
+`;
+
 const Select = styled.select`
   padding: 5px;
   border: solid 1px ${({ theme }) => theme.colors.gray500};
@@ -351,19 +358,24 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
             return (
               <ExerciseGroup key={index}>
                 <ExerciseRow>
-                  <Select
-                    value={selectedWorkout ? selectedWorkout.id : ''}
-                    onChange={e =>
-                      handleWorkoutTypeChange(index, e.target.value)
-                    }
-                  >
-                    <option value="">운동 종류</option>
-                    {workoutTypes.map(workout => (
-                      <option key={workout.id} value={workout.id}>
-                        {workout.name}
-                      </option>
-                    ))}
-                  </Select>
+                  <SelectWrap>
+                    <Select
+                      value={selectedWorkout ? selectedWorkout.id : ''}
+                      onChange={e =>
+                        handleWorkoutTypeChange(index, e.target.value)
+                      }
+                    >
+                      <option value="">운동 종류</option>
+                      {workoutTypes.map(workout => (
+                        <option key={workout.id} value={workout.id}>
+                          {workout.name}
+                        </option>
+                      ))}
+                    </Select>
+                    <RemoveExerciseButton onClick={() => removeExercise(index)}>
+                      삭제
+                    </RemoveExerciseButton>
+                  </SelectWrap>
                   {selectedWorkout && (
                     <AttributeGroup>
                       {selectedWorkout.weightInputRequired && (
@@ -439,9 +451,6 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                     </AttributeGroup>
                   )}
                 </ExerciseRow>
-                <RemoveExerciseButton onClick={() => removeExercise(index)}>
-                  삭제
-                </RemoveExerciseButton>
               </ExerciseGroup>
             );
           })}
