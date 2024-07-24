@@ -74,7 +74,7 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
 }) => {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [errorAlert, setErrorAlert] = useState<string>('');
-  const MAX_VIDEO_SIZE_MB = 100; // 용량 회의 후 변경 예정
+  const MAX_VIDEO_SIZE_MB = 200; // 용량 회의 후 변경
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

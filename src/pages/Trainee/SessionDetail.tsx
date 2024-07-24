@@ -370,7 +370,7 @@ const SessionDetail: React.FC = () => {
             </Button>
           </ImageTitle>
           <ScrollContainer ref={imageContainerRef}>
-            {sessionData.photoUrls.map((photo, index) => (
+            {sessionData.photoUrls.slice(0, 10).map((photo, index) => (
               <ImagePreview key={index}>
                 <img src={photo} alt={`자세 사진 ${index}`} />
               </ImagePreview>
@@ -381,18 +381,19 @@ const SessionDetail: React.FC = () => {
           <ImageTitle>
             <LabelWrap>
               <Label>운동 영상</Label>
-              <span>동영상은 최대 10개 까지 등록 가능합니다.</span>
+              <span>동영상은 최대 5개 까지 등록 가능합니다.</span>
             </LabelWrap>
             <Button
               $size="small"
               $variant="primary"
               onClick={() => openModal('videoUpload')}
+              disabled={sessionData.videoUrls.length >= 5}
             >
               업로드
             </Button>
           </ImageTitle>
           <VideoContainer ref={videoContainerRef}>
-            {sessionData.videoUrls.map((video, index) => (
+            {sessionData.videoUrls.slice(0, 5).map((video, index) => (
               <video key={index} controls>
                 <source src={video} type="video/mp4" />
                 Your browser does not support the video tag.
