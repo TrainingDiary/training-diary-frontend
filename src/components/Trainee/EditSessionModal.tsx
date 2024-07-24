@@ -130,6 +130,15 @@ const AddExerciseButton = styled.button`
   cursor: pointer;
 `;
 
+const RemoveExerciseButton = styled.button`
+  padding: 5px 10px;
+  background-color: ${({ theme }) => theme.colors.red500};
+  color: ${({ theme }) => theme.colors.white};
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
 interface EditSessionModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -186,10 +195,11 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
   };
 
   const handleDateChange = (date: Date | null) => {
-    handleInputChange(
-      'sessionDate',
-      date ? date.toISOString().split('T')[0] : ''
-    );
+    if (date) {
+      handleInputChange('sessionDate', date.toISOString().split('T')[0]);
+    } else {
+      setErrorAlert('날짜를 입력해주세요.');
+    }
   };
 
   const handleExerciseChange = (
@@ -237,6 +247,13 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
     }
   };
 
+  const removeExercise = (index: number) => {
+    if (formState) {
+      const newWorkouts = formState.workouts.filter((_, i) => i !== index);
+      setFormState(prev => (prev ? { ...prev, workouts: newWorkouts } : null));
+    }
+  };
+
   const [errorAlert, setErrorAlert] = useState<string>('');
 
   const handleSave = () => {
@@ -254,7 +271,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
           type => type.name === workout.workoutTypeName
         );
         if (!selectedWorkout) {
-          return setErrorAlert(`${i + 1}번째 운동 종류를 선택해주세요.`);
+          continue; // 운동 종류를 선택하지 않은 경우 에러 검사를 하지 않음
         }
         if (selectedWorkout.weightInputRequired && workout.weight <= 0) {
           return setErrorAlert('무게를 입력해주세요.');
@@ -352,7 +369,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                         <AttributeTabInput
                           type="number"
                           placeholder="무게"
-                          value={exercise.weight}
+                          value={exercise.weight || ''}
                           onChange={e =>
                             handleExerciseChange(
                               index,
@@ -366,7 +383,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                         <AttributeTabInput
                           type="number"
                           placeholder="속도"
-                          value={exercise.speed}
+                          value={exercise.speed || ''}
                           onChange={e =>
                             handleExerciseChange(
                               index,
@@ -380,7 +397,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                         <AttributeTabInput
                           type="number"
                           placeholder="시간"
-                          value={exercise.time}
+                          value={exercise.time || ''}
                           onChange={e =>
                             handleExerciseChange(
                               index,
@@ -394,7 +411,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                         <AttributeTabInput
                           type="number"
                           placeholder="세트"
-                          value={exercise.sets}
+                          value={exercise.sets || ''}
                           onChange={e =>
                             handleExerciseChange(
                               index,
@@ -408,7 +425,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                         <AttributeTabInput
                           type="number"
                           placeholder="횟수"
-                          value={exercise.rep}
+                          value={exercise.rep || ''}
                           onChange={e =>
                             handleExerciseChange(
                               index,
@@ -421,6 +438,9 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                     </AttributeGroup>
                   )}
                 </ExerciseRow>
+                <RemoveExerciseButton onClick={() => removeExercise(index)}>
+                  삭제
+                </RemoveExerciseButton>
               </ExerciseGroup>
             );
           })}
