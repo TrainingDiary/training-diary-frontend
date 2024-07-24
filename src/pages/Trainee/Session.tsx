@@ -11,7 +11,6 @@ import AddSessionModal, {
 } from '@components/Trainee/AddSessionModal';
 import { user } from 'src/stores/userStore';
 import useModals from 'src/hooks/useModals';
-import { traineeList } from 'src/mocks/data/traineeList';
 
 const Wrapper = styled.div`
   display: flex;

@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import { SectionWrapper } from '@components/Common/SectionWrapper';
+import Modal from '@components/Common/Modal/Modal';
 import Button from '@components/Common/Button/Button';
 import PhotoUploadModal from '@components/Trainee/PhotoUploadModal';
 import VideoUploadModal from '@components/Trainee/VideoUploadModal';
@@ -14,7 +15,6 @@ import {
   sessionDetails,
   SessionDetailType,
 } from 'src/mocks/data/workoutSessionList';
-import Modal from '@components/Common/Modal/Modal';
 
 const DetailWrapper = styled.div`
   display: flex;
