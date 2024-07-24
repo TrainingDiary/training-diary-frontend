@@ -1,21 +1,19 @@
-// api 연동 후 zustand 이용해 수정
+import { create } from 'zustand';
 
-interface User {
+export interface User {
   id: string;
-  role: string;
+  role: 'TRAINEE' | 'TRAINER';
+  unreadNotification: boolean;
 }
 
-// 로그인 하지 않은 유저 상태 테스트하려면 주석해제
-// export const user: User | null = null;
+interface UserState {
+  user: User | null;
+  setUser: (user: any) => void;
+}
 
-// 트레이너 유저 테스트하려면 주석해제
-export const user: User | null = {
-  id: '1',
-  role: 'TRAINER',
-};
+const useUserStore = create<UserState>(set => ({
+  user: null,
+  setUser: user => set({ user }),
+}));
 
-// 트레이니 유저 테스트하려면 주석해제
-// export const user: User | null = {
-//   id: '1',
-//   role: 'TRAINEE',
-// };
+export default useUserStore;

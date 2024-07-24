@@ -22,7 +22,7 @@ import InbodyModal from '@components/Trainee/InbodyModal';
 import Calendar from '@components/Trainee/Calendar';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import useModals from 'src/hooks/useModals';
-import { user } from 'src/stores/userStore';
+import useUserStore from 'src/stores/userStore';
 
 Chart.register(
   CategoryScale,
@@ -212,6 +212,7 @@ export interface InfoData {
 }
 
 const Dashboard: React.FC = () => {
+  const user = useUserStore(state => state.user);
   const [editInfo, setEditInfo] = useState(true);
   const { openModal, closeModal, isOpen } = useModals();
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());

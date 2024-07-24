@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import App from './App.tsx';
+import registerServiceWorker from './firebase/registerServiceWorker.ts';
 
 // enableMocking 함수 정의
 async function enableMocking() {
@@ -15,6 +16,7 @@ async function enableMocking() {
   return worker.start();
 }
 
+registerServiceWorker();
 enableMocking().then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
