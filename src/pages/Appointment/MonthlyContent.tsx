@@ -55,7 +55,7 @@ const TraineeRegisterModalText = styled.span`
 const MonthlyContent: React.FC = () => {
   useFetchUser();
   const navigate = useNavigate();
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate] = useState(new Date());
   const { startDate, endDate } = getMonthRange(currentDate);
   const { data, isLoading, error } = useFetchSchedules(startDate, endDate);
   const { openModal, closeModal, isOpen } = useModals();
