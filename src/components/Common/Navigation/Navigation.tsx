@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import homeIcon from '@icons/navigation/home.svg';
@@ -8,6 +8,8 @@ import appointmentIcon from '@icons/navigation/appointment.svg';
 import activeAppointmentIcon from '@icons/navigation/activeAppointment.svg';
 import logOutIcon from '@icons/navigation/logout.svg';
 import { hexToRgba } from 'src/utils/hexToRgba';
+import CreateAuthApi from 'src/api/auth';
+import useUserStore from 'src/stores/userStore';
 
 // 하단에 고정된 네비게이션 바 스타일 정의
 const Nav = styled.nav`
@@ -81,11 +83,16 @@ const LogOutBtn = styled.img``;
 
 const Navigation: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const AuthApi = CreateAuthApi(navigate);
 
-  const handleLogout = () => {
-    // TODO : 로그아웃 로직 구현
-    // 현재 publicRoute 때문에 동작하지 않음
-    console.log('Logged out');
+  const handleLogout = async () => {
+    try {
+      await AuthApi.logout();
+      useUserStore.getState().clearUser();
+    } catch (error) {
+      console.error('로그아웃 에러: ', error);
+    }
   };
 
   const isHomeActive = !location.pathname.startsWith('/appointment');

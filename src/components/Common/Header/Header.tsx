@@ -8,6 +8,7 @@ import hamBtnIcon from '@icons/header/hamBtn.svg';
 import Drawer from './Drawer';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import useUserStore from 'src/stores/userStore';
+import CreateAuthApi from 'src/api/auth';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -58,6 +59,7 @@ const BackIcon = styled.div`
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const AuthApi = CreateAuthApi(navigate);
   const user = useUserStore(state => state.user);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
@@ -73,9 +75,13 @@ const Header: React.FC = () => {
     }
   };
 
-  const handleLogout = () => {
-    // 로그아웃 처리 로직
-    console.log('Logged out');
+  const handleLogout = async () => {
+    try {
+      await AuthApi.logout();
+      useUserStore.getState().clearUser();
+    } catch (error) {
+      console.error('로그아웃 에러: ', error);
+    }
   };
 
   const shouldHideBackButton = () => {

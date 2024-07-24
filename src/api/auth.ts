@@ -2,12 +2,19 @@ import { NavigateFunction } from 'react-router-dom';
 
 import { axiosInstance, createInterceptor } from './axiosInstance';
 
+let isInterceptorCreated = false;
+
 const CreateAuthApi = (navigate: NavigateFunction) => {
-  createInterceptor(navigate);
+  if (!isInterceptorCreated) {
+    createInterceptor(navigate);
+    isInterceptorCreated = true;
+  }
 
   return {
     login: (email: string, password: string) =>
       axiosInstance.post('/users/sign-in', { email, password }),
+
+    logout: () => axiosInstance.post('/users/sign-out'),
 
     getUser: () => axiosInstance.get('/users/info'),
   };
