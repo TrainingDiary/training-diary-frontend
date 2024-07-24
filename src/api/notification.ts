@@ -9,6 +9,7 @@ const CreateNotificationApi = (navigate: NavigateFunction) => {
     createInterceptor(navigate);
     isInterceptorCreated = true;
   }
+
   return {
     registerFCMToken: (token: string) =>
       axiosInstance.put('/notifications/fcm-token', { token }),
