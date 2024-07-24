@@ -21,7 +21,8 @@ const useFetchUser = () => {
 
         useUserStore.getState().setUser(user);
       } catch (error) {
-        throw error;
+        useUserStore.getState().clearUser();
+        console.error('유저 정보 조회 에러: ', error);
       }
     };
 
