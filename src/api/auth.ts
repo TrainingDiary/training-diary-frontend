@@ -21,6 +21,12 @@ const CreateAuthApi = (navigate: NavigateFunction) => {
         email,
       }),
 
+    checkCode: (email: string, verificationCode: string) =>
+      axiosInstance.post('/users/check-verification-code', {
+        email,
+        verificationCode,
+      }),
+
     getUser: () => axiosInstance.get('/users/info'),
   };
 };

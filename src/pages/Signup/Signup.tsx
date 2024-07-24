@@ -51,6 +51,8 @@ const Signup: React.FC = () => {
   const [successAlert, setSuccessAlert] = useState<string>('');
   const [errorAlert, setErrorAlert] = useState<string>('');
 
+  const email = watch('email');
+
   const onSubmit = async (data: FormState) => {
     setErrorAlert('');
 
@@ -92,9 +94,11 @@ const Signup: React.FC = () => {
     }
   };
 
-  const onEmailVerify = () => {
-    if (!watch('code')) {
-      setErrorAlert('인증코드는 필수 항목입니다.');
+  const onEmailVerify = async () => {
+    const verificationCode = watch('code');
+
+    if (!verificationCode) {
+      setErrorAlert('인증코드를 입력해주세요.');
       return;
     }
 
@@ -103,15 +107,24 @@ const Signup: React.FC = () => {
       return;
     }
 
-    // 이메일 코드 확인 API 요청 단계 추가
-    setIsCodeVerified(true);
-    setSuccessAlert('이메일 인증에 성공했습니다.');
+    try {
+      await AuthApi.checkCode(email, verificationCode);
+      setIsCodeVerified(true);
+      setSuccessAlert('이메일 인증에 성공했습니다.');
+    } catch (error: any) {
+      if (error.response && error.response.status === 400) {
+        setErrorAlert('인증 코드가 일치하지 않습니다.');
+      } else if (error.response && error.response.status === 406) {
+        setErrorAlert('인증 코드가 만료되었습니다. 다시 시도해주세요.');
+      } else {
+        console.error('인증 코드 확인 에러: ', error);
+      }
+    }
   };
 
   const onCloseSuccessAlert = () => setSuccessAlert('');
   const onCloseErrorAlert = () => setErrorAlert('');
 
-  const email = watch('email');
   const isEmailValid = email && !errors.email;
 
   const validatePasswordConfirm = (value: string) => {
@@ -139,7 +152,7 @@ const Signup: React.FC = () => {
             disabled={showEmailCodeInput}
             error={errors.email?.message}
             {...register('email', {
-              required: '이메일은 필수 항목입니다.',
+              required: '이메일을 입력해주세요.',
               pattern: {
                 value: emailPattern,
                 message: '유효한 이메일을 입력해주세요.',
@@ -170,7 +183,7 @@ const Signup: React.FC = () => {
               onClick={onEmailVerify}
               onResendVerificationCode={onEmailVerificationBtnClick}
               {...register('code', {
-                required: '인증코드는 필수 항목입니다.',
+                required: '인증코드를 입력해주세요.',
                 pattern: {
                   value: codePattern,
                   message: '유효한 인증코드를 입력해주세요.',
@@ -187,7 +200,7 @@ const Signup: React.FC = () => {
             id="name"
             error={errors.name?.message}
             {...register('name', {
-              required: '이름은 필수 항목입니다.',
+              required: '이름을 입력해주세요.',
             })}
           />
 
@@ -200,7 +213,7 @@ const Signup: React.FC = () => {
             showIcon={false}
             error={errors.password?.message}
             {...register('password', {
-              required: '비밀번호는 필수 항목입니다.',
+              required: '비밀번호를 입력해주세요.',
               pattern: {
                 value: passwordPattern,
                 message:
@@ -219,7 +232,7 @@ const Signup: React.FC = () => {
             showIcon={false}
             error={errors.confirmPassword?.message}
             {...register('confirmPassword', {
-              required: '비밀번호 확인란은 필수 항목입니다.',
+              required: '비밀번호 확인란을 입력해주세요.',
               validate: validatePasswordConfirm,
             })}
           />
