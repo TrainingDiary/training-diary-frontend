@@ -107,7 +107,7 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({
       const existingPhotos = new Set(selectedPhotos);
 
       if (files.length + selectedPhotos.length > 10) {
-        setErrorAlert('사진은 최대 10개 입니다.');
+        setErrorAlert('사진은 최대 10장 입니다.');
         return;
       }
 
@@ -120,6 +120,10 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({
   };
 
   const handleUpload = () => {
+    if (selectedPhotos.length === 0) {
+      setErrorAlert('사진을 1장 이상 등록해주세요.');
+      return;
+    }
     onUpload(selectedPhotos);
     setSelectedPhotos([]);
   };
