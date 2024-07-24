@@ -1,5 +1,4 @@
 import { initializeApp } from 'firebase/app';
-import { getMessaging } from 'firebase/messaging';
 
 //Firebase Config values imported from .env file
 const firebaseConfig = {
@@ -13,7 +12,4 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Messaging service
-export const messaging = getMessaging(app);
+export const app = initializeApp(firebaseConfig);

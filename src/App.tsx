@@ -1,17 +1,19 @@
 import { useEffect } from 'react';
 import { ThemeProvider } from 'styled-components';
-import { onMessage } from 'firebase/messaging';
+import { getMessaging, onMessage } from 'firebase/messaging';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { messaging } from './firebase/firebaseConfig';
 import AppRoutes from './routes';
 import GlobalStyles from './styles/globalStyles';
 import theme from './styles/theme';
 import PushMessage from '@components/Common/PushMessage';
+import { app } from './firebase/initFirebase';
 
 function App() {
   useEffect(() => {
+    const messaging = getMessaging(app);
+
     onMessage(messaging, payload => {
       if (payload.notification) {
         toast(<PushMessage notification={payload.notification} />);

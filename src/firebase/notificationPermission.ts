@@ -1,17 +1,14 @@
-import { getToken } from 'firebase/messaging';
-
-import { messaging } from 'src/firebase/firebaseConfig';
+import { getMessaging, getToken } from 'firebase/messaging';
+import { app } from 'src/firebase/initFirebase';
 
 const requestPermission = async () => {
   try {
-    const { VITE_APP_VAPID_KEY } = import.meta.env;
-
-    // Requesting permission using Notification API
     const permission = await Notification.requestPermission();
+    const messaging = getMessaging(app);
 
     if (permission === 'granted') {
       const token = await getToken(messaging, {
-        vapidKey: VITE_APP_VAPID_KEY,
+        vapidKey: import.meta.env.VITE_APP_VAPID_KEY,
       });
 
       if (token) {

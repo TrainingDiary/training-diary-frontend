@@ -12,7 +12,7 @@ import AuthInputBox from '@components/Auth/AuthInputBox/AuthInputBox';
 import { AuthWrapper } from '@components/Auth/styledComponents/AuthWrapper';
 import { AuthContainer } from '@components/Auth/styledComponents/AuthContainer';
 import { AuthForm } from '@components/Auth/styledComponents/AuthForm';
-import requestPermission from './loginService';
+import requestPermission from '../../firebase/notificationPermission';
 import CreateAuthApi from 'src/api/auth';
 
 interface FormState {
@@ -71,7 +71,7 @@ const Login: React.FC = () => {
       await AuthApi.getUser();
     } catch (error) {
       setErrorAlert('이메일과 비밀번호를 확인해주세요.');
-      console.log(error);
+      console.error('로그인 에러: ', error);
     } finally {
       setLoading(false);
     }
