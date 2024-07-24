@@ -1,5 +1,4 @@
 import { getToken } from 'firebase/messaging';
-import { toast } from 'react-toastify';
 
 import { messaging } from 'src/firebase/firebaseConfig';
 
@@ -18,15 +17,10 @@ const requestPermission = async () => {
       if (token) {
         // We can send token to server
         console.log('Token generated : ', token);
-        toast.success('Notification permission granted. Token generated.');
       }
-    } else if (permission === 'denied') {
-      // Notifications are blocked
-      toast.error('Notification permission denied.');
     }
   } catch (error) {
     console.error('Error getting permission or token: ', error);
-    toast.error('Error getting permission or token.');
   }
 };
 

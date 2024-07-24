@@ -13,7 +13,6 @@ import PushMessage from '@components/Common/PushMessage';
 function App() {
   useEffect(() => {
     onMessage(messaging, payload => {
-      console.log('Message received. ', payload);
       if (payload.notification) {
         toast(<PushMessage notification={payload.notification} />);
       }
