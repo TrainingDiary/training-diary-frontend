@@ -108,6 +108,7 @@ interface InputBoxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   disabled?: boolean;
   onClick?: () => void;
   error?: string;
+  onResendVerificationCode?: () => void;
 }
 
 const AuthInputBox = React.forwardRef<HTMLInputElement, InputBoxProps>(
@@ -124,6 +125,7 @@ const AuthInputBox = React.forwardRef<HTMLInputElement, InputBoxProps>(
       disabled,
       onClick,
       error,
+      onResendVerificationCode,
       ...rest
     },
     ref
@@ -164,7 +166,9 @@ const AuthInputBox = React.forwardRef<HTMLInputElement, InputBoxProps>(
         </InputContainer>
         <ErrorMessage>{error}</ErrorMessage>
         {id === 'code' && !disabled && (
-          <ResendVerificationCode>인증 번호 다시 보내기</ResendVerificationCode>
+          <ResendVerificationCode onClick={onResendVerificationCode}>
+            인증 번호 다시 보내기
+          </ResendVerificationCode>
         )}
       </Wrapper>
     );

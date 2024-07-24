@@ -16,6 +16,7 @@ import { codePattern, emailPattern, passwordPattern } from 'src/utils/regExp';
 import emailIcon from '@icons/auth/email.svg';
 import passwordIcon from '@icons/auth/password.svg';
 import nameIcon from '@icons/auth/name.svg';
+import CreateAuthApi from 'src/api/auth';
 
 interface FormState {
   email: string;
@@ -28,6 +29,7 @@ interface FormState {
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
+  const AuthApi = CreateAuthApi(navigate);
 
   const {
     register,
@@ -43,6 +45,7 @@ const Signup: React.FC = () => {
   });
 
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [isSendingEmail, setSendingEmail] = useState<boolean>(false);
   const [showEmailCodeInput, setShowEmailCodeInput] = useState<boolean>(false);
   const [isCodeVerified, setIsCodeVerified] = useState<boolean>(false);
   const [successAlert, setSuccessAlert] = useState<string>('');
@@ -69,9 +72,24 @@ const Signup: React.FC = () => {
     }
   };
 
-  const onEmailVerificationBtnClick = () => {
-    // 이메일 중복 확인 및 인증메일 전송 API 요청 단계 추가
-    setShowEmailCodeInput(true);
+  const onEmailVerificationBtnClick = async () => {
+    try {
+      setSendingEmail(true);
+
+      await AuthApi.checkEmail(email);
+
+      setShowEmailCodeInput(true);
+
+      setSuccessAlert('인증메일이 발송되었습니다.');
+    } catch (error: any) {
+      if (error.response && error.response.status === 409) {
+        setErrorAlert('이미 등록된 이메일입니다.');
+      } else {
+        console.error('이메일 인증 에러: ', error);
+      }
+    } finally {
+      setSendingEmail(false);
+    }
   };
 
   const onEmailVerify = () => {
@@ -108,7 +126,7 @@ const Signup: React.FC = () => {
         <AuthForm onSubmit={handleSubmit(onSubmit)}>
           <RoleSelector
             role={watch('role')}
-            onChange={(e) =>
+            onChange={e =>
               setValue('role', e.target.value as 'TRAINEE' | 'TRAINER')
             }
           />
@@ -137,7 +155,7 @@ const Signup: React.FC = () => {
               type="button"
               disabled={!isEmailValid}
             >
-              이메일 인증
+              {isSendingEmail ? '인증메일 발송 중...' : '이메일 인증'}
             </Button>
           )}
 
@@ -150,6 +168,7 @@ const Signup: React.FC = () => {
               id="code"
               disabled={isCodeVerified}
               onClick={onEmailVerify}
+              onResendVerificationCode={onEmailVerificationBtnClick}
               {...register('code', {
                 required: '인증코드는 필수 항목입니다.',
                 pattern: {

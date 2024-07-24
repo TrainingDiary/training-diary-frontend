@@ -16,6 +16,11 @@ const CreateAuthApi = (navigate: NavigateFunction) => {
 
     logout: () => axiosInstance.post('/users/sign-out'),
 
+    checkEmail: (email: string) =>
+      axiosInstance.post('/users/check-duplicate-and-send-verification', {
+        email,
+      }),
+
     getUser: () => axiosInstance.get('/users/info'),
   };
 };
