@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import addBtn from '@icons/home/addbtn.svg';
@@ -11,6 +11,7 @@ import AddSessionModal, {
 } from '@components/Trainee/AddSessionModal';
 import { user } from 'src/stores/userStore';
 import useModals from 'src/hooks/useModals';
+import { traineeList } from 'src/mocks/data/traineeList';
 
 const Wrapper = styled.div`
   display: flex;
@@ -54,6 +55,7 @@ const ImageLayout = styled.div`
   display: flex;
   justify-content: center;
   user-select: none;
+  cursor: pointer;
 `;
 
 const Image = styled.img`
@@ -86,6 +88,11 @@ interface Session {
   sessionId: number;
 }
 
+interface ImageWithSession {
+  src: string;
+  sessionId: number;
+}
+
 const sessions: Session[] = [
   { sessionDate: '2024. 00. 00', sessionNumber: 3, sessionId: 3 },
   { sessionDate: '2024. 00. 00', sessionNumber: 2, sessionId: 2 },
@@ -93,7 +100,7 @@ const sessions: Session[] = [
 ];
 
 const Session: React.FC = () => {
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<ImageWithSession[]>([]);
   const observerRef = useRef<HTMLDivElement | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const touchStartXRef = useRef<number | null>(null);
@@ -120,13 +127,17 @@ const Session: React.FC = () => {
       speedInputRequired: boolean;
     }[]
   >([]);
+  const navigate = useNavigate();
 
   const getMoreImages = (count = 9) => {
     const newImages = [];
     for (let i = 0; i < count; i++) {
-      newImages.push(
-        `https://via.placeholder.com/200x250?text=Image${Math.floor(Math.random() * 100)}`
-      );
+      newImages.push({
+        src: `https://via.placeholder.com/200x250?text=Image${Math.floor(
+          Math.random() * 100
+        )}`,
+        sessionId: Math.floor(Math.random() * 3) + 1, // 임의로 세션 ID를 할당
+      });
     }
     return newImages;
   };
@@ -245,15 +256,22 @@ const Session: React.FC = () => {
     // Handle the save logic
   };
 
+  const handleImageClick = (sessionId: number) => {
+    navigate(`/trainee/1/session/${sessionId}`); // traineeID
+  };
+
   return (
     <SectionWrapper>
       <Wrapper>
         <PhotoBox>
           <SectionTitle>자세 사진 목록</SectionTitle>
           <ImageContainer ref={imageContainerRef}>
-            {images.map((src, index) => (
-              <ImageLayout key={index}>
-                <Image src={src} alt={`image ${index}`} loading="lazy" />
+            {images.map((image, index) => (
+              <ImageLayout
+                key={index}
+                onClick={() => handleImageClick(image.sessionId)}
+              >
+                <Image src={image.src} alt={`image ${index}`} loading="lazy" />
               </ImageLayout>
             ))}
             <div ref={observerRef} />
