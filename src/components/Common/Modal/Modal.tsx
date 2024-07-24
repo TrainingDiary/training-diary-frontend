@@ -147,7 +147,7 @@ const Modal: React.FC<ModalProps> = ({
         {type === 'input' && (
           <ModalInputWrapper>
             <ModalInput
-              type="text"
+              type="email"
               value={inputValue}
               placeholder={typeof children === 'string' ? children : undefined}
               onChange={e => setInputValue(e.target.value)}
