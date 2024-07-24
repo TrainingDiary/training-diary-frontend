@@ -216,13 +216,16 @@ const TraineeManagement: React.FC = () => {
       setErrorAlert('이메일을 확인해주세요.');
       console.error('트레이니 추가 에러: ', error);
     } finally {
-      setErrorAlert('');
     }
   };
 
-  const handleDeleteConfirm = () => {
-    if (selectedTraineeId !== null) {
-      handleDelete(selectedTraineeId);
+  const handleDeleteConfirm = async () => {
+    if (selectedTraineeId === null) return;
+    try {
+      await traineeApi.deleteTrainee(selectedTraineeId);
+    } catch (error) {
+      setErrorAlert('삭제할 수 없습니다.');
+      console.error('트레이니 삭제 에러: ', error);
     }
     closeModal('deleteModal');
   };

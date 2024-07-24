@@ -10,6 +10,9 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
 
     addTrainee: (traineeEmail: string) =>
       axiosInstance.post('/pt-contracts', { traineeEmail }),
+
+    deleteTrainee: (ptContractId: number) =>
+      axiosInstance.post('/pt-contracts/terminate', { ptContractId }),
   };
 };
 
