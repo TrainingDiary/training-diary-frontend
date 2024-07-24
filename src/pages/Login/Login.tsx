@@ -22,6 +22,7 @@ interface FormState {
 }
 
 const Login: React.FC = () => {
+  useFetchUser(); // 로그인 API response 변경 후 로직 수정
   const navigate = useNavigate();
   const AuthApi = CreateAuthApi(navigate);
 
@@ -73,7 +74,6 @@ const Login: React.FC = () => {
       console.error('로그인 에러: ', error);
     } finally {
       setLoading(false);
-      useFetchUser(); // 로그인 API response 변경 후 로직 수정
     }
   };
 
