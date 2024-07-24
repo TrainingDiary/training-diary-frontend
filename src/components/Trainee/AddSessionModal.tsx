@@ -194,7 +194,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
   const handleDateChange = (date: Date | null) => {
     setFormState(prev => ({
       ...prev,
-      date: date,
+      sessionDate: date,
     }));
   };
 
@@ -267,34 +267,19 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
       if (!selectedWorkout) {
         return setErrorAlert(`${i + 1}번째 운동 종류를 선택해주세요.`);
       }
-      if (
-        (selectedWorkout.weightInputRequired && workout.weight.trim() === '') ||
-        typeof workout.weight === 'string'
-      ) {
+      if (selectedWorkout.weightInputRequired && workout.weight.trim() === '') {
         return setErrorAlert(`무게를 입력해주세요.`);
       }
-      if (
-        (selectedWorkout.setInputRequired && workout.sets.trim() === '') ||
-        typeof workout.sets === 'string'
-      ) {
+      if (selectedWorkout.setInputRequired && workout.sets.trim() === '') {
         return setErrorAlert(`세트를 입력해주세요.`);
       }
-      if (
-        (selectedWorkout.repInputRequired && workout.rep.trim() === '') ||
-        typeof workout.rep === 'string'
-      ) {
+      if (selectedWorkout.repInputRequired && workout.rep.trim() === '') {
         return setErrorAlert(`횟수를 입력해주세요.`);
       }
-      if (
-        (selectedWorkout.timeInputRequired && workout.time.trim() === '') ||
-        typeof workout.time === 'string'
-      ) {
+      if (selectedWorkout.timeInputRequired && workout.time.trim() === '') {
         return setErrorAlert(`시간을 입력해주세요.`);
       }
-      if (
-        (selectedWorkout.speedInputRequired && workout.speed.trim() === '') ||
-        typeof workout.speed === 'string'
-      ) {
+      if (selectedWorkout.speedInputRequired && workout.speed.trim() === '') {
         return setErrorAlert(`속도를 입력해주세요.`);
       }
     }
