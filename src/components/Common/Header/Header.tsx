@@ -7,7 +7,7 @@ import bellIcon from '@icons/header/bell.svg';
 import hamBtnIcon from '@icons/header/hamBtn.svg';
 import Drawer from './Drawer';
 import { hexToRgba } from 'src/utils/hexToRgba';
-import { user } from 'src/stores/userStore';
+import useUserStore from 'src/stores/userStore';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -58,6 +58,7 @@ const BackIcon = styled.div`
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const user = useUserStore(state => state.user);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
   const toggleDrawer = () => {

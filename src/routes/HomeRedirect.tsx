@@ -1,8 +1,11 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { user } from 'src/stores/userStore';
+
+import useUserStore from 'src/stores/userStore';
 
 const HomeRedirect: React.FC = () => {
+  const user = useUserStore(state => state.user);
+
   if (!user) {
     return <Navigate to="/login" />;
   }
