@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 import App from './App.tsx';
 import registerServiceWorker from './firebase/registerServiceWorker.ts';
+
+const queryClient = new QueryClient();
 
 // enableMocking 함수 정의
 async function enableMocking() {
@@ -20,7 +23,9 @@ registerServiceWorker();
 enableMocking().then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-      <App />
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
     </React.StrictMode>
   );
 });
