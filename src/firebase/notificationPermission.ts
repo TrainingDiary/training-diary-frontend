@@ -1,8 +1,13 @@
 import { getMessaging, getToken } from 'firebase/messaging';
+import { NavigateFunction } from 'react-router-dom';
+
+import CreateNotificationApi from 'src/api/notification';
 import { app } from 'src/firebase/initFirebase';
 
-const requestPermission = async () => {
+const requestPermission = async (navigate: NavigateFunction) => {
   try {
+    const NotificationApi = CreateNotificationApi(navigate);
+
     const permission = await Notification.requestPermission();
     const messaging = getMessaging(app);
 
@@ -12,12 +17,11 @@ const requestPermission = async () => {
       });
 
       if (token) {
-        // We can send token to server
-        console.log('Token generated : ', token);
+        await NotificationApi.registerFCMToken(token);
       }
     }
   } catch (error) {
-    console.error('Error getting permission or token: ', error);
+    console.error('FCM 토큰 등록 에러: ', error);
   }
 };
 
