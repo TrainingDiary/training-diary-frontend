@@ -1,9 +1,11 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { NavigateFunction } from 'react-router-dom';
 
+import useUserStore from 'src/stores/userStore';
+
 const axiosInstance = axios.create({
   baseURL: 'https://api.training-diary.co.kr/api',
-  withCredentials: true, //필요한 경우 사용 (클라이언트 로컬에서는 주석처리해야 쿠키 받아옴)
+  withCredentials: true,
 });
 
 const createInterceptor = (navigate: NavigateFunction): void => {
@@ -11,6 +13,9 @@ const createInterceptor = (navigate: NavigateFunction): void => {
     (response: AxiosResponse) => response,
     (error: AxiosError) => {
       if (error.response?.status === 401) {
+        const setUser = useUserStore.getState().setUser;
+        setUser(null);
+
         navigate('/login');
       } else if (error.response?.status === 404) {
         navigate('/not-found');
