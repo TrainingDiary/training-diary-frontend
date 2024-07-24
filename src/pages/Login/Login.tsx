@@ -14,6 +14,7 @@ import { AuthContainer } from '@components/Auth/styledComponents/AuthContainer';
 import { AuthForm } from '@components/Auth/styledComponents/AuthForm';
 import requestPermission from '../../firebase/notificationPermission';
 import CreateAuthApi from 'src/api/auth';
+import useFetchUser from 'src/hooks/useFetchUser';
 
 interface FormState {
   email: string;
@@ -67,13 +68,12 @@ const Login: React.FC = () => {
       await AuthApi.login(email, password);
 
       await requestPermission();
-
-      await AuthApi.getUser();
     } catch (error) {
       setErrorAlert('이메일과 비밀번호를 확인해주세요.');
       console.error('로그인 에러: ', error);
     } finally {
       setLoading(false);
+      useFetchUser(); // 로그인 API response 변경 후 로직 수정
     }
   };
 
