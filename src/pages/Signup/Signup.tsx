@@ -18,6 +18,7 @@ import passwordIcon from '@icons/auth/password.svg';
 import nameIcon from '@icons/auth/name.svg';
 import CreateAuthApi from 'src/api/auth';
 import useUserStore from 'src/stores/userStore';
+import requestPermission from 'src/firebase/notificationPermission';
 
 interface FormState {
   email: string;
@@ -77,6 +78,8 @@ const Signup: React.FC = () => {
       };
 
       useUserStore.getState().setUser(user);
+
+      await requestPermission(navigate);
     } catch (error) {
       console.error('회원가입 에러: ', error);
     } finally {
