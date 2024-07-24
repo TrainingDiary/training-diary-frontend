@@ -15,10 +15,38 @@ async function enableMocking() {
   return worker.start();
 }
 
-enableMocking().then(() => {
-  ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
-});
+// enableMocking().then(() => {
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+// });
+
+// Service Worker 등록
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .getRegistrations()
+    .then(registrations => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    })
+    .catch(error => {
+      console.error('Service Worker unregistration failed:', error);
+    });
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/firebase-messaging-sw.js')
+      .then(registration => {
+        console.log(
+          'Service Worker registered with scope:',
+          registration.scope
+        );
+      })
+      .catch(error => {
+        console.error('Service Worker registration failed:', error);
+      });
+  });
+}
