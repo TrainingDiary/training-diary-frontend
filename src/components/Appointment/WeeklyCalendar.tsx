@@ -10,6 +10,7 @@ const CalendarWrapper = styled.div`
   white-space: nowrap;
   gap: 20px;
   padding-bottom: 10px;
+  cursor: grab;
 `;
 
 const CalendarItem = styled.div<{ $isSelected: boolean }>`
@@ -50,6 +51,9 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
 }) => {
   const [week, setWeek] = useState<Date[]>([]);
   const calendarRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
 
   const generateInitialMonth = (date: Date) => {
     const week = [];
@@ -81,6 +85,8 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   };
 
   const onClickDate = (date: Date) => {
+    if (isDragging.current) return;
+
     onDateChange(date);
     scrollCenter(date);
   };
@@ -120,6 +126,27 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
     }
   };
 
+  const onMouseDown = (e: MouseEvent) => {
+    isDragging.current = true;
+    startX.current = e.pageX - (calendarRef.current?.offsetLeft || 0);
+    scrollLeft.current = calendarRef.current?.scrollLeft || 0;
+  };
+
+  const onMouseMove = (e: MouseEvent) => {
+    if (!isDragging.current) return;
+    e.preventDefault();
+
+    const x = e.pageX - (calendarRef.current?.offsetLeft || 0);
+    const walk = x - startX.current;
+    if (calendarRef.current) {
+      calendarRef.current.scrollLeft = scrollLeft.current - walk;
+    }
+  };
+
+  const onMouseUp = () => {
+    isDragging.current = false;
+  };
+
   useEffect(() => {
     setWeek(generateInitialMonth(selectedDate));
     setTimeout(() => scrollCenter(selectedDate, 'auto'), 0);
@@ -127,8 +154,16 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
     const calendar = calendarRef.current;
     if (calendar) {
       calendar.addEventListener('wheel', onWheelScroll);
+      calendar.addEventListener('mousedown', onMouseDown);
+      calendar.addEventListener('mousemove', onMouseMove);
+      calendar.addEventListener('mouseup', onMouseUp);
+      calendar.addEventListener('mouseleave', onMouseUp);
       return () => {
         calendar.removeEventListener('wheel', onWheelScroll);
+        calendar.removeEventListener('mousedown', onMouseDown);
+        calendar.removeEventListener('mousemove', onMouseMove);
+        calendar.removeEventListener('mouseup', onMouseUp);
+        calendar.removeEventListener('mouseleave', onMouseUp);
       };
     }
   }, []);
