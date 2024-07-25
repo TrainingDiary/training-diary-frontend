@@ -195,8 +195,12 @@ const TraineeManagement: React.FC = () => {
       await traineeApi.addTrainee(value);
       fetchData(sortOption);
       closeModal('addModal');
-    } catch (error) {
-      setErrorAlert('이메일을 확인해주세요.');
+    } catch (error: any) {
+      if (error.response.status === 409) {
+        setErrorAlert('이미 계약된 트레이니 입니다.');
+      } else if (error.response.status === 404) {
+        setErrorAlert('이메일을 확인해주세요.');
+      }
       console.error('트레이니 추가 에러: ', error);
     }
   };
