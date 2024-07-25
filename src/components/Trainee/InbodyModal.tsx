@@ -1,16 +1,21 @@
+// InbodyModal.tsx
 import React from 'react';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import Modal from '@components/Common/Modal/Modal';
-import { InbodyData } from '../../pages/Trainee/Dashboard';
+import {
+  WeightHistory,
+  BodyFatHistory,
+  MuscleMassHistory,
+} from '../../pages/Trainee/Dashboard';
 
 interface InbodyModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: () => void;
-  inbodyData: InbodyData;
+  inbodyData: WeightHistory | BodyFatHistory | MuscleMassHistory;
   handleDateChange: (date: Date | null) => void;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -192,7 +197,7 @@ const InbodyModal: React.FC<InbodyModalProps> = ({
         <DatePickerWrapper>
           <DatePicker
             showIcon
-            selected={inbodyData.date}
+            selected={new Date(inbodyData.addedDate)}
             onChange={handleDateChange}
             dateFormat="yyyy. MM. dd."
           />
