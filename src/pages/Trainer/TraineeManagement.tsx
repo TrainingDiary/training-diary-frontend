@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
 import addBtn from '@icons/home/addbtn.svg';
@@ -136,7 +135,7 @@ const TraineeManagement: React.FC = () => {
   const [isLoading, setLoading] = useState<boolean>(false);
   const { openModal, closeModal, isOpen } = useModals();
   const [traineeData, setTraineeData] = useState<TraineeDataType[]>([]);
-  const [sortOption, setSortOption] = useState<string>('name');
+  const [sortOption, setSortOption] = useState<string>('NAME');
   const [selectedTraineeId, setSelectedTraineeId] = useState<number | null>(
     null
   );
@@ -144,51 +143,32 @@ const TraineeManagement: React.FC = () => {
 
   const traineeApi = CreateTraineeApi(navigate);
 
-  // Dummy data API 가져오기(msw) -> api 변경
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // const res = await traineeApi.getTrainees();
-        setLoading(true);
-        const res = await axios.get('/api/pt-contracts');
-        if (res.status === 200 && res.data) {
-          const sortedData = res.data.sort(
-            (a: TraineeDataType, b: TraineeDataType) =>
-              a.traineeName.localeCompare(b.traineeName)
-          );
-          setTraineeData(sortedData);
-        }
-      } catch (error) {
-        console.error('Failed to fetch trainee data', error);
+  // fetchData 추가, 삭제 등 이후로 여러 사용으로 인해 분리
+  const fetchData = async (sortOption: string) => {
+    try {
+      setLoading(false);
+      const res = await traineeApi.getTrainees(sortOption, 0, 10);
+
+      setLoading(true);
+      if (res.status === 200 && res.data) {
+        setTraineeData(res.data.content);
       }
-    };
-    fetchData();
-  }, []);
+    } catch (error) {
+      console.error('Failed to fetch trainee data', error);
+    }
+  };
+
+  // 트레이니 api 연동
+  useEffect(() => {
+    fetchData(sortOption);
+  }, [sortOption]);
 
   // 필터 정렬 로직
   const handleSort = (option: string) => {
-    const sortedData = [...traineeData];
-    if (option === 'name') {
-      sortedData.sort((a, b) => a.traineeName.localeCompare(b.traineeName));
-    } else if (option === 'date') {
-      sortedData.sort(
-        (a, b) =>
-          new Date(b.totalSessionUpdatedAt).getTime() -
-          new Date(a.totalSessionUpdatedAt).getTime()
-      );
-    }
     setSortOption(option);
-    setTraineeData(sortedData);
   };
 
-  // 삭제 버튼 로직
-  const handleDelete = (id: number) => {
-    setTraineeData(prevData =>
-      prevData.filter(trainee => trainee.ptContractId !== id)
-    );
-  };
-
-  //추가 버튼 로직
+  //추가 버튼 모달
   const handleOpenAddModal = () => {
     openModal('addModal');
   };
@@ -197,6 +177,7 @@ const TraineeManagement: React.FC = () => {
     closeModal('addModal');
   };
 
+  // 삭제 버튼 모달
   const handleOpenDeleteModal = (id: number) => {
     setSelectedTraineeId(id);
     openModal('deleteModal');
@@ -207,22 +188,25 @@ const TraineeManagement: React.FC = () => {
     closeModal('deleteModal');
   };
 
+  // 트레이니 추가 로직
   const handleSaveInput = async (value?: string) => {
     if (!value) return;
     try {
       await traineeApi.addTrainee(value);
+      fetchData(sortOption);
       closeModal('addModal');
     } catch (error) {
       setErrorAlert('이메일을 확인해주세요.');
       console.error('트레이니 추가 에러: ', error);
-    } finally {
     }
   };
 
+  // 트레이니 삭제 로직
   const handleDeleteConfirm = async () => {
     if (selectedTraineeId === null) return;
     try {
       await traineeApi.deleteTrainee(selectedTraineeId);
+      fetchData(sortOption);
     } catch (error) {
       setErrorAlert('삭제할 수 없습니다.');
       console.error('트레이니 삭제 에러: ', error);
@@ -236,16 +220,16 @@ const TraineeManagement: React.FC = () => {
     <React.Fragment>
       <SectionWrapper>
         <HomeLayout>
-          {/* Dropdown for sorting options */}
           <DropDownWrapper>
             <select
               onChange={e => handleSort(e.target.value)}
               value={sortOption}
             >
-              <option value="name">이름순</option>
-              <option value="date">PT 등록 최신순</option>
+              <option value="NAME">이름순</option>
+              <option value="SESSION_UPDATED_AT">PT 등록 최신순</option>
             </select>
           </DropDownWrapper>
+
           {isLoading ? (
             <TraineeList>
               {traineeData.length > 0 ? (
@@ -272,7 +256,9 @@ const TraineeManagement: React.FC = () => {
                   </TraineeItem>
                 ))
               ) : (
-                <li>트레이니 데이터가 없습니다.</li>
+                <li style={{ fontSize: '1.4rem' }}>
+                  등록된 트레이니가 없습니다.
+                </li>
               )}
             </TraineeList>
           ) : (
@@ -280,7 +266,7 @@ const TraineeManagement: React.FC = () => {
               트레이니 목록 로딩중...
             </div>
           )}
-          {/* Add button 추가 */}
+
           <AddButton onClick={handleOpenAddModal}>
             <img src={addBtn} alt="add button" />
           </AddButton>
@@ -305,6 +291,7 @@ const TraineeManagement: React.FC = () => {
         >
           트레이니를 삭제하겠습니까?
         </Modal>
+
         {errorAlert && (
           <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
         )}

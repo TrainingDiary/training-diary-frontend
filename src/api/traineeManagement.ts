@@ -2,11 +2,23 @@ import { NavigateFunction } from 'react-router-dom';
 
 import { axiosInstance, createInterceptor } from './axiosInstance';
 
+let isInterceptorCreated = false;
+
 const CreateTraineeApi = (navigate: NavigateFunction) => {
-  createInterceptor(navigate);
+  if (!isInterceptorCreated) {
+    createInterceptor(navigate);
+    isInterceptorCreated = true;
+  }
 
   return {
-    getTrainees: () => axiosInstance.get('/pt-contracts'),
+    getTrainees: (sortBy: string, page: number, size: number) =>
+      axiosInstance.get('/pt-contracts', {
+        params: {
+          sortBy,
+          page,
+          size,
+        },
+      }),
 
     addTrainee: (traineeEmail: string) =>
       axiosInstance.post('/pt-contracts', { traineeEmail }),
