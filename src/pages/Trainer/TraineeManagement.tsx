@@ -132,8 +132,9 @@ interface TraineeDataType {
 const TraineeManagement: React.FC = () => {
   useFetchUser();
   const navigate = useNavigate();
-  const [isLoading, setLoading] = useState<boolean>(false);
+  const trainerApi = CreateTrainerApi(navigate);
   const { openModal, closeModal, isOpen } = useModals();
+  const [isLoading, setLoading] = useState<boolean>(false);
   const [traineeData, setTraineeData] = useState<TraineeDataType[]>([]);
   const [sortOption, setSortOption] = useState<string>('NAME');
   const [selectedTraineeId, setSelectedTraineeId] = useState<number | null>(
@@ -141,13 +142,11 @@ const TraineeManagement: React.FC = () => {
   );
   const [errorAlert, setErrorAlert] = useState<string>('');
 
-  const traineeApi = CreateTrainerApi(navigate);
-
   // fetchData 추가, 삭제 등 이후로 여러 사용으로 인해 분리
   const fetchData = async (sortOption: string) => {
     try {
       setLoading(true);
-      const res = await traineeApi.getTrainees(sortOption, 0, 100);
+      const res = await trainerApi.getTrainees(sortOption, 0, 100);
 
       if (res.status === 200 && res.data) {
         setTraineeData(res.data.content);
@@ -196,7 +195,7 @@ const TraineeManagement: React.FC = () => {
       return;
     }
     try {
-      await traineeApi.addTrainee(email);
+      await trainerApi.addTrainee(email);
       fetchData(sortOption);
       closeModal('addModal');
     } catch (error: any) {
@@ -213,7 +212,7 @@ const TraineeManagement: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (selectedTraineeId === null) return;
     try {
-      await traineeApi.deleteTrainee(selectedTraineeId);
+      await trainerApi.deleteTrainee(selectedTraineeId);
       fetchData(sortOption);
     } catch (error) {
       console.error('트레이니 삭제 에러: ', error);
