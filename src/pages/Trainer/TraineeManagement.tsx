@@ -12,7 +12,7 @@ import { hexToRgba } from 'src/utils/hexToRgba';
 import formatDate from 'src/utils/formatDate';
 import useModals from 'src/hooks/useModals';
 import useFetchUser from 'src/hooks/useFetchUser';
-import CreateTraineeApi from 'src/api/traineeManagement';
+import CreateTrainerApi from 'src/api/trainer';
 
 // Styled components
 const HomeLayout = styled.div`
@@ -141,20 +141,21 @@ const TraineeManagement: React.FC = () => {
   );
   const [errorAlert, setErrorAlert] = useState<string>('');
 
-  const traineeApi = CreateTraineeApi(navigate);
+  const traineeApi = CreateTrainerApi(navigate);
 
   // fetchData 추가, 삭제 등 이후로 여러 사용으로 인해 분리
   const fetchData = async (sortOption: string) => {
     try {
-      setLoading(false);
-      const res = await traineeApi.getTrainees(sortOption, 0, 10);
-
       setLoading(true);
+      const res = await traineeApi.getTrainees(sortOption, 0, 100);
+
       if (res.status === 200 && res.data) {
         setTraineeData(res.data.content);
       }
     } catch (error) {
       console.error('Failed to fetch trainee data', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -189,16 +190,19 @@ const TraineeManagement: React.FC = () => {
   };
 
   // 트레이니 추가 로직
-  const handleSaveInput = async (value?: string) => {
-    if (!value) return;
+  const handleSaveInput = async (email: string) => {
+    if (!email) {
+      setErrorAlert('이메일을 입력해주세요.');
+      return;
+    }
     try {
-      await traineeApi.addTrainee(value);
+      await traineeApi.addTrainee(email);
       fetchData(sortOption);
       closeModal('addModal');
     } catch (error: any) {
       if (error.response.status === 409) {
-        setErrorAlert('이미 계약된 트레이니 입니다.');
-      } else if (error.response.status === 404) {
+        setErrorAlert('이미 등록된 트레이니 입니다.');
+      } else if (error.response.status === 406) {
         setErrorAlert('이메일을 확인해주세요.');
       }
       console.error('트레이니 추가 에러: ', error);
@@ -212,7 +216,6 @@ const TraineeManagement: React.FC = () => {
       await traineeApi.deleteTrainee(selectedTraineeId);
       fetchData(sortOption);
     } catch (error) {
-      setErrorAlert('삭제할 수 없습니다.');
       console.error('트레이니 삭제 에러: ', error);
     }
     closeModal('deleteModal');
@@ -235,6 +238,10 @@ const TraineeManagement: React.FC = () => {
           </DropDownWrapper>
 
           {isLoading ? (
+            <div style={{ marginRight: 'auto', fontSize: '1.4rem' }}>
+              트레이니 목록 로딩중...
+            </div>
+          ) : (
             <TraineeList>
               {traineeData.length > 0 ? (
                 traineeData.map(trainee => (
@@ -265,10 +272,6 @@ const TraineeManagement: React.FC = () => {
                 </li>
               )}
             </TraineeList>
-          ) : (
-            <div style={{ marginRight: 'auto', fontSize: '1.4rem' }}>
-              트레이니 목록 로딩중...
-            </div>
           )}
 
           <AddButton onClick={handleOpenAddModal}>

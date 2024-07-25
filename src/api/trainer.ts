@@ -4,7 +4,7 @@ import { axiosInstance, createInterceptor } from './axiosInstance';
 
 let isInterceptorCreated = false;
 
-const CreateTraineeApi = (navigate: NavigateFunction) => {
+const CreateTrainerApi = (navigate: NavigateFunction) => {
   if (!isInterceptorCreated) {
     createInterceptor(navigate);
     isInterceptorCreated = true;
@@ -28,4 +28,4 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
   };
 };
 
-export default CreateTraineeApi;
+export default CreateTrainerApi;
