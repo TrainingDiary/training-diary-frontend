@@ -90,7 +90,7 @@ interface CardProps {
     id: number;
     name: string;
     targetMuscle: string;
-    remark: string;
+    remarks: string;
     weightInputRequired: boolean;
     setInputRequired: boolean;
     repInputRequired: boolean;
@@ -119,7 +119,7 @@ const Card: React.FC<CardProps> = ({ workout, onDelete, onEdit }) => {
         </ButtonGroup>
       </CardHeader>
       <Divider />
-      <CardBody>{workout.remark}</CardBody>
+      <CardBody>{workout.remarks}</CardBody>
       <Tags>
         {workout.weightInputRequired && <Tag>#무게</Tag>}
         {workout.setInputRequired && <Tag>#세트횟수</Tag>}

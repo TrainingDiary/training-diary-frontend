@@ -152,7 +152,7 @@ const TraineeManagement: React.FC = () => {
         setTraineeData(res.data.content);
       }
     } catch (error) {
-      console.error('Failed to fetch trainee data', error);
+      console.error('트레이니 조회 에러: ', error);
     } finally {
       setLoading(false);
     }
