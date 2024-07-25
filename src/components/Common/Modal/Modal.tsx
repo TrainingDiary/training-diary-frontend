@@ -107,7 +107,7 @@ interface ModalProps {
   type: 'input' | 'confirm' | 'custom';
   isOpen: boolean;
   onClose: () => void;
-  onSave?: (value?: string) => void;
+  onSave?: (email: string) => void;
   btnConfirm?: string;
 }
 
