@@ -2,8 +2,13 @@ import { NavigateFunction } from 'react-router-dom';
 
 import { axiosInstance, createInterceptor } from './axiosInstance';
 
+let isInterceptorCreated = false;
+
 const CreateAppointmentApi = (navigate: NavigateFunction) => {
-  createInterceptor(navigate);
+  if (!isInterceptorCreated) {
+    createInterceptor(navigate);
+    isInterceptorCreated = true;
+  }
 
   return {
     getTrainerSchedules: (startDate: string, endDate: string) =>

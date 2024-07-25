@@ -16,6 +16,9 @@ import { codePattern, emailPattern, passwordPattern } from 'src/utils/regExp';
 import emailIcon from '@icons/auth/email.svg';
 import passwordIcon from '@icons/auth/password.svg';
 import nameIcon from '@icons/auth/name.svg';
+import CreateAuthApi from 'src/api/auth';
+import useUserStore from 'src/stores/userStore';
+import requestPermission from 'src/firebase/notificationPermission';
 
 interface FormState {
   email: string;
@@ -28,6 +31,7 @@ interface FormState {
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
+  const AuthApi = CreateAuthApi(navigate);
 
   const {
     register,
@@ -43,10 +47,13 @@ const Signup: React.FC = () => {
   });
 
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [isSendingEmail, setSendingEmail] = useState<boolean>(false);
   const [showEmailCodeInput, setShowEmailCodeInput] = useState<boolean>(false);
   const [isCodeVerified, setIsCodeVerified] = useState<boolean>(false);
   const [successAlert, setSuccessAlert] = useState<string>('');
   const [errorAlert, setErrorAlert] = useState<string>('');
+
+  const email = watch('email');
 
   const onSubmit = async (data: FormState) => {
     setErrorAlert('');
@@ -56,27 +63,55 @@ const Signup: React.FC = () => {
     try {
       setLoading(true);
 
-      // 회원가입 API 요청 단계 추가
-      console.log(data);
+      const response = await AuthApi.signup(
+        data.email,
+        data.password,
+        data.confirmPassword,
+        data.name,
+        data.role
+      );
 
-      setSuccessAlert('회원가입에 성공했습니다.');
+      const user = {
+        id: response.data.id,
+        role: response.data.role,
+        unreadNotification: response.data.unreadNotification,
+      };
 
-      setTimeout(() => navigate('/'), 2500);
+      useUserStore.getState().setUser(user);
+
+      await requestPermission(navigate);
     } catch (error) {
-      setErrorAlert('회원가입에 실패했습니다.');
+      console.error('회원가입 에러: ', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const onEmailVerificationBtnClick = () => {
-    // 이메일 중복 확인 및 인증메일 전송 API 요청 단계 추가
-    setShowEmailCodeInput(true);
+  const onEmailVerificationBtnClick = async () => {
+    try {
+      setSendingEmail(true);
+
+      await AuthApi.checkEmail(email);
+
+      setShowEmailCodeInput(true);
+
+      setSuccessAlert('인증메일이 발송되었습니다.');
+    } catch (error: any) {
+      if (error.response && error.response.status === 409) {
+        setErrorAlert('이미 등록된 이메일입니다.');
+      } else {
+        console.error('이메일 인증 에러: ', error);
+      }
+    } finally {
+      setSendingEmail(false);
+    }
   };
 
-  const onEmailVerify = () => {
-    if (!watch('code')) {
-      setErrorAlert('인증코드는 필수 항목입니다.');
+  const onEmailVerify = async () => {
+    const verificationCode = watch('code');
+
+    if (!verificationCode) {
+      setErrorAlert('인증코드를 입력해주세요.');
       return;
     }
 
@@ -85,15 +120,24 @@ const Signup: React.FC = () => {
       return;
     }
 
-    // 이메일 코드 확인 API 요청 단계 추가
-    setIsCodeVerified(true);
-    setSuccessAlert('이메일 인증에 성공했습니다.');
+    try {
+      await AuthApi.checkCode(email, verificationCode);
+      setIsCodeVerified(true);
+      setSuccessAlert('이메일 인증에 성공했습니다.');
+    } catch (error: any) {
+      if (error.response && error.response.status === 400) {
+        setErrorAlert('인증 코드가 일치하지 않습니다.');
+      } else if (error.response && error.response.status === 406) {
+        setErrorAlert('인증 코드가 만료되었습니다. 다시 시도해주세요.');
+      } else {
+        console.error('인증 코드 확인 에러: ', error);
+      }
+    }
   };
 
   const onCloseSuccessAlert = () => setSuccessAlert('');
   const onCloseErrorAlert = () => setErrorAlert('');
 
-  const email = watch('email');
   const isEmailValid = email && !errors.email;
 
   const validatePasswordConfirm = (value: string) => {
@@ -108,7 +152,7 @@ const Signup: React.FC = () => {
         <AuthForm onSubmit={handleSubmit(onSubmit)}>
           <RoleSelector
             role={watch('role')}
-            onChange={(e) =>
+            onChange={e =>
               setValue('role', e.target.value as 'TRAINEE' | 'TRAINER')
             }
           />
@@ -121,7 +165,7 @@ const Signup: React.FC = () => {
             disabled={showEmailCodeInput}
             error={errors.email?.message}
             {...register('email', {
-              required: '이메일은 필수 항목입니다.',
+              required: '이메일을 입력해주세요.',
               pattern: {
                 value: emailPattern,
                 message: '유효한 이메일을 입력해주세요.',
@@ -137,7 +181,7 @@ const Signup: React.FC = () => {
               type="button"
               disabled={!isEmailValid}
             >
-              이메일 인증
+              {isSendingEmail ? '인증메일 발송 중...' : '이메일 인증'}
             </Button>
           )}
 
@@ -150,8 +194,9 @@ const Signup: React.FC = () => {
               id="code"
               disabled={isCodeVerified}
               onClick={onEmailVerify}
+              onResendVerificationCode={onEmailVerificationBtnClick}
               {...register('code', {
-                required: '인증코드는 필수 항목입니다.',
+                required: '인증코드를 입력해주세요.',
                 pattern: {
                   value: codePattern,
                   message: '유효한 인증코드를 입력해주세요.',
@@ -168,7 +213,7 @@ const Signup: React.FC = () => {
             id="name"
             error={errors.name?.message}
             {...register('name', {
-              required: '이름은 필수 항목입니다.',
+              required: '이름을 입력해주세요.',
             })}
           />
 
@@ -181,7 +226,7 @@ const Signup: React.FC = () => {
             showIcon={false}
             error={errors.password?.message}
             {...register('password', {
-              required: '비밀번호는 필수 항목입니다.',
+              required: '비밀번호를 입력해주세요.',
               pattern: {
                 value: passwordPattern,
                 message:
@@ -200,7 +245,7 @@ const Signup: React.FC = () => {
             showIcon={false}
             error={errors.confirmPassword?.message}
             {...register('confirmPassword', {
-              required: '비밀번호 확인란은 필수 항목입니다.',
+              required: '비밀번호 확인란을 입력해주세요.',
               validate: validatePasswordConfirm,
             })}
           />
