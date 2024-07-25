@@ -109,8 +109,23 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
   };
 
   const handleSave = () => {
-    if (!formState.name || !formState.targetMuscle || !formState.remarks) {
-      setErrorAlert('내용을 입력해주세요.');
+    if (!formState.name) {
+      setErrorAlert('운동명을 입력해주세요.');
+      return;
+    } else if (!formState.targetMuscle) {
+      setErrorAlert('자극 부위를 입력해주세요.');
+      return;
+    } else if (!formState.remarks) {
+      setErrorAlert('주의사항을 입력해주세요.');
+      return;
+    } else if (
+      !formState.weightInputRequired &&
+      !formState.setInputRequired &&
+      !formState.repInputRequired &&
+      !formState.timeInputRequired &&
+      !formState.speedInputRequired
+    ) {
+      setErrorAlert('속성을 입력해주세요.');
       return;
     }
 
