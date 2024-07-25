@@ -1,4 +1,5 @@
-import { create } from 'zustand';
+import { StateCreator, create } from 'zustand';
+import { PersistOptions, persist } from 'zustand/middleware';
 
 export interface User {
   id: string;
@@ -8,14 +9,32 @@ export interface User {
 
 interface UserState {
   user: User | null;
-  setUser: (user: any) => void;
+  setUser: (user: User) => void;
   clearUser: () => void;
 }
 
-const useUserStore = create<UserState>(set => ({
-  user: null,
-  setUser: user => set({ user }),
-  clearUser: () => set({ user: null }),
-}));
+type MyState = UserState & {
+  setUser: (user: User) => void;
+  clearUser: () => void;
+};
+
+type MyPersist = (
+  config: StateCreator<MyState>,
+  options: PersistOptions<MyState>
+) => StateCreator<MyState>;
+
+const useUserStore = create<MyState>(
+  (persist as MyPersist)(
+    set => ({
+      user: null,
+      setUser: user => set({ user }),
+      clearUser: () => set({ user: null }),
+    }),
+    {
+      name: 'user-storage',
+      getStorage: () => localStorage,
+    }
+  )
+);
 
 export default useUserStore;
