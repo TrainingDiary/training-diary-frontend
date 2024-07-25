@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import addBtn from '@icons/home/addbtn.svg';
 import avatar from '@icons/home/avatar.svg';
 import Modal from '@components/Common/Modal/Modal';
+import Alert from '@components/Common/Alert/Alert';
 import { AddButton } from '@components/Common/AddButton';
+import { SectionWrapper } from '@components/Common/SectionWrapper';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import formatDate from 'src/utils/formatDate';
 import useModals from 'src/hooks/useModals';
-import { SectionWrapper } from '@components/Common/SectionWrapper';
+import useFetchUser from 'src/hooks/useFetchUser';
+import CreateTrainerApi from 'src/api/trainer';
 
 // Styled components
 const HomeLayout = styled.div`
@@ -128,56 +130,45 @@ interface TraineeDataType {
 }
 
 const TraineeManagement: React.FC = () => {
+  useFetchUser();
+  const navigate = useNavigate();
+  const trainerApi = CreateTrainerApi(navigate);
   const { openModal, closeModal, isOpen } = useModals();
+  const [isLoading, setLoading] = useState<boolean>(false);
   const [traineeData, setTraineeData] = useState<TraineeDataType[]>([]);
-  const [sortOption, setSortOption] = useState<string>('name');
+  const [sortOption, setSortOption] = useState<string>('NAME');
   const [selectedTraineeId, setSelectedTraineeId] = useState<number | null>(
     null
   );
+  const [errorAlert, setErrorAlert] = useState<string>('');
 
-  // Dummy data API 가져오기(msw)
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get('/api/pt-contracts');
-        if (res.status === 200 && res.data) {
-          const sortedData = res.data.sort(
-            (a: TraineeDataType, b: TraineeDataType) =>
-              a.traineeName.localeCompare(b.traineeName)
-          );
-          setTraineeData(sortedData);
-        }
-      } catch (error) {
-        console.error('Failed to fetch trainee data', error);
+  // fetchData 추가, 삭제 등 이후로 여러 사용으로 인해 분리
+  const fetchData = async (sortOption: string) => {
+    try {
+      setLoading(true);
+      const res = await trainerApi.getTrainees(sortOption, 0, 100);
+
+      if (res.status === 200 && res.data) {
+        setTraineeData(res.data.content);
       }
-    };
-    fetchData();
-  }, []);
+    } catch (error) {
+      console.error('Failed to fetch trainee data', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 트레이니 api 연동
+  useEffect(() => {
+    fetchData(sortOption);
+  }, [sortOption]);
 
   // 필터 정렬 로직
   const handleSort = (option: string) => {
-    const sortedData = [...traineeData];
-    if (option === 'name') {
-      sortedData.sort((a, b) => a.traineeName.localeCompare(b.traineeName));
-    } else if (option === 'date') {
-      sortedData.sort(
-        (a, b) =>
-          new Date(b.totalSessionUpdatedAt).getTime() -
-          new Date(a.totalSessionUpdatedAt).getTime()
-      );
-    }
     setSortOption(option);
-    setTraineeData(sortedData);
   };
 
-  // 삭제 버튼 로직
-  const handleDelete = (id: number) => {
-    setTraineeData(prevData =>
-      prevData.filter(trainee => trainee.ptContractId !== id)
-    );
-  };
-
-  //추가 버튼 로직
+  //추가 버튼 모달
   const handleOpenAddModal = () => {
     openModal('addModal');
   };
@@ -186,6 +177,7 @@ const TraineeManagement: React.FC = () => {
     closeModal('addModal');
   };
 
+  // 삭제 버튼 모달
   const handleOpenDeleteModal = (id: number) => {
     setSelectedTraineeId(id);
     openModal('deleteModal');
@@ -196,60 +188,91 @@ const TraineeManagement: React.FC = () => {
     closeModal('deleteModal');
   };
 
-  const handleSaveInput = (value?: string) => {
-    console.log(`Saved value: ${value}`);
-    closeModal('addModal');
+  // 트레이니 추가 로직
+  const handleSaveInput = async (email: string) => {
+    if (!email) {
+      setErrorAlert('이메일을 입력해주세요.');
+      return;
+    }
+    try {
+      await trainerApi.addTrainee(email);
+      fetchData(sortOption);
+      closeModal('addModal');
+    } catch (error: any) {
+      if (error.response.status === 409) {
+        setErrorAlert('이미 등록된 트레이니 입니다.');
+      } else if (error.response.status === 406) {
+        setErrorAlert('이메일을 확인해주세요.');
+      }
+      console.error('트레이니 추가 에러: ', error);
+    }
   };
 
-  const handleDeleteConfirm = () => {
-    if (selectedTraineeId !== null) {
-      handleDelete(selectedTraineeId);
+  // 트레이니 삭제 로직
+  const handleDeleteConfirm = async () => {
+    if (selectedTraineeId === null) return;
+    try {
+      await trainerApi.deleteTrainee(selectedTraineeId);
+      fetchData(sortOption);
+    } catch (error) {
+      console.error('트레이니 삭제 에러: ', error);
     }
     closeModal('deleteModal');
   };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
 
   return (
     <React.Fragment>
       <SectionWrapper>
         <HomeLayout>
-          {/* Dropdown for sorting options */}
           <DropDownWrapper>
             <select
               onChange={e => handleSort(e.target.value)}
               value={sortOption}
             >
-              <option value="name">이름순</option>
-              <option value="date">PT 등록 최신순</option>
+              <option value="NAME">이름순</option>
+              <option value="SESSION_UPDATED_AT">PT 등록 최신순</option>
             </select>
           </DropDownWrapper>
-          {/* Trainee list */}
-          <TraineeList>
-            {traineeData.length > 0 ? (
-              traineeData.map(trainee => (
-                <TraineeItem key={trainee.ptContractId}>
-                  <Link to={`/trainee/${trainee.traineeId}/dashboard`}>
-                    <Avatar>
-                      <img src={avatar} alt="user avatar" />
-                    </Avatar>
-                    <TraineeInfo>
-                      <p>{trainee.traineeName}</p>
-                      <span>
-                        등록일 : {formatDate(trainee.totalSessionUpdatedAt)}
-                      </span>
-                    </TraineeInfo>
-                  </Link>
-                  <DeleteButton
-                    onClick={() => handleOpenDeleteModal(trainee.ptContractId)}
-                  >
-                    삭제
-                  </DeleteButton>
-                </TraineeItem>
-              ))
-            ) : (
-              <li>트레이니 데이터가 없습니다.</li>
-            )}
-          </TraineeList>
-          {/* Add button 추가 */}
+
+          {isLoading ? (
+            <div style={{ marginRight: 'auto', fontSize: '1.4rem' }}>
+              트레이니 목록 로딩중...
+            </div>
+          ) : (
+            <TraineeList>
+              {traineeData.length > 0 ? (
+                traineeData.map(trainee => (
+                  <TraineeItem key={trainee.ptContractId}>
+                    <Link to={`/trainee/${trainee.traineeId}/dashboard`}>
+                      <Avatar>
+                        <img src={avatar} alt="user avatar" />
+                      </Avatar>
+                      <TraineeInfo>
+                        <p>{trainee.traineeName}</p>
+                        <span>
+                          등록일 : {formatDate(trainee.totalSessionUpdatedAt)}
+                        </span>
+                      </TraineeInfo>
+                    </Link>
+                    <DeleteButton
+                      onClick={() =>
+                        handleOpenDeleteModal(trainee.ptContractId)
+                      }
+                    >
+                      삭제
+                    </DeleteButton>
+                  </TraineeItem>
+                ))
+              ) : (
+                <li style={{ fontSize: '1.4rem' }}>
+                  등록된 트레이니가 없습니다.
+                </li>
+              )}
+            </TraineeList>
+          )}
+
           <AddButton onClick={handleOpenAddModal}>
             <img src={addBtn} alt="add button" />
           </AddButton>
@@ -274,6 +297,10 @@ const TraineeManagement: React.FC = () => {
         >
           트레이니를 삭제하겠습니까?
         </Modal>
+
+        {errorAlert && (
+          <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+        )}
       </SectionWrapper>
     </React.Fragment>
   );
