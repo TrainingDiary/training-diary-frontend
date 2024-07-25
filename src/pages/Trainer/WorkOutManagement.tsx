@@ -45,8 +45,8 @@ const WorkOutManagement: React.FC = () => {
   const [selectedWorkoutId, setSelectedWorkoutId] = useState<number | null>(
     null
   );
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10);
+  const [page] = useState(0);
+  const [size] = useState(20);
   const [formState, setFormState] = useState<WorkoutDataType>({
     id: 0,
     name: '',

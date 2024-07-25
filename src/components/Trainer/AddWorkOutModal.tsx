@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+
 import Modal from '@components/Common/Modal/Modal';
+import Alert from '@components/Common/Alert/Alert';
 import { WorkoutDataType } from '@pages/Trainer/WorkOutManagement';
 
 // 스타일 정의
@@ -90,7 +92,9 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
   formState,
   setFormState,
 }) => {
-  const handleInputChange = (field: string, value: string) => {
+  const [errorAlert, setErrorAlert] = useState<string>('');
+
+  const handleInputChange = (field: keyof WorkoutDataType, value: string) => {
     setFormState(prev => ({
       ...prev,
       [field]: value,
@@ -100,11 +104,16 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
   const handleAttributeChange = (attr: keyof WorkoutDataType) => {
     setFormState(prev => ({
       ...prev,
-      [attr]: !prev[attr],
+      [attr]: !prev[attr] as boolean,
     }));
   };
 
   const handleSave = () => {
+    if (!formState.name || !formState.targetMuscle || !formState.remarks) {
+      setErrorAlert('내용을 입력해주세요.');
+      return;
+    }
+
     const newWorkout: WorkoutDataType = {
       ...formState,
       id: formState.id || Date.now(), // 새로 추가하는 경우에만 임시 ID 할당
@@ -117,6 +126,8 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
     }
     onClose();
   };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
 
   return (
     <Modal
@@ -150,38 +161,44 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
           onChange={e => handleInputChange('remarks', e.target.value)}
         ></TextArea>
       </FormGroup>
-      <FormGroup>
-        <Label>속성 값:</Label>
-        <CheckboxGroup>
-          {[
-            'weightInputRequired',
-            'setInputRequired',
-            'repInputRequired',
-            'timeInputRequired',
-            'speedInputRequired',
-          ].map(attr => (
-            <CheckboxLabel
-              key={attr}
-              className={
-                formState[attr as keyof WorkoutDataType] ? 'selected' : ''
-              }
-            >
-              <input
-                type="checkbox"
-                checked={formState[attr as keyof WorkoutDataType]}
-                onChange={() =>
-                  handleAttributeChange(attr as keyof WorkoutDataType)
+      {formState.id ? null : (
+        <FormGroup>
+          <Label>속성 값:</Label>
+          <CheckboxGroup>
+            {[
+              'weightInputRequired',
+              'setInputRequired',
+              'repInputRequired',
+              'timeInputRequired',
+              'speedInputRequired',
+            ].map(attr => (
+              <CheckboxLabel
+                key={attr}
+                className={
+                  formState[attr as keyof WorkoutDataType] ? 'selected' : ''
                 }
-              />
-              {attr === 'weightInputRequired' && '무게'}
-              {attr === 'setInputRequired' && '세트'}
-              {attr === 'repInputRequired' && '횟수'}
-              {attr === 'timeInputRequired' && '시간'}
-              {attr === 'speedInputRequired' && '속도'}
-            </CheckboxLabel>
-          ))}
-        </CheckboxGroup>
-      </FormGroup>
+              >
+                <input
+                  type="checkbox"
+                  checked={formState[attr as keyof WorkoutDataType] as boolean}
+                  onChange={() =>
+                    handleAttributeChange(attr as keyof WorkoutDataType)
+                  }
+                  disabled={formState.id ? true : false}
+                />
+                {attr === 'weightInputRequired' && '무게'}
+                {attr === 'setInputRequired' && '세트'}
+                {attr === 'repInputRequired' && '횟수'}
+                {attr === 'timeInputRequired' && '시간'}
+                {attr === 'speedInputRequired' && '속도'}
+              </CheckboxLabel>
+            ))}
+          </CheckboxGroup>
+        </FormGroup>
+      )}
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
     </Modal>
   );
 };
