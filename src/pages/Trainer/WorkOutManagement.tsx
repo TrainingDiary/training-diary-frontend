@@ -135,12 +135,12 @@ const WorkOutManagement: React.FC = () => {
         name: workout.name,
         targetMuscle: workout.targetMuscle,
         remarks: workout.remarks,
-        id: 0,
-        weightInputRequired: false,
-        setInputRequired: false,
-        repInputRequired: false,
-        timeInputRequired: false,
-        speedInputRequired: false,
+        weightInputRequired: workout.weightInputRequired,
+        setInputRequired: workout.setInputRequired,
+        repInputRequired: workout.repInputRequired,
+        timeInputRequired: workout.timeInputRequired,
+        speedInputRequired: workout.speedInputRequired,
+        id: workout.id,
       });
       refetch();
       closeModal('addModal');

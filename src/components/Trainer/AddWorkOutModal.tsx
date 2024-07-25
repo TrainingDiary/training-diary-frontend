@@ -1,4 +1,3 @@
-// AddWorkOutModal.tsx
 import React from 'react';
 import styled from 'styled-components';
 import Modal from '@components/Common/Modal/Modal';
@@ -87,6 +86,7 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  onEdit,
   formState,
   setFormState,
 }) => {
@@ -109,7 +109,12 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
       ...formState,
       id: formState.id || Date.now(), // 새로 추가하는 경우에만 임시 ID 할당
     };
-    onSave(newWorkout);
+
+    if (formState.id) {
+      onEdit(newWorkout);
+    } else {
+      onSave(newWorkout);
+    }
     onClose();
   };
 
