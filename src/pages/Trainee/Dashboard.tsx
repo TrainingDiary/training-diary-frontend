@@ -268,6 +268,7 @@ const Dashboard: React.FC = () => {
   });
   const [traineeInfo, setTraineeInfo] = useState<TraineeInfoData | null>(null);
 
+  // 트레이니 정보 조회 api 연동
   const fetchTraineeInfo = async () => {
     if (traineeId) {
       try {
@@ -288,28 +289,28 @@ const Dashboard: React.FC = () => {
     datasets: [
       {
         label: '몸무게',
-        data: [78],
+        data: [0],
         borderColor: '#FF3B3B',
         pointBackgroundColor: '#FF3B3B',
         fill: false,
       },
       {
         label: '체지방률',
-        data: [15],
+        data: [0],
         borderColor: '#3B98FF',
         pointBackgroundColor: '#3B98FF',
         fill: false,
       },
       {
         label: '근골격량',
-        data: [30.6],
+        data: [0],
         borderColor: '#ADB5BD',
         pointBackgroundColor: '#ADB5BD',
         fill: false,
       },
       {
         label: '목표수치',
-        data: [70],
+        data: [0],
         borderColor: '#89DAC1',
         pointBackgroundColor: '#89DAC1',
         fill: false,
@@ -319,6 +320,13 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     if (traineeInfo) {
+      const targetTypeLabel =
+        traineeInfo.targetType === 'TARGET_WEIGHT'
+          ? '몸무게'
+          : traineeInfo.targetType === 'TARGET_BODY_FAT_PERCENTAGE'
+            ? '체지방률'
+            : '근골격량';
+
       setChartData({
         labels: traineeInfo.weightHistory.map(
           (w: { addedDate: string | number | Date }) =>
@@ -353,7 +361,7 @@ const Dashboard: React.FC = () => {
             fill: false,
           },
           {
-            label: `목표수치(${traineeInfo.targetType})`,
+            label: `목표수치(${targetTypeLabel})`,
             data: Array(traineeInfo.weightHistory.length).fill(
               traineeInfo.targetValue
             ),
@@ -366,6 +374,7 @@ const Dashboard: React.FC = () => {
     }
   }, [traineeInfo]);
 
+  // 데이터 변경
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setTraineeInfo(prevInfo =>
@@ -402,6 +411,7 @@ const Dashboard: React.FC = () => {
     }));
   };
 
+  // datepicker 날짜 선택 및 나이 변경
   const handleDateChange = (date: Date | null) => {
     if (date && traineeInfo) {
       const calculatedAge = differenceInYears(new Date(), date);
@@ -418,6 +428,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  // 트레이니 정보 수정 저장 api
   const saveTraineeInfo = async () => {
     if (traineeInfo?.remainingSession === null) {
       setErrorAlert('잔여 횟수를 입력해주세요');
@@ -445,13 +456,13 @@ const Dashboard: React.FC = () => {
       try {
         await traineeApi.updateTraineeInfo(traineeInfo);
         setEditInfo(true);
-        console.log('트레이니 정보 추가 성공');
       } catch (error) {
         console.error('트레이니 정보 수정 에러:', error);
       }
     }
   };
 
+  // inbody 정보 저장 api
   const saveInbodyInfo = async () => {
     try {
       await traineeApi.addInbodyInfo({ ...inbodyData, traineeId: traineeId });
@@ -484,12 +495,12 @@ const Dashboard: React.FC = () => {
           : null
       );
       closeModal('inbodyModal');
-      console.log('인바디 정보 추가 성공');
     } catch (error) {
       console.error('트레이니 인바디정보 추가 에러:', error);
     }
   };
 
+  // inbody 정보 모달 저장 로직
   const handleSaveModal = async () => {
     const { weight, bodyFatPercentage, skeletalMuscleMass } = inbodyData;
     if (weight === 0) {
