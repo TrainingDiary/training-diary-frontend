@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import Modal from '@components/Common/Modal/Modal';
-import { WorkoutDataType } from '@pages/Trainer/WorkOutManagement';
+import Alert from '@components/Common/Alert/Alert';
+import {
+  AddWorkoutDataType,
+  EditWorkoutDataType,
+  WorkoutDataType,
+} from '@pages/Trainer/WorkOutManagement';
 
 // 스타일 정의
 const FormGroup = styled.div`
@@ -77,32 +82,11 @@ const CheckboxLabel = styled.label`
 interface AddWorkOutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (workout: WorkoutDataType) => void;
-  formState: {
-    name: string;
-    targetMuscle: string;
-    remark: string;
-    attributes: {
-      weight: boolean;
-      set: boolean;
-      rep: boolean;
-      time: boolean;
-      speed: boolean;
-    };
-  };
+  onSave: (workout: AddWorkoutDataType) => void;
+  onEdit: (workout: EditWorkoutDataType) => void;
+  formState: AddWorkoutDataType | WorkoutDataType;
   setFormState: React.Dispatch<
-    React.SetStateAction<{
-      name: string;
-      targetMuscle: string;
-      remark: string;
-      attributes: {
-        weight: boolean;
-        set: boolean;
-        rep: boolean;
-        time: boolean;
-        speed: boolean;
-      };
-    }>
+    React.SetStateAction<WorkoutDataType | AddWorkoutDataType>
   >;
 }
 
@@ -110,50 +94,73 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  onEdit,
   formState,
   setFormState,
 }) => {
-  const handleInputChange = (field: string, value: string) => {
+  const [errorAlert, setErrorAlert] = useState<string>('');
+
+  const handleInputChange = (
+    field: keyof AddWorkoutDataType,
+    value: string
+  ) => {
     setFormState(prev => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleAttributeChange = (attr: keyof typeof formState.attributes) => {
+  const handleAttributeChange = (attr: keyof AddWorkoutDataType) => {
     setFormState(prev => ({
       ...prev,
-      attributes: {
-        ...prev.attributes,
-        [attr]: !prev.attributes[attr],
-      },
+      [attr]: !prev[attr] as boolean,
     }));
   };
 
   const handleSave = () => {
-    const newWorkout: WorkoutDataType = {
-      id: Date.now(), // 임시 ID 할당
-      name: formState.name,
-      targetMuscle: formState.targetMuscle,
-      remark: formState.remark,
-      weightInputRequired: formState.attributes.weight,
-      setInputRequired: formState.attributes.set,
-      repInputRequired: formState.attributes.rep,
-      timeInputRequired: formState.attributes.time,
-      speedInputRequired: formState.attributes.speed,
-    };
-    onSave(newWorkout);
+    if (!formState.name) {
+      setErrorAlert('운동명을 입력해주세요.');
+      return;
+    } else if (!formState.targetMuscle) {
+      setErrorAlert('자극 부위를 입력해주세요.');
+      return;
+    } else if (!formState.remarks) {
+      setErrorAlert('주의사항을 입력해주세요.');
+      return;
+    } else if (
+      !formState.weightInputRequired &&
+      !formState.setInputRequired &&
+      !formState.repInputRequired &&
+      !formState.timeInputRequired &&
+      !formState.speedInputRequired
+    ) {
+      setErrorAlert('속성을 입력해주세요.');
+      return;
+    }
+
+    if ('id' in formState) {
+      onEdit({
+        workoutTypeId: formState.id,
+        name: formState.name,
+        targetMuscle: formState.targetMuscle,
+        remarks: formState.remarks,
+      });
+    } else {
+      onSave(formState as AddWorkoutDataType);
+    }
     onClose();
   };
 
+  const onCloseErrorAlert = () => setErrorAlert('');
+
   return (
     <Modal
-      title={formState.name ? '운동 종류 수정' : '운동 종류 추가'}
+      title={'id' in formState ? '운동 종류 수정' : '운동 종류 추가'}
       type="custom"
       isOpen={isOpen}
       onClose={onClose}
       onSave={handleSave}
-      btnConfirm={formState.name ? '수정' : '추가'}
+      btnConfirm={'id' in formState ? '수정' : '추가'}
     >
       <FormGroup>
         <Label>운동명:</Label>
@@ -174,44 +181,50 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
       <FormGroup>
         <Label>주의사항 노트:</Label>
         <TextArea
-          value={formState.remark}
-          onChange={e => handleInputChange('remark', e.target.value)}
+          value={formState.remarks}
+          onChange={e => handleInputChange('remarks', e.target.value)}
         ></TextArea>
       </FormGroup>
-      <FormGroup>
-        <Label>속성 값:</Label>
-        <CheckboxGroup>
-          {Object.keys(formState.attributes).map(attr => (
-            <CheckboxLabel
-              key={attr}
-              className={
-                formState.attributes[attr as keyof typeof formState.attributes]
-                  ? 'selected'
-                  : ''
-              }
-            >
-              <input
-                type="checkbox"
-                checked={
-                  formState.attributes[
-                    attr as keyof typeof formState.attributes
-                  ]
+      {'id' in formState ? null : (
+        <FormGroup>
+          <Label>속성 값:</Label>
+          <CheckboxGroup>
+            {[
+              'weightInputRequired',
+              'setInputRequired',
+              'repInputRequired',
+              'timeInputRequired',
+              'speedInputRequired',
+            ].map(attr => (
+              <CheckboxLabel
+                key={attr}
+                className={
+                  formState[attr as keyof AddWorkoutDataType] ? 'selected' : ''
                 }
-                onChange={() =>
-                  handleAttributeChange(
-                    attr as keyof typeof formState.attributes
-                  )
-                }
-              />
-              {attr === 'weight' && '무게'}
-              {attr === 'set' && '세트'}
-              {attr === 'rep' && '횟수'}
-              {attr === 'time' && '시간'}
-              {attr === 'speed' && '속도'}
-            </CheckboxLabel>
-          ))}
-        </CheckboxGroup>
-      </FormGroup>
+              >
+                <input
+                  type="checkbox"
+                  checked={
+                    formState[attr as keyof AddWorkoutDataType] as boolean
+                  }
+                  onChange={() =>
+                    handleAttributeChange(attr as keyof AddWorkoutDataType)
+                  }
+                  disabled={'id' in formState ? true : false}
+                />
+                {attr === 'weightInputRequired' && '무게'}
+                {attr === 'setInputRequired' && '세트'}
+                {attr === 'repInputRequired' && '횟수'}
+                {attr === 'timeInputRequired' && '시간'}
+                {attr === 'speedInputRequired' && '속도'}
+              </CheckboxLabel>
+            ))}
+          </CheckboxGroup>
+        </FormGroup>
+      )}
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
     </Modal>
   );
 };
