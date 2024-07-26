@@ -8,6 +8,7 @@ import Modal from '@components/Common/Modal/Modal';
 import { generateTimes } from 'src/utils/generateTimes';
 import useModals from 'src/hooks/useModals';
 import CreateAppointmentApi from 'src/api/appointment';
+import useUserStore from 'src/stores/userStore';
 
 const Wrapper = styled.div`
   display: flex;
@@ -107,7 +108,7 @@ const ButtonBox = styled.div`
   }
 `;
 
-const StatusButton = styled.button<{ $status: ScheduleStatus }>`
+const StatusButton = styled.button<{ $status: ScheduleStatus; role?: string }>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -118,58 +119,111 @@ const StatusButton = styled.button<{ $status: ScheduleStatus }>`
   width: 100%;
   max-width: 80px;
   white-space: nowrap;
-  background-color: ${({ theme, $status }) => {
-    switch ($status) {
-      case 'PAST':
-        return;
-      case 'EMPTY':
-        return theme.colors.main500;
-      case 'OPEN':
-        return theme.colors.gray700;
-      case 'RESERVE_APPLIED':
-        return theme.colors.main500;
-      case 'RESERVED':
-        return theme.colors.gray100;
-    }
-  }};
-  color: ${({ theme, $status }) => {
-    switch ($status) {
-      case 'PAST':
-        return;
-      case 'EMPTY':
-      case 'OPEN':
-      case 'RESERVE_APPLIED':
-        return theme.colors.white;
-      case 'RESERVED':
-        return theme.colors.gray600;
-    }
-  }};
-  border: ${({ theme, $status }) => {
-    switch ($status) {
-      case 'PAST':
-        return;
-      case 'EMPTY':
-      case 'OPEN':
-      case 'RESERVE_APPLIED':
-        return 'none';
-      case 'RESERVED':
-        return `1px solid ${theme.colors.gray300}`;
-    }
-  }};
-
-  &:active {
-    background-color: ${({ theme, $status }) => {
+  background-color: ${({ theme, $status, role }) => {
+    if (role === 'TRAINER') {
       switch ($status) {
         case 'PAST':
           return;
         case 'EMPTY':
-          return theme.colors.main700;
+          return theme.colors.main500;
         case 'OPEN':
-          return theme.colors.gray900;
+          return theme.colors.gray700;
         case 'RESERVE_APPLIED':
-          return theme.colors.main700;
+          return theme.colors.main500;
         case 'RESERVED':
-          return theme.colors.gray300;
+          return theme.colors.gray100;
+      }
+    } else if (role === 'TRAINEE') {
+      switch ($status) {
+        case 'PAST':
+        case 'EMPTY':
+          return;
+        case 'OPEN':
+          return theme.colors.main500;
+        case 'RESERVE_APPLIED':
+          return theme.colors.gray100;
+        case 'RESERVED':
+          return theme.colors.gray100;
+      }
+    }
+  }};
+  color: ${({ theme, $status, role }) => {
+    if (role === 'TRAINER') {
+      switch ($status) {
+        case 'PAST':
+          return;
+        case 'EMPTY':
+        case 'OPEN':
+        case 'RESERVE_APPLIED':
+          return theme.colors.white;
+        case 'RESERVED':
+          return theme.colors.gray600;
+      }
+    } else if (role === 'TRAINEE') {
+      switch ($status) {
+        case 'PAST':
+        case 'EMPTY':
+          return;
+        case 'OPEN':
+          return theme.colors.white;
+        case 'RESERVE_APPLIED':
+        case 'RESERVED':
+          return theme.colors.gray600;
+      }
+    }
+  }};
+  border: ${({ theme, $status, role }) => {
+    if (role === 'TRAINER') {
+      switch ($status) {
+        case 'PAST':
+          return;
+        case 'EMPTY':
+        case 'OPEN':
+        case 'RESERVE_APPLIED':
+          return 'none';
+        case 'RESERVED':
+          return `1px solid ${theme.colors.gray300}`;
+      }
+    } else if (role === 'TRAINEE') {
+      switch ($status) {
+        case 'PAST':
+        case 'EMPTY':
+          return;
+        case 'OPEN':
+          return 'none';
+        case 'RESERVE_APPLIED':
+        case 'RESERVED':
+          return `1px solid ${theme.colors.gray300}`;
+      }
+    }
+  }};
+
+  &:active {
+    background-color: ${({ theme, $status, role }) => {
+      if (role === 'TRAINER') {
+        switch ($status) {
+          case 'PAST':
+            return;
+          case 'EMPTY':
+            return theme.colors.main700;
+          case 'OPEN':
+            return theme.colors.gray900;
+          case 'RESERVE_APPLIED':
+            return theme.colors.main700;
+          case 'RESERVED':
+            return theme.colors.gray300;
+        }
+      } else if (role === 'TRAINEE') {
+        switch ($status) {
+          case 'PAST':
+          case 'EMPTY':
+            return;
+          case 'OPEN':
+            return theme.colors.main700;
+          case 'RESERVE_APPLIED':
+          case 'RESERVED':
+            return theme.colors.gray300;
+        }
       }
     }};
     color: ${({ theme }) => theme.colors.white};
@@ -222,6 +276,7 @@ interface ScheduleDetailProps {
 }
 
 const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
+  const { user } = useUserStore();
   const navigate = useNavigate();
   const AppointmentApi = CreateAppointmentApi(navigate);
   const { openModal, closeModal, isOpen } = useModals();
@@ -299,17 +354,30 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
   };
 
   const getButtonText = ($status: ScheduleStatus) => {
-    switch ($status) {
-      case 'PAST':
-        return;
-      case 'EMPTY':
-        return '오픈';
-      case 'OPEN':
-        return '닫기';
-      case 'RESERVE_APPLIED':
-        return '확정';
-      case 'RESERVED':
-        return '취소';
+    if (user?.role === 'TRAINER') {
+      switch ($status) {
+        case 'PAST':
+          return;
+        case 'EMPTY':
+          return '오픈';
+        case 'OPEN':
+          return '닫기';
+        case 'RESERVE_APPLIED':
+          return '확정';
+        case 'RESERVED':
+          return '취소';
+      }
+    } else if (user?.role === 'TRAINEE') {
+      switch ($status) {
+        case 'PAST':
+        case 'EMPTY':
+          return;
+        case 'OPEN':
+          return '신청';
+        case 'RESERVE_APPLIED':
+        case 'RESERVED':
+          return '취소';
+      }
     }
   };
 
@@ -377,26 +445,33 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
               </TimeBox>
               <InfoBox $status={$status}>
                 <Detail $status={$status}>{detailText}</Detail>
-                {$status !== 'PAST' && (
-                  <ButtonBox>
-                    <StatusButton
-                      $status={$status}
-                      onClick={() =>
-                        handleModal($status, 'open', scheduleId, time.shortTime)
-                      }
-                    >
-                      {getButtonText($status)}
-                    </StatusButton>
-                    {$status === 'RESERVE_APPLIED' && (
-                      <RejectButton
+                {$status !== 'PAST' &&
+                  !(user?.role === 'TRAINEE' && $status === 'EMPTY') && (
+                    <ButtonBox>
+                      <StatusButton
                         $status={$status}
-                        onClick={() => openModal('rejectModal')}
+                        role={user?.role}
+                        onClick={() =>
+                          handleModal(
+                            $status,
+                            'open',
+                            scheduleId,
+                            time.shortTime
+                          )
+                        }
                       >
-                        거절
-                      </RejectButton>
-                    )}
-                  </ButtonBox>
-                )}
+                        {getButtonText($status)}
+                      </StatusButton>
+                      {$status === 'RESERVE_APPLIED' && (
+                        <RejectButton
+                          $status={$status}
+                          onClick={() => openModal('rejectModal')}
+                        >
+                          거절
+                        </RejectButton>
+                      )}
+                    </ButtonBox>
+                  )}
               </InfoBox>
             </ScheduleTable>
           );
