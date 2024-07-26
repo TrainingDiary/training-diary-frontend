@@ -14,7 +14,9 @@ import useModals from 'src/hooks/useModals';
 import useFetchSchedules from 'src/hooks/useFetchSchedules';
 import useFetchUser from 'src/hooks/useFetchUser';
 import { traineeList } from 'src/mocks/data/traineeList';
-import { useCalendarStore } from 'src/stores/calendarStore';
+import useCalendarStore from 'src/stores/calendarStore';
+import useUserStore from 'src/stores/userStore';
+import CreateAppointmentApi from 'src/api/appointment';
 
 const Wrapper = styled.div`
   display: flex;
@@ -55,9 +57,11 @@ const TraineeRegisterModalText = styled.span`
 const MonthlyContent: React.FC = () => {
   useFetchUser();
   const navigate = useNavigate();
+  const { user } = useUserStore();
   const { startDate, endDate } = useCalendarStore();
-  const { data, isLoading, error } = useFetchSchedules(startDate, endDate);
+  const { data, isLoading, refetch } = useFetchSchedules(startDate, endDate);
   const { openModal, closeModal, isOpen } = useModals();
+  const AppointmentApi = CreateAppointmentApi(navigate);
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
@@ -125,9 +129,25 @@ const MonthlyContent: React.FC = () => {
     closeModal(modalName);
   };
 
-  const onSaveModal = (modalName: string) => {
+  const onSaveModal = async (modalName: string) => {
     if (modalName === 'openModal') {
-      // 수업 일괄 오픈 API 요청 단계 추가 (추후 react-query 이용한 refetch)
+      try {
+        const dateTimes = selectedDates.reduce(
+          (acc, date) => {
+            acc.push({
+              startDate: date,
+              startTimes: selectedTimes,
+            });
+            return acc;
+          },
+          [] as { startDate: string; startTimes: string[] }[]
+        );
+
+        await AppointmentApi.openSchedules(dateTimes);
+        refetch({ force: true });
+      } catch (error) {
+        console.error('수업 일괄 오픈 에러: ', error);
+      }
     } else if (modalName === 'registerModal') {
       if (!selectedTraineeId) return setErrorAlert('트레이니를 선택해주세요.');
 
@@ -144,10 +164,6 @@ const MonthlyContent: React.FC = () => {
   };
 
   if (isLoading) return <div>Loading...</div>;
-  if (error || !data)
-    return (
-      <div>Error: {error?.message || '데이터를 불러오지 못했습니다.'}</div>
-    );
 
   return (
     <SectionWrapper>
@@ -158,11 +174,12 @@ const MonthlyContent: React.FC = () => {
           selectedDates={selectedDates}
           onDateClick={onDateClick}
         />
-        <ButtonContainer
-          onButtonClick={onButtonClick}
-          selectedButton={selectedButton}
-        />
-
+        {user?.role === 'TRAINER' && (
+          <ButtonContainer
+            onButtonClick={onButtonClick}
+            selectedButton={selectedButton}
+          />
+        )}
         {selectedButton && (
           <Fragment>
             <Divider />
@@ -178,6 +195,7 @@ const MonthlyContent: React.FC = () => {
             </CompleteButton>
           </Fragment>
         )}
+
         {errorAlert && (
           <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
         )}

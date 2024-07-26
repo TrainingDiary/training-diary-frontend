@@ -1,16 +1,13 @@
+import { useEffect } from 'react';
 import styled from 'styled-components';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import {
-  DatesSetArg,
-  DayCellMountArg,
-  DayHeaderContentArg,
-} from '@fullcalendar/core';
+import { DatesSetArg, DayHeaderContentArg } from '@fullcalendar/core';
 import { addMonths, format, startOfMonth } from 'date-fns';
 
 import { hexToRgba } from 'src/utils/hexToRgba';
-import { useCalendarStore } from 'src/stores/calendarStore';
+import useCalendarStore from 'src/stores/calendarStore';
 
 const FullCalendarWrapper = styled.div`
   box-shadow: 0 4px 4px ${({ theme }) => hexToRgba(theme.colors.black, 0.25)};
@@ -123,35 +120,6 @@ const dayHeaderContent = (arg: DayHeaderContentArg) => {
   return dayNames[arg.date.getUTCDay()];
 };
 
-const updateDayCell = (
-  info: DayCellMountArg,
-  selectedButton: string | null,
-  selectedDates: string[],
-  scheduledDates: string[],
-  reservedDates: string[]
-) => {
-  const formattedDate = format(info.date, 'yyyy-MM-dd');
-  const dayNumberElement = info.el.querySelector('.fc-daygrid-day-number');
-
-  if (!dayNumberElement) return;
-
-  if (selectedButton === null) {
-    dayNumberElement.classList.add('active-enabled');
-
-    if (reservedDates.includes(formattedDate)) {
-      dayNumberElement.classList.add('fc-reserved-number');
-    }
-  }
-
-  if (selectedButton === 'open' && scheduledDates.includes(formattedDate)) {
-    dayNumberElement.classList.add('fc-has-event-number');
-  }
-
-  if (selectedDates.includes(formattedDate)) {
-    dayNumberElement.classList.add('fc-selected-number');
-  }
-};
-
 interface MonthlyCalendarProps {
   data: {
     scheduledDates: string[];
@@ -161,7 +129,6 @@ interface MonthlyCalendarProps {
       notAllowedTimes: string[];
     }[];
   };
-
   selectedButton: string | null;
   selectedDates: string[];
   onDateClick: (date: Date) => void;
@@ -176,9 +143,6 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   const { scheduledDates, reservedDates } = data;
   const { selectedDate, setSelectedDate, setStartDate, setEndDate } =
     useCalendarStore();
-  const formattedSelectedDates = selectedDates.map(date =>
-    format(date, 'yyyy-MM-dd')
-  );
 
   const handleDateClick = (info: { date: Date }) => {
     const formattedDate = format(info.date, 'yyyy-MM-dd');
@@ -206,10 +170,50 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
     setEndDate(format(arg.end, 'yyyy-MM-dd'));
   };
 
+  useEffect(() => {
+    const updateCells = () => {
+      const dayCells = document.querySelectorAll('.fc-daygrid-day');
+      dayCells.forEach(dayCell => {
+        const dayNumberElement = dayCell.querySelector(
+          '.fc-daygrid-day-number'
+        );
+        const date = dayCell.getAttribute('data-date');
+        if (!date || !dayNumberElement) return;
+        const formattedDate = format(new Date(date), 'yyyy-MM-dd');
+
+        dayNumberElement.classList.remove(
+          'active-enabled',
+          'fc-reserved-number',
+          'fc-has-event-number',
+          'fc-selected-number'
+        );
+
+        if (selectedButton === null) {
+          dayNumberElement.classList.add('active-enabled');
+          if (reservedDates.includes(formattedDate)) {
+            dayNumberElement.classList.add('fc-reserved-number');
+          }
+        }
+
+        if (
+          selectedButton === 'open' &&
+          scheduledDates.includes(formattedDate)
+        ) {
+          dayNumberElement.classList.add('fc-has-event-number');
+        }
+
+        if (selectedDates.includes(formattedDate)) {
+          dayNumberElement.classList.add('fc-selected-number');
+        }
+      });
+    };
+
+    updateCells();
+  }, [data, selectedButton, selectedDates]);
+
   return (
     <FullCalendarWrapper>
       <FullCalendar
-        key={formattedSelectedDates.join() + selectedButton}
         plugins={[dayGridPlugin, interactionPlugin]}
         headerToolbar={{
           left: 'prev',
@@ -220,15 +224,6 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         fixedWeekCount={false}
         height="auto"
         dayHeaderContent={dayHeaderContent}
-        dayCellDidMount={info =>
-          updateDayCell(
-            info,
-            selectedButton,
-            formattedSelectedDates,
-            scheduledDates,
-            reservedDates
-          )
-        }
         dateClick={handleDateClick}
         datesSet={handleDatesSet}
       />

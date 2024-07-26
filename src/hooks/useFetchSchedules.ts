@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { QueryClient, useQuery } from 'react-query';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 import CreateAppointmentApi from 'src/api/appointment';
@@ -35,7 +35,7 @@ const fetchSchedules = async (
 ): Promise<ScheduleData> => {
   const AppointmentApi = CreateAppointmentApi(navigate);
 
-  const response = await AppointmentApi?.getSchedules(startDate, endDate);
+  const response = await AppointmentApi.getSchedules(startDate, endDate);
   const scheduleList: Schedule[] = response?.data;
 
   const scheduled: string[] = [];
@@ -71,18 +71,38 @@ const fetchSchedules = async (
 
 const useFetchSchedules = (startDate: string, endDate: string) => {
   const navigate = useNavigate();
+  const queryClient = new QueryClient();
 
   const queryKey = ['schedules', startDate, endDate];
 
-  const { data, error, isLoading } = useQuery<ScheduleData, Error>(
+  const {
+    data,
+    error,
+    isLoading,
+    refetch: baseRefetch,
+  } = useQuery<ScheduleData, Error>(
     queryKey,
     () => fetchSchedules(navigate, startDate, endDate),
     {
       staleTime: 30 * 1000,
+      keepPreviousData: true,
     }
   );
 
-  return { data, error, isLoading };
+  const refetch = (options?: { force: boolean }) => {
+    if (options?.force) {
+      queryClient.invalidateQueries(queryKey);
+    }
+    return baseRefetch();
+  };
+
+  const initialData: ScheduleData = {
+    scheduledDates: [],
+    reservedDates: [],
+    reservedAndAppliedDates: [],
+  };
+
+  return { data: data || initialData, error, isLoading, refetch };
 };
 
 export default useFetchSchedules;

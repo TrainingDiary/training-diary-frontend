@@ -12,15 +12,28 @@ const CreateAppointmentApi = (navigate: NavigateFunction) => {
   }
 
   const { user } = useUserStore.getState();
-  if (!user) return;
 
   return {
+    registerSchedules: (
+      traineeId: number,
+      dateTimes: { startDate: string; startTimes: string[] }[]
+    ) =>
+      axiosInstance.post('/schedules/trainers/register', {
+        traineeId,
+        dateTimes,
+      }),
+
+    openSchedules: (dateTimes: { startDate: string; startTimes: string[] }[]) =>
+      axiosInstance.post('/schedules/trainers/open', {
+        dateTimes,
+      }),
+
     getSchedules: (startDate: string, endDate: string) => {
-      if (user.role === 'TRAINER') {
+      if (user?.role === 'TRAINER') {
         return axiosInstance.get('/schedules/trainers', {
           params: { startDate, endDate },
         });
-      } else if (user.role === 'TRAINEE') {
+      } else if (user?.role === 'TRAINEE') {
         return axiosInstance.get('/schedules/trainees', {
           params: { startDate, endDate },
         });
