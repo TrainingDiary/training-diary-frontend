@@ -14,7 +14,7 @@ import useModals from 'src/hooks/useModals';
 import useFetchSchedules from 'src/hooks/useFetchSchedules';
 import useFetchUser from 'src/hooks/useFetchUser';
 import { traineeList } from 'src/mocks/data/traineeList';
-import { getMonthRange } from 'src/utils/getMonthRange';
+import { useCalendarStore } from 'src/stores/calendarStore';
 
 const Wrapper = styled.div`
   display: flex;
@@ -55,8 +55,7 @@ const TraineeRegisterModalText = styled.span`
 const MonthlyContent: React.FC = () => {
   useFetchUser();
   const navigate = useNavigate();
-  const [currentDate] = useState(new Date());
-  const { startDate, endDate } = getMonthRange(currentDate);
+  const { startDate, endDate } = useCalendarStore();
   const { data, isLoading, error } = useFetchSchedules(startDate, endDate);
   const { openModal, closeModal, isOpen } = useModals();
   const [selectedButton, setSelectedButton] = useState<string | null>(null);

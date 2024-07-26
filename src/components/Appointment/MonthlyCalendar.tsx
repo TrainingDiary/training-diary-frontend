@@ -1,12 +1,16 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { DayCellMountArg, DayHeaderContentArg } from '@fullcalendar/core';
-import { format } from 'date-fns';
+import {
+  DatesSetArg,
+  DayCellMountArg,
+  DayHeaderContentArg,
+} from '@fullcalendar/core';
+import { addMonths, format, startOfMonth } from 'date-fns';
 
 import { hexToRgba } from 'src/utils/hexToRgba';
+import { useCalendarStore } from 'src/stores/calendarStore';
 
 const FullCalendarWrapper = styled.div`
   box-shadow: 0 4px 4px ${({ theme }) => hexToRgba(theme.colors.black, 0.25)};
@@ -169,9 +173,9 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   selectedDates,
   onDateClick,
 }) => {
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
-
   const { scheduledDates, reservedDates } = data;
+  const { selectedDate, setSelectedDate, setStartDate, setEndDate } =
+    useCalendarStore();
   const formattedSelectedDates = selectedDates.map(date =>
     format(date, 'yyyy-MM-dd')
   );
@@ -185,8 +189,21 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
       (selectedButton == 'open' && !scheduledDates.includes(formattedDate))
     ) {
       onDateClick(info.date);
-      setCurrentDate(info.date);
     }
+  };
+
+  const handleDatesSet = (arg: DatesSetArg) => {
+    const hasFirstDayOfMonth = arg.start.getDate() === 1;
+
+    if (!hasFirstDayOfMonth) {
+      const nextMonthStart = startOfMonth(addMonths(arg.start, 1));
+      setSelectedDate(nextMonthStart);
+    } else {
+      setSelectedDate(arg.start);
+    }
+
+    setStartDate(format(arg.start, 'yyyy-MM-dd'));
+    setEndDate(format(arg.end, 'yyyy-MM-dd'));
   };
 
   return (
@@ -199,7 +216,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
           center: 'title',
           right: 'next',
         }}
-        initialDate={currentDate}
+        initialDate={selectedDate}
         fixedWeekCount={false}
         height="auto"
         dayHeaderContent={dayHeaderContent}
@@ -213,6 +230,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
           )
         }
         dateClick={handleDateClick}
+        datesSet={handleDatesSet}
       />
     </FullCalendarWrapper>
   );

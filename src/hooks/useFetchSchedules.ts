@@ -35,8 +35,8 @@ const fetchSchedules = async (
 ): Promise<ScheduleData> => {
   const AppointmentApi = CreateAppointmentApi(navigate);
 
-  const response = await AppointmentApi.getTrainerSchedules(startDate, endDate);
-  const scheduleList: Schedule[] = response.data;
+  const response = await AppointmentApi?.getSchedules(startDate, endDate);
+  const scheduleList: Schedule[] = response?.data;
 
   const scheduled: string[] = [];
   const reserved: string[] = [];
@@ -72,10 +72,17 @@ const fetchSchedules = async (
 const useFetchSchedules = (startDate: string, endDate: string) => {
   const navigate = useNavigate();
 
-  return useQuery<ScheduleData, Error>(
-    ['trainerSchedules', startDate, endDate],
-    () => fetchSchedules(navigate, startDate, endDate)
+  const queryKey = ['schedules', startDate, endDate];
+
+  const { data, error, isLoading } = useQuery<ScheduleData, Error>(
+    queryKey,
+    () => fetchSchedules(navigate, startDate, endDate),
+    {
+      staleTime: 30 * 1000,
+    }
   );
+
+  return { data, error, isLoading };
 };
 
 export default useFetchSchedules;
