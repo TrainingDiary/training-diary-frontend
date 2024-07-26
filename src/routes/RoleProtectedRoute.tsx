@@ -5,7 +5,7 @@ import useUserStore from 'src/stores/userStore';
 
 const RoleProtectedRoute: React.FC = () => {
   const location = useLocation();
-  const user = useUserStore(state => state.user);
+  const { user } = useUserStore();
 
   if (user?.role !== 'TRAINER') {
     return <Navigate to="/not-found" state={{ from: location }} replace />;

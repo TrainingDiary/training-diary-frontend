@@ -7,6 +7,7 @@ import CreateAuthApi from 'src/api/auth';
 const useFetchUser = () => {
   const navigate = useNavigate();
   const AuthApi = CreateAuthApi(navigate);
+  const { setUser, clearUser } = useUserStore();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -19,9 +20,9 @@ const useFetchUser = () => {
           unreadNotification: userData.unreadNotification,
         };
 
-        useUserStore.getState().setUser(user);
+        setUser(user);
       } catch (error) {
-        useUserStore.getState().clearUser();
+        clearUser();
         console.error('유저 정보 조회 에러: ', error);
       }
     };

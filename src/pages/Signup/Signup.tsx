@@ -32,6 +32,7 @@ interface FormState {
 const Signup: React.FC = () => {
   const navigate = useNavigate();
   const AuthApi = CreateAuthApi(navigate);
+  const { setUser } = useUserStore();
 
   const {
     register,
@@ -77,7 +78,7 @@ const Signup: React.FC = () => {
         unreadNotification: response.data.unreadNotification,
       };
 
-      useUserStore.getState().setUser(user);
+      setUser(user);
 
       await requestPermission(navigate);
     } catch (error) {

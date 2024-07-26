@@ -85,11 +85,12 @@ const Navigation: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const AuthApi = CreateAuthApi(navigate);
+  const { clearUser } = useUserStore();
 
   const handleLogout = async () => {
     try {
       await AuthApi.logout();
-      useUserStore.getState().clearUser();
+      clearUser();
     } catch (error) {
       console.error('로그아웃 에러: ', error);
     }

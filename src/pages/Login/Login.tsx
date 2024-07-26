@@ -24,6 +24,7 @@ interface FormState {
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const AuthApi = CreateAuthApi(navigate);
+  const { setUser } = useUserStore();
 
   const [isLoading, setLoading] = useState<boolean>(false);
   const [formState, setFormState] = useState<FormState>({
@@ -72,7 +73,7 @@ const Login: React.FC = () => {
         unreadNotification: response.data.unreadNotification,
       };
 
-      useUserStore.getState().setUser(user);
+      setUser(user);
 
       await requestPermission(navigate);
     } catch (error) {
