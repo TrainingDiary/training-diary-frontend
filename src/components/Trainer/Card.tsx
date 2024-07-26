@@ -26,7 +26,6 @@ const CardHeader = styled.div`
 const TitleGroup = styled.div`
   width: 100%;
   display: flex;
-  flex-grow: 1;
   align-items: center;
   gap: 4px;
   color: ${({ theme }) => theme.colors.gray900};
@@ -48,11 +47,13 @@ const ButtonGroup = styled.div`
   justify-content: flex-end;
   gap: 10px;
   width: 100%;
+  flex: 1;
 
   & > button {
     line-height: 1;
     font-size: 1.2rem;
     max-width: 60px;
+    padding: 8px 20px;
   }
 `;
 
