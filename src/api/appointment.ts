@@ -14,10 +14,13 @@ const CreateAppointmentApi = (navigate: NavigateFunction) => {
   const { user } = useUserStore.getState();
 
   return {
-    registerSchedules: (
-      traineeId: number,
-      dateTimes: { startDate: string; startTimes: string[] }[]
-    ) =>
+    registerSchedules: ({
+      traineeId,
+      dateTimes,
+    }: {
+      traineeId: number;
+      dateTimes: { startDate: string; startTimes: string[] }[];
+    }) =>
       axiosInstance.post('/schedules/trainers/register', {
         traineeId,
         dateTimes,

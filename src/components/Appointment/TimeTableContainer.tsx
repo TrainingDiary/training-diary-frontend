@@ -35,14 +35,14 @@ const Time = styled.div<{ $isSelected: boolean; disabled: boolean }>`
     disabled
       ? theme.colors.gray500
       : $isSelected
-      ? theme.colors.white
-      : theme.colors.gray600};
+        ? theme.colors.white
+        : theme.colors.gray600};
   background-color: ${({ theme, $isSelected, disabled }) =>
     disabled
       ? theme.colors.gray300
       : $isSelected
-      ? theme.colors.main500
-      : theme.colors.gray100};
+        ? theme.colors.main500
+        : theme.colors.gray100};
   border: 1px solid
     ${({ theme, $isSelected, disabled }) =>
       $isSelected || disabled ? 'none' : theme.colors.gray200};
@@ -121,9 +121,9 @@ const TimeTableContainer: React.FC<TimeTableContainerProps> = ({
         {times.map((time, index) => {
           const isDisabled =
             selectedButton === 'register' &&
-            selectedDates.some((selectedDate) => {
+            selectedDates.some(selectedDate => {
               const reserved = reservedAndAppliedDates.find(
-                (date) => date.startDate === selectedDate
+                date => date.startDate === selectedDate
               );
               return reserved?.notAllowedTimes.includes(time.shortTime);
             });

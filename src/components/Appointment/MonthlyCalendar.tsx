@@ -4,7 +4,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { DatesSetArg, DayHeaderContentArg } from '@fullcalendar/core';
-import { addMonths, format, startOfMonth } from 'date-fns';
+import { addMonths, format, isBefore, startOfMonth } from 'date-fns';
 
 import { hexToRgba } from 'src/utils/hexToRgba';
 import useCalendarStore from 'src/stores/calendarStore';
@@ -148,6 +148,13 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
     const formattedDate = format(info.date, 'yyyy-MM-dd');
 
     if (
+      selectedButton !== null &&
+      isBefore(new Date(formattedDate), new Date())
+    ) {
+      return;
+    }
+
+    if (
       selectedButton === null ||
       selectedButton === 'register' ||
       (selectedButton == 'open' && !scheduledDates.includes(formattedDate))
@@ -193,6 +200,13 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
           if (reservedDates.includes(formattedDate)) {
             dayNumberElement.classList.add('fc-reserved-number');
           }
+        }
+
+        if (
+          selectedButton !== null &&
+          isBefore(new Date(formattedDate), new Date())
+        ) {
+          dayNumberElement.classList.add('fc-has-event-number');
         }
 
         if (

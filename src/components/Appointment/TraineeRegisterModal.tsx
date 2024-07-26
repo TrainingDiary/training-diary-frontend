@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import avatar from '@icons/home/avatar.svg';
+import Alert from '@components/Common/Alert/Alert';
+import CreateTrainerApi from 'src/api/trainer';
 
 const TraineeListWrapper = styled.ul`
   width: 100%;
@@ -61,40 +64,83 @@ const TraineeInfo = styled.div`
 interface TraineeDataType {
   ptContractId: number;
   totalSessionUpdatedAt: string;
-  totalSession: number;
+  remainingSession: number;
   trainerId: number;
   traineeId: number;
   traineeName: string;
 }
 
 interface TraineeRegisterModalProps {
-  items: TraineeDataType[];
+  isOpen: boolean;
   selectedTraineeId: number | null;
   onClick: (id: number) => void;
 }
 
 const TraineeRegisterModal: React.FC<TraineeRegisterModalProps> = ({
-  items,
+  isOpen,
   selectedTraineeId,
   onClick,
 }) => {
+  const navigate = useNavigate();
+  const TrainerApi = CreateTrainerApi(navigate);
+  const [items, setItems] = useState<TraineeDataType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorAlert, setErrorAlert] = useState<string>('');
+
+  useEffect(() => {
+    if (isOpen) {
+      const fetchTrainees = async () => {
+        try {
+          setIsLoading(true);
+
+          const response = await TrainerApi.getTrainees('NAME', 0, 30);
+
+          setItems(response.data.content);
+        } catch (error) {
+          console.error('트레이니 조회 에러: ', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchTrainees();
+    }
+  }, [isOpen]);
+
+  const onClickTrainee = (trainee: TraineeDataType) => {
+    if (trainee.remainingSession === 0) {
+      setErrorAlert('잔여 횟수가 없습니다.');
+      return;
+    }
+
+    onClick(trainee.traineeId);
+  };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
+
+  if (isLoading) return <div>Loading...</div>;
+  if (items.length === 0) return <div>등록된 트레이니가 없습니다.</div>;
+
   return (
     <TraineeListWrapper>
       {items.map(trainee => (
         <TraineeItem
           key={trainee.traineeId}
           $isSelected={trainee.traineeId === selectedTraineeId}
-          onClick={() => onClick(trainee.traineeId)}
+          onClick={() => onClickTrainee(trainee)}
         >
           <Avatar>
             <img src={avatar} alt="user avatar" />
           </Avatar>
           <TraineeInfo>
             <span>{trainee.traineeName}</span>
-            <span>잔여 횟수 : {trainee.totalSession}</span>
+            <span>잔여 횟수 : {trainee.remainingSession}</span>
           </TraineeInfo>
         </TraineeItem>
       ))}
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
     </TraineeListWrapper>
   );
 };
