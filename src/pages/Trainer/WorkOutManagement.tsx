@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import addBtn from '@icons/home/addbtn.svg';
@@ -10,7 +11,6 @@ import Alert from '@components/Common/Alert/Alert';
 import Card from '@components/Trainer/Card';
 import AddWorkOutModal from '@components/Trainer/AddWorkOutModal';
 import CreateTrainerApi from 'src/api/trainer';
-import { useNavigate } from 'react-router-dom';
 import useModals from 'src/hooks/useModals';
 import useFetchUser from 'src/hooks/useFetchUser';
 
@@ -24,7 +24,6 @@ const Wrapper = styled.div`
 
 // data type 정의
 export interface WorkoutDataType {
-  workoutTypeId?: number;
   id: number;
   name: string;
   targetMuscle: string;
@@ -34,6 +33,24 @@ export interface WorkoutDataType {
   repInputRequired: boolean;
   timeInputRequired: boolean;
   speedInputRequired: boolean;
+}
+
+export interface AddWorkoutDataType {
+  name: string;
+  targetMuscle: string;
+  remarks: string;
+  weightInputRequired: boolean;
+  setInputRequired: boolean;
+  repInputRequired: boolean;
+  timeInputRequired: boolean;
+  speedInputRequired: boolean;
+}
+
+export interface EditWorkoutDataType {
+  workoutTypeId: number;
+  name: string;
+  targetMuscle: string;
+  remarks: string;
 }
 
 const WorkOutManagement: React.FC = () => {
@@ -47,7 +64,9 @@ const WorkOutManagement: React.FC = () => {
   );
   const [page] = useState(0);
   const [size] = useState(20);
-  const [formState, setFormState] = useState<WorkoutDataType>({
+  const [formState, setFormState] = useState<
+    WorkoutDataType | AddWorkoutDataType
+  >({
     id: 0,
     name: '',
     targetMuscle: '',
@@ -69,8 +88,7 @@ const WorkOutManagement: React.FC = () => {
 
   const workouts: WorkoutDataType[] = data?.data.content || [];
 
-  const initialFormState = {
-    id: 0,
+  const initialFormState: AddWorkoutDataType = {
     name: '',
     targetMuscle: '',
     remarks: '',
@@ -117,7 +135,7 @@ const WorkOutManagement: React.FC = () => {
   };
 
   // 운동 종류 추가
-  const handleSaveInput = async (workout: WorkoutDataType) => {
+  const handleSaveInput = async (workout: AddWorkoutDataType) => {
     try {
       await trainerApi.addWorkouts(workout);
       refetch();
@@ -128,20 +146,9 @@ const WorkOutManagement: React.FC = () => {
   };
 
   // 운동 종류 수정
-  const handleEditInput = async (workout: WorkoutDataType) => {
+  const handleEditInput = async (workout: EditWorkoutDataType) => {
     try {
-      await trainerApi.editWorkouts({
-        workoutTypeId: workout.id,
-        name: workout.name,
-        targetMuscle: workout.targetMuscle,
-        remarks: workout.remarks,
-        weightInputRequired: workout.weightInputRequired,
-        setInputRequired: workout.setInputRequired,
-        repInputRequired: workout.repInputRequired,
-        timeInputRequired: workout.timeInputRequired,
-        speedInputRequired: workout.speedInputRequired,
-        id: workout.id,
-      });
+      await trainerApi.editWorkouts(workout);
       refetch();
       closeModal('addModal');
     } catch (error) {
@@ -173,18 +180,33 @@ const WorkOutManagement: React.FC = () => {
   return (
     <SectionWrapper>
       <Wrapper>
-        {isLoading ? (
-          <div>운동 종류 목록 로딩중...</div>
+        {workouts.length > 0 ? (
+          isLoading ? (
+            <div>운동 종류 목록 로딩중...</div>
+          ) : (
+            workouts.map(workout => (
+              <Card
+                key={workout.id}
+                workout={workout}
+                onDelete={() => handleOpenDeleteModal(workout.id)}
+                onEdit={() => handleOpenEditModal(workout)}
+              />
+            ))
+          )
         ) : (
-          workouts.map(workout => (
-            <Card
-              key={workout.id}
-              workout={workout}
-              onDelete={() => handleOpenDeleteModal(workout.id)}
-              onEdit={() => handleOpenEditModal(workout)}
-            />
-          ))
+          <div
+            style={{
+              fontSize: '1.4rem',
+              display: 'flex',
+              justifyContent: 'center',
+              height: '50vh',
+              alignItems: 'center',
+            }}
+          >
+            운동 종류를 생성해주세요.
+          </div>
         )}
+
         {/* Add button 추가 */}
         <AddButton onClick={handleOpenAddModal}>
           <img src={addBtn} alt="add button" />

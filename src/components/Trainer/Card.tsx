@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import Button from '@components/Common/Button/Button';
+import { WorkoutDataType } from '@pages/Trainer/WorkOutManagement';
 import { hexToRgba } from 'src/utils/hexToRgba';
 
 const CardWrapper = styled.div`
@@ -86,17 +87,7 @@ const Tag = styled.span`
 `;
 
 interface CardProps {
-  workout: {
-    id: number;
-    name: string;
-    targetMuscle: string;
-    remarks: string;
-    weightInputRequired: boolean;
-    setInputRequired: boolean;
-    repInputRequired: boolean;
-    timeInputRequired: boolean;
-    speedInputRequired: boolean;
-  };
+  workout: WorkoutDataType;
   onDelete: (id: number) => void;
   onEdit: (id: number) => void;
 }
