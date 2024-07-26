@@ -226,6 +226,8 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
   const AppointmentApi = CreateAppointmentApi(navigate);
   const { openModal, closeModal, isOpen } = useModals();
   const [schedules, setSchedules] = useState<ScheduleType[]>([]);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const fetchSchedules = async () => {
     const formattedDate = format(selectedDate, 'yyyy-MM-dd');
@@ -259,9 +261,10 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
 
   const getScheduleDetail = (
     time: string
-  ): { $status: ScheduleStatus; detailText: string } => {
+  ): { $status: ScheduleStatus; detailText: string; scheduleId?: number } => {
     let $status: ScheduleStatus = 'EMPTY';
     let detailText: string = '';
+    let scheduleId: number | undefined;
 
     const schedule = schedules[0]?.details.find(
       detail => detail.startTime === time
@@ -273,6 +276,7 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
 
     if (schedule) {
       $status = schedule.scheduleStatus;
+      scheduleId = schedule.scheduleId;
       detailText =
         schedule.scheduleStatus === 'OPEN'
           ? '-'
@@ -290,6 +294,7 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
     return {
       $status,
       detailText,
+      scheduleId,
     };
   };
 
@@ -308,9 +313,11 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
     }
   };
 
-  const handleModal = (
+  const handleModal = async (
     $status: ScheduleStatus,
-    action: 'open' | 'close' | 'save'
+    action: 'open' | 'close' | 'save',
+    id?: number,
+    time?: string
   ) => {
     const modalTypeMap: Record<ScheduleStatus, string> = {
       PAST: '',
@@ -322,19 +329,34 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
 
     const modalType = modalTypeMap[$status];
 
-    if (modalType) {
-      switch (action) {
-        case 'open':
-          openModal(modalType);
-          break;
-        case 'close':
+    if (!modalType) return;
+
+    switch (action) {
+      case 'open':
+        setSelectedId(id || null);
+        setSelectedTime(time || null);
+        openModal(modalType);
+        break;
+      case 'close':
+        closeModal(modalType);
+        break;
+      case 'save':
+        try {
+          if ($status === 'EMPTY' && selectedTime) {
+            const startDate = format(selectedDate, 'yyyy-MM-dd');
+            const startTimes = [selectedTime];
+            await AppointmentApi.openSchedules([{ startDate, startTimes }]);
+          } else if ($status === 'OPEN' && selectedId) {
+            await AppointmentApi.closeSchedules([selectedId]);
+          }
+          refetch();
+        } catch (error) {
+          console.error('API 요청 에러: ', error);
+        } finally {
           closeModal(modalType);
-          break;
-        case 'save':
-          // 각 버튼에 맞는 API 요청 단계 추가
-          closeModal(modalType);
-          break;
-      }
+        }
+
+        break;
     }
   };
 
@@ -344,7 +366,9 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
       {!isLoading &&
         !error &&
         times.map((time, idx) => {
-          const { $status, detailText } = getScheduleDetail(time.shortTime);
+          const { $status, detailText, scheduleId } = getScheduleDetail(
+            time.shortTime
+          );
           return (
             <ScheduleTable key={idx}>
               <TimeBox>
@@ -357,7 +381,9 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
                   <ButtonBox>
                     <StatusButton
                       $status={$status}
-                      onClick={() => handleModal($status, 'open')}
+                      onClick={() =>
+                        handleModal($status, 'open', scheduleId, time.shortTime)
+                      }
                     >
                       {getButtonText($status)}
                     </StatusButton>

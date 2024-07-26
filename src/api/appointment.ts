@@ -31,6 +31,9 @@ const CreateAppointmentApi = (navigate: NavigateFunction) => {
         dateTimes,
       }),
 
+    closeSchedules: (scheduleIds: number[]) =>
+      axiosInstance.post('/schedules/trainers/close', { scheduleIds }),
+
     getSchedules: (startDate: string, endDate: string) => {
       if (user?.role === 'TRAINER') {
         return axiosInstance.get('/schedules/trainers', {
