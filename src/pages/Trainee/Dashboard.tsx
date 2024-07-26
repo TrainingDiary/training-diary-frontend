@@ -252,53 +252,9 @@ const Dashboard: React.FC = () => {
     () => traineeApi.getTraineeInfo(traineeId),
     {
       keepPreviousData: true,
-      onSuccess: data => {
-        const traineeInfo = data.data;
-        setInfo({
-          ...traineeInfo,
-          age: differenceInYears(new Date(), new Date(traineeInfo.birthDate)),
-        });
-        const chartLabels = traineeInfo.weightHistory.map(item =>
-          format(new Date(item.addedDate), 'MM.dd.')
-        );
-        setChartData({
-          labels: chartLabels,
-          datasets: [
-            {
-              label: '몸무게',
-              data: traineeInfo.weightHistory.map(item => item.weight),
-              borderColor: '#FF3B3B',
-              pointBackgroundColor: '#FF3B3B',
-              fill: false,
-            },
-            {
-              label: '체지방률',
-              data: traineeInfo.bodyFatHistory.map(
-                item => item.bodyFatPercentage
-              ),
-              borderColor: '#3B98FF',
-              pointBackgroundColor: '#3B98FF',
-              fill: false,
-            },
-            {
-              label: '근골격량',
-              data: traineeInfo.muscleMassHistory.map(item => item.muscleMass),
-              borderColor: '#ADB5BD',
-              pointBackgroundColor: '#ADB5BD',
-              fill: false,
-            },
-            {
-              label: `목표수치(${traineeInfo.targetType})`,
-              data: Array(chartLabels.length).fill(traineeInfo.targetValue),
-              borderColor: '#89DAC1',
-              pointBackgroundColor: '#89DAC1',
-              fill: false,
-            },
-          ],
-        });
-      },
     }
   );
+  const traineeInfo = data?.data;
 
   const [chartData, setChartData] = useState({
     labels: [format(new Date(), 'MM.dd.')],
