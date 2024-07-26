@@ -1,7 +1,5 @@
-// Dashboard.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { differenceInYears, format } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -143,6 +141,19 @@ const Input = styled.input<{ $unit?: string; $editMode?: boolean }>`
   `}
 `;
 
+const RadioGroup = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const RadioLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 1.4rem;
+  color: ${({ theme }) => theme.colors.gray900};
+`;
+
 const TextArea = styled.textarea<{ $unit?: string; $editMode?: boolean }>`
   border: 1px solid
     ${({ theme, $editMode }) =>
@@ -211,11 +222,19 @@ export interface MuscleMassHistory {
   muscleMass: number;
 }
 
+export interface AddInbodyData {
+  traineeId: string | undefined;
+  weight: number;
+  bodyFatPercentage: number;
+  skeletalMuscleMass: number;
+  addedDate: string | Date;
+}
+
 export interface TraineeInfoData {
-  traineeId: number;
+  traineeId: string | undefined;
   name: string;
   age: number;
-  gender: 'MALE' | 'FEMALE'; // gender는 MALE 또는 FEMALE만 허용
+  gender: string; // gender는 MALE 또는 FEMALE만 허용
   height: number;
   birthDate: string;
   remainingSession: number;
@@ -237,24 +256,29 @@ const Dashboard: React.FC = () => {
   const [editInfo, setEditInfo] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [errorAlert, setErrorAlert] = useState<string>('');
-  const [inbodyData, setInbodyData] = useState<
-    WeightHistory | BodyFatHistory | MuscleMassHistory
-  >({
+  const [inbodyData, setInbodyData] = useState<AddInbodyData>({
+    traineeId: traineeId,
     addedDate: format(new Date(), 'yyyy-MM-dd'),
     weight: 0,
     bodyFatPercentage: 0,
-    muscleMass: 0,
+    skeletalMuscleMass: 0,
   });
-  const [info, setInfo] = useState<TraineeInfoData | null>(null);
+  const [traineeInfo, setTraineeInfo] = useState<TraineeInfoData | null>(null);
 
-  const { data, isLoading, refetch } = useQuery(
-    ['traineeInfo', traineeId],
-    () => traineeApi.getTraineeInfo(traineeId),
-    {
-      keepPreviousData: true,
+  const fetchTraineeInfo = async () => {
+    if (traineeId) {
+      try {
+        const res = await traineeApi.getTraineeInfo(traineeId);
+        setTraineeInfo(res.data);
+      } catch (error) {
+        console.error('트레이니 정보 조회 에러:', error);
+      }
     }
-  );
-  const traineeInfo = data?.data;
+  };
+
+  useEffect(() => {
+    fetchTraineeInfo();
+  }, [traineeId]);
 
   const [chartData, setChartData] = useState({
     labels: [format(new Date(), 'MM.dd.')],
@@ -281,7 +305,7 @@ const Dashboard: React.FC = () => {
         fill: false,
       },
       {
-        label: `목표수치(${info?.targetType || '몸무게'})`,
+        label: '목표수치',
         data: [70],
         borderColor: '#89DAC1',
         pointBackgroundColor: '#89DAC1',
@@ -291,104 +315,175 @@ const Dashboard: React.FC = () => {
   });
 
   useEffect(() => {
-    if (info) {
-      setChartData(prevData => ({
-        ...prevData,
-        datasets: prevData.datasets.map(dataset => {
-          if (dataset.label.startsWith('목표수치')) {
-            return {
-              ...dataset,
-              label: `목표수치(${info.targetType})`,
-              data: Array(prevData.labels.length).fill(info.targetValue),
-            };
-          }
-          return dataset;
-        }),
-      }));
+    if (traineeInfo) {
+      setChartData({
+        labels: traineeInfo.weightHistory.map(
+          (w: { addedDate: string | number | Date }) =>
+            format(new Date(w.addedDate), 'MM.dd.')
+        ),
+        datasets: [
+          {
+            label: '몸무게',
+            data: traineeInfo.weightHistory.map(
+              (w: { weight: number }) => w.weight
+            ),
+            borderColor: '#FF3B3B',
+            pointBackgroundColor: '#FF3B3B',
+            fill: false,
+          },
+          {
+            label: '체지방률',
+            data: traineeInfo.bodyFatHistory.map(
+              (b: { bodyFatPercentage: number }) => b.bodyFatPercentage
+            ),
+            borderColor: '#3B98FF',
+            pointBackgroundColor: '#3B98FF',
+            fill: false,
+          },
+          {
+            label: '근골격량',
+            data: traineeInfo.muscleMassHistory.map(
+              (m: { muscleMass: number }) => m.muscleMass
+            ),
+            borderColor: '#ADB5BD',
+            pointBackgroundColor: '#ADB5BD',
+            fill: false,
+          },
+          {
+            label: `목표수치(${traineeInfo.targetType})`,
+            data: Array(traineeInfo.weightHistory.length).fill(
+              traineeInfo.targetValue
+            ),
+            borderColor: '#89DAC1',
+            pointBackgroundColor: '#89DAC1',
+            fill: false,
+          },
+        ],
+      });
     }
-  }, [info]);
+  }, [traineeInfo]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setInfo(
-      prevInfo =>
-        ({
-          ...prevInfo,
-          [name]: value,
-        }) as TraineeInfoData
+    setTraineeInfo(prevInfo =>
+      prevInfo ? { ...prevInfo, [name]: value } : null
     );
   };
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setInfo(
-      prevInfo =>
-        ({
-          ...prevInfo,
-          [name]: value,
-        }) as TraineeInfoData
+    setTraineeInfo(prevInfo =>
+      prevInfo ? { ...prevInfo, [name]: value } : null
     );
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setInfo(
-      prevInfo =>
-        ({
-          ...prevInfo,
-          [name]: value,
-        }) as TraineeInfoData
+    setTraineeInfo(prevInfo =>
+      prevInfo ? { ...prevInfo, [name]: value } : null
+    );
+  };
+
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setTraineeInfo(prevInfo =>
+      prevInfo ? { ...prevInfo, gender: value } : null
     );
   };
 
   const handleInbodyInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setInbodyData(
-      prevData =>
-        ({
-          ...prevData,
-          [name]: value,
-        }) as WeightHistory | BodyFatHistory | MuscleMassHistory
-    );
+    setInbodyData(prevData => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleDateChange = (date: Date | null) => {
-    if (date) {
+    if (date && traineeInfo) {
       const calculatedAge = differenceInYears(new Date(), date);
-      setInfo(
-        prevInfo =>
-          ({
-            ...prevInfo,
-            age: calculatedAge,
-            birthDate: format(date, 'yyyy-MM-dd'),
-          }) as TraineeInfoData
+      setTraineeInfo(prevInfo =>
+        prevInfo
+          ? {
+              ...prevInfo,
+              age: calculatedAge,
+              birthDate: format(date, 'yyyy-MM-dd'),
+            }
+          : null
       );
       setSelectedDate(date);
     }
   };
 
-  const handleSaveModal = () => {
-    const requiredFields = ['weight', 'bodyFatPercentage', 'muscleMass'];
-    for (const field of requiredFields) {
-      if (
-        !inbodyData[
-          field as
-            | keyof WeightHistory
-            | keyof BodyFatHistory
-            | keyof MuscleMassHistory
-        ]
-      ) {
-        switch (field) {
-          case 'weight':
-            return setErrorAlert('몸무게를 입력해주세요');
-          case 'bodyFatPercentage':
-            return setErrorAlert('체지방을 입력해주세요');
-          case 'muscleMass':
-            return setErrorAlert('근골격량을 입력해주세요');
-          default:
-            return;
-        }
+  const saveTraineeInfo = async () => {
+    if (traineeInfo?.remainingSession === null) {
+      setErrorAlert('잔여 횟수를 입력해주세요');
+    } else if (traineeInfo?.birthDate === '') {
+      setErrorAlert('생년월일을 입력해주세요');
+    } else if (traineeInfo?.gender === '') {
+      setErrorAlert('성별을 입력해주세요');
+    } else if (traineeInfo?.height === null) {
+      setErrorAlert('키를 입력해주세요');
+    } else if (traineeInfo?.targetValue === null) {
+      setErrorAlert('목표 수치를 입력해주세요');
+    } else if (traineeInfo?.targetReward === '') {
+      setErrorAlert('목표 보상을 입력해주세요');
+    }
+    if (traineeInfo) {
+      try {
+        await traineeApi.updateTraineeInfo(traineeInfo);
+        setEditInfo(true);
+      } catch (error) {
+        console.error('트레이니 정보 수정 에러:', error);
       }
+    }
+  };
+
+  const saveInbodyInfo = async () => {
+    try {
+      await traineeApi.addInbodyInfo({ ...inbodyData, traineeId: traineeId });
+      setTraineeInfo(prevInfo =>
+        prevInfo
+          ? {
+              ...prevInfo,
+              weightHistory: [
+                ...prevInfo.weightHistory,
+                {
+                  addedDate: format(new Date(), 'yyyy-MM-dd'),
+                  weight: inbodyData.weight,
+                },
+              ],
+              bodyFatHistory: [
+                ...prevInfo.bodyFatHistory,
+                {
+                  addedDate: format(new Date(), 'yyyy-MM-dd'),
+                  bodyFatPercentage: inbodyData.bodyFatPercentage,
+                },
+              ],
+              muscleMassHistory: [
+                ...prevInfo.muscleMassHistory,
+                {
+                  addedDate: format(new Date(), 'yyyy-MM-dd'),
+                  muscleMass: inbodyData.skeletalMuscleMass,
+                },
+              ],
+            }
+          : null
+      );
+      closeModal('inbodyModal');
+    } catch (error) {
+      console.error('트레이니 인바디정보 추가 에러:', error);
+    }
+  };
+
+  const handleSaveModal = async () => {
+    const { weight, bodyFatPercentage, skeletalMuscleMass } = inbodyData;
+    if (weight === 0) {
+      return setErrorAlert('몸무게를 입력해주세요');
+    } else if (bodyFatPercentage === 0) {
+      return setErrorAlert('체지방을 입력해주세요');
+    } else if (skeletalMuscleMass === 0) {
+      return setErrorAlert('근골격량을 입력해주세요');
     }
 
     const formattedDate = format(new Date(), 'MM.dd');
@@ -399,106 +494,32 @@ const Dashboard: React.FC = () => {
         if (dataset.label === '몸무게') {
           return {
             ...dataset,
-            data: [...dataset.data, (inbodyData as WeightHistory).weight],
+            data: [...dataset.data, weight],
           };
         }
         if (dataset.label === '체지방률') {
           return {
             ...dataset,
-            data: [
-              ...dataset.data,
-              (inbodyData as BodyFatHistory).bodyFatPercentage,
-            ],
+            data: [...dataset.data, bodyFatPercentage],
           };
         }
         if (dataset.label === '근골격량') {
           return {
             ...dataset,
-            data: [
-              ...dataset.data,
-              (inbodyData as MuscleMassHistory).muscleMass,
-            ],
+            data: [...dataset.data, skeletalMuscleMass],
           };
         }
         if (dataset.label.startsWith('목표수치')) {
           return {
             ...dataset,
-            data: [...dataset.data, info!.targetValue],
+            data: [...dataset.data, traineeInfo!.targetValue],
           };
         }
         return dataset;
       }),
     }));
 
-    setInfo(
-      prevInfo =>
-        ({
-          ...prevInfo,
-          weightHistory: [
-            ...prevInfo!.weightHistory,
-            {
-              addedDate: format(new Date(), 'yyyy-MM-dd'),
-              weight: (inbodyData as WeightHistory).weight,
-            },
-          ],
-          bodyFatHistory: [
-            ...prevInfo!.bodyFatHistory,
-            {
-              addedDate: format(new Date(), 'yyyy-MM-dd'),
-              bodyFatPercentage: (inbodyData as BodyFatHistory)
-                .bodyFatPercentage,
-            },
-          ],
-          muscleMassHistory: [
-            ...prevInfo!.muscleMassHistory,
-            {
-              addedDate: format(new Date(), 'yyyy-MM-dd'),
-              muscleMass: (inbodyData as MuscleMassHistory).muscleMass,
-            },
-          ],
-        }) as TraineeInfoData
-    );
-
-    closeModal('inbodyModal');
-  };
-
-  const handleSaveInfo = () => {
-    const requiredFields = [
-      'remainingSession',
-      'birthDate',
-      'gender',
-      'height',
-      'targetValue',
-      'targetReward',
-    ];
-    for (const field of requiredFields) {
-      if (!info![field as keyof TraineeInfoData]) {
-        switch (field) {
-          case 'remainingSession':
-            return setErrorAlert('잔여 횟수를 입력해주세요');
-          case 'birthDate':
-            return setErrorAlert('생년월일을 입력해주세요');
-          case 'gender':
-            return setErrorAlert('성별을 입력해주세요');
-          case 'height':
-            return setErrorAlert('키를 입력해주세요');
-          case 'targetValue':
-            return setErrorAlert('목표 수치를 입력해주세요');
-          case 'targetReward':
-            return setErrorAlert('목표 보상을 입력해주세요');
-          default:
-            return;
-        }
-      }
-    }
-
-    const genderForServer = info!.gender === '남' ? 'MALE' : 'FEMALE';
-
-    console.log({
-      ...info,
-      gender: genderForServer,
-    });
-    setEditInfo(true);
+    await saveInbodyInfo();
   };
 
   const handleAddInbody = () => {
@@ -506,7 +527,8 @@ const Dashboard: React.FC = () => {
       addedDate: format(new Date(), 'yyyy-MM-dd'),
       weight: 0,
       bodyFatPercentage: 0,
-      muscleMass: 0,
+      skeletalMuscleMass: 0,
+      traineeId: traineeId,
     });
     openModal('inbodyModal');
   };
@@ -525,12 +547,16 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  if (!traineeInfo) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <SectionWrapper>
       <Wrapper>
         <Section>
           <SectionHeader>
-            <SectionTitle>{info?.name}</SectionTitle>
+            <SectionTitle>{traineeInfo.name}</SectionTitle>
             {user?.role === 'TRAINER' &&
               (editInfo ? (
                 <EditButton
@@ -540,7 +566,7 @@ const Dashboard: React.FC = () => {
                   정보 수정
                 </EditButton>
               ) : (
-                <EditButton $editMode={editInfo} onClick={handleSaveInfo}>
+                <EditButton $editMode={editInfo} onClick={saveTraineeInfo}>
                   정보 저장
                 </EditButton>
               ))}
@@ -551,7 +577,7 @@ const Dashboard: React.FC = () => {
               <Input
                 type="number"
                 name="remainingSession"
-                value={info?.remainingSession || 0}
+                value={traineeInfo.remainingSession || 0}
                 readOnly={editInfo}
                 onChange={handleInputChange}
                 $editMode={!editInfo}
@@ -564,7 +590,7 @@ const Dashboard: React.FC = () => {
                 <Input
                   type={editInfo ? 'text' : 'number'}
                   name="age"
-                  value={`${info?.age} 세`}
+                  value={`${traineeInfo.age} 세`}
                   readOnly
                   $editMode={!editInfo}
                 />
@@ -577,21 +603,50 @@ const Dashboard: React.FC = () => {
             </InfoItem>
             <InfoItem>
               <Label>성별</Label>
-              <Input
-                type="text"
-                name="gender"
-                value={info?.gender === 'MALE' ? '남' : '여'}
-                readOnly={editInfo}
-                onChange={handleInputChange}
-                $editMode={!editInfo}
-              />
+              {editInfo ? (
+                <Input
+                  type="text"
+                  name="gender"
+                  value={traineeInfo.gender === 'MALE' ? '남' : '여'}
+                  readOnly={editInfo}
+                  onChange={handleInputChange}
+                  $editMode={!editInfo}
+                />
+              ) : (
+                <RadioGroup>
+                  <RadioLabel>
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="MALE"
+                      checked={traineeInfo.gender === 'MALE'}
+                      onChange={handleRadioChange}
+                    />
+                    남
+                  </RadioLabel>
+                  <RadioLabel>
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="FEMALE"
+                      checked={traineeInfo.gender === 'FEMALE'}
+                      onChange={handleRadioChange}
+                    />
+                    여
+                  </RadioLabel>
+                </RadioGroup>
+              )}
             </InfoItem>
             <InfoItem>
               <Label>키</Label>
               <Input
                 type={editInfo ? 'text' : 'number'}
                 name="height"
-                value={editInfo ? `${info?.height} cm` : info?.height || 0}
+                value={
+                  editInfo
+                    ? `${traineeInfo.height} cm`
+                    : traineeInfo.height || 0
+                }
                 readOnly={editInfo}
                 onChange={handleInputChange}
                 $editMode={!editInfo}
@@ -603,9 +658,9 @@ const Dashboard: React.FC = () => {
                 <Input
                   type="text"
                   value={
-                    info?.targetType === 'TARGET_WEIGHT'
+                    traineeInfo.targetType === 'TARGET_WEIGHT'
                       ? '몸무게'
-                      : info?.targetType === 'TARGET_BODY_FAT'
+                      : traineeInfo.targetType === 'TARGET_BODY_FAT'
                         ? '체지방률'
                         : '근골격량'
                   }
@@ -615,7 +670,7 @@ const Dashboard: React.FC = () => {
               ) : (
                 <Select
                   name="targetType"
-                  value={info?.targetType}
+                  value={traineeInfo.targetType}
                   onChange={handleSelectChange}
                   $editMode={!editInfo}
                 >
@@ -632,12 +687,12 @@ const Dashboard: React.FC = () => {
                 name="targetValue"
                 value={
                   editInfo
-                    ? `${info?.targetValue} ${getUnit(info?.targetType || '')}`
-                    : `${info?.targetValue}`
+                    ? `${traineeInfo.targetValue} ${getUnit(traineeInfo.targetType || '')}`
+                    : `${traineeInfo.targetValue}`
                 }
                 readOnly={editInfo}
                 onChange={handleInputChange}
-                $unit={getUnit(info?.targetType || '')}
+                $unit={getUnit(traineeInfo.targetType || '')}
                 $editMode={!editInfo}
               />
             </InfoItem>
@@ -645,7 +700,7 @@ const Dashboard: React.FC = () => {
               <Label>목표 보상</Label>
               <TextArea
                 name="targetReward"
-                value={info?.targetReward}
+                value={traineeInfo.targetReward}
                 readOnly={editInfo}
                 onChange={handleTextAreaChange}
                 $editMode={!editInfo}
@@ -671,7 +726,7 @@ const Dashboard: React.FC = () => {
               </Label>
               <Input
                 type="text"
-                value={`${info?.weightHistory[info.weightHistory.length - 1]?.weight || 0} kg`}
+                value={`${traineeInfo.weightHistory[traineeInfo.weightHistory.length - 1]?.weight || 0} kg`}
                 readOnly
               />
             </InfoItem>
@@ -684,7 +739,7 @@ const Dashboard: React.FC = () => {
               </Label>
               <Input
                 type="text"
-                value={`${info?.bodyFatHistory[info.bodyFatHistory.length - 1]?.bodyFatPercentage || 0} %`}
+                value={`${traineeInfo.bodyFatHistory[traineeInfo.bodyFatHistory.length - 1]?.bodyFatPercentage || 0} %`}
                 readOnly
               />
             </InfoItem>
@@ -697,7 +752,7 @@ const Dashboard: React.FC = () => {
               </Label>
               <Input
                 type="text"
-                value={`${info?.muscleMassHistory[info.muscleMassHistory.length - 1]?.muscleMass || 0} kg`}
+                value={`${traineeInfo.muscleMassHistory[traineeInfo.muscleMassHistory.length - 1]?.muscleMass || 0} kg`}
                 readOnly
               />
             </InfoItem>

@@ -5,20 +5,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import Modal from '@components/Common/Modal/Modal';
-import {
-  WeightHistory,
-  BodyFatHistory,
-  MuscleMassHistory,
-} from '../../pages/Trainee/Dashboard';
-
-interface InbodyModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: () => void;
-  inbodyData: WeightHistory | BodyFatHistory | MuscleMassHistory;
-  handleDateChange: (date: Date | null) => void;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
+import { AddInbodyData } from '@pages/Trainee/Dashboard';
 
 const InfoGroup = styled.div`
   display: flex;
@@ -175,6 +162,15 @@ const DatePickerWrapper = styled.div`
   }
 `;
 
+interface InbodyModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: () => void;
+  inbodyData: AddInbodyData;
+  handleDateChange: (date: Date | null) => void;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
 const InbodyModal: React.FC<InbodyModalProps> = ({
   isOpen,
   onClose,
@@ -225,8 +221,8 @@ const InbodyModal: React.FC<InbodyModalProps> = ({
         <Label>근골격량(kg)</Label>
         <Input
           type="number"
-          name="muscleMass"
-          value={inbodyData.muscleMass}
+          name="skeletalMuscleMass"
+          value={inbodyData.skeletalMuscleMass}
           onChange={handleInputChange}
         />
       </InfoItem>

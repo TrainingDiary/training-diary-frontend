@@ -1,12 +1,7 @@
 import { NavigateFunction } from 'react-router-dom';
 
 import { axiosInstance, createInterceptor } from './axiosInstance';
-import {
-  BodyFatHistory,
-  MuscleMassHistory,
-  TraineeInfoData,
-  WeightHistory,
-} from '@pages/Trainee/Dashboard';
+import { AddInbodyData, TraineeInfoData } from '@pages/Trainee/Dashboard';
 
 let isInterceptorCreated = false;
 
@@ -23,9 +18,8 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
     updateTraineeInfo: (traineeData: TraineeInfoData) =>
       axiosInstance.put('trainers/trainees', traineeData),
 
-    addInbodyInfo: (
-      inbodyData: WeightHistory | BodyFatHistory | MuscleMassHistory
-    ) => axiosInstance.post('trainers/trainees', inbodyData),
+    addInbodyInfo: (inbodyData: AddInbodyData) =>
+      axiosInstance.post('trainers/trainees', inbodyData),
   };
 };
 
