@@ -1,6 +1,10 @@
 import { NavigateFunction } from 'react-router-dom';
 
 import { axiosInstance, createInterceptor } from './axiosInstance';
+import {
+  AddWorkoutDataType,
+  EditWorkoutDataType,
+} from '@pages/Trainer/WorkOutManagement';
 
 let isInterceptorCreated = false;
 
@@ -25,6 +29,23 @@ const CreateTrainerApi = (navigate: NavigateFunction) => {
 
     deleteTrainee: (ptContractId: number) =>
       axiosInstance.post('/pt-contracts/terminate', { ptContractId }),
+
+    getWorkouts: (page: number, size: number) =>
+      axiosInstance.get('/workout-types', {
+        params: {
+          page,
+          size,
+        },
+      }),
+
+    addWorkouts: (workoutData: AddWorkoutDataType) =>
+      axiosInstance.post('/workout-types', workoutData),
+
+    editWorkouts: (workoutData: EditWorkoutDataType) =>
+      axiosInstance.put('/workout-types', workoutData),
+
+    deleteWorkouts: (id: number) =>
+      axiosInstance.delete(`/workout-types/${id}`),
   };
 };
 

@@ -152,7 +152,7 @@ const TraineeManagement: React.FC = () => {
         setTraineeData(res.data.content);
       }
     } catch (error) {
-      console.error('Failed to fetch trainee data', error);
+      console.error('트레이니 조회 에러: ', error);
     } finally {
       setLoading(false);
     }
@@ -266,8 +266,16 @@ const TraineeManagement: React.FC = () => {
                   </TraineeItem>
                 ))
               ) : (
-                <li style={{ fontSize: '1.4rem' }}>
-                  등록된 트레이니가 없습니다.
+                <li
+                  style={{
+                    fontSize: '1.4rem',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    height: '50vh',
+                    alignItems: 'center',
+                  }}
+                >
+                  트레이너를 등록해주세요.
                 </li>
               )}
             </TraineeList>

@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import Button from '@components/Common/Button/Button';
+import { WorkoutDataType } from '@pages/Trainer/WorkOutManagement';
 import { hexToRgba } from 'src/utils/hexToRgba';
 
 const CardWrapper = styled.div`
@@ -25,7 +26,6 @@ const CardHeader = styled.div`
 const TitleGroup = styled.div`
   width: 100%;
   display: flex;
-  flex-grow: 1;
   align-items: center;
   gap: 4px;
   color: ${({ theme }) => theme.colors.gray900};
@@ -47,11 +47,13 @@ const ButtonGroup = styled.div`
   justify-content: flex-end;
   gap: 10px;
   width: 100%;
+  flex: 1;
 
   & > button {
     line-height: 1;
     font-size: 1.2rem;
     max-width: 60px;
+    padding: 8px 20px;
   }
 `;
 
@@ -86,17 +88,7 @@ const Tag = styled.span`
 `;
 
 interface CardProps {
-  workout: {
-    id: number;
-    name: string;
-    targetMuscle: string;
-    remark: string;
-    weightInputRequired: boolean;
-    setInputRequired: boolean;
-    repInputRequired: boolean;
-    timeInputRequired: boolean;
-    speedInputRequired: boolean;
-  };
+  workout: WorkoutDataType;
   onDelete: (id: number) => void;
   onEdit: (id: number) => void;
 }
@@ -119,7 +111,7 @@ const Card: React.FC<CardProps> = ({ workout, onDelete, onEdit }) => {
         </ButtonGroup>
       </CardHeader>
       <Divider />
-      <CardBody>{workout.remark}</CardBody>
+      <CardBody>{workout.remarks}</CardBody>
       <Tags>
         {workout.weightInputRequired && <Tag>#무게</Tag>}
         {workout.setInputRequired && <Tag>#세트횟수</Tag>}
