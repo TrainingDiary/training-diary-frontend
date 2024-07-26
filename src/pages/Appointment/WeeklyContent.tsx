@@ -6,6 +6,7 @@ import { format, parse } from 'date-fns';
 import WeeklyCalendar from '@components/Appointment/WeeklyCalendar';
 import ScheduleDetail from '@components/Appointment/ScheduleDetail';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
+import useCalendarStore from 'src/stores/calendarStore';
 
 const Wrapper = styled.div`
   display: flex;
@@ -16,11 +17,13 @@ const Wrapper = styled.div`
 const WeeklyContent: React.FC = () => {
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
+  const { setSelectedDate } = useCalendarStore();
   const initialDate = date ? parse(date, 'yyyy-MM-dd', new Date()) : new Date();
-  const [selectedDate, setSelectedDate] = useState<Date>(initialDate);
+  const [currentDate, setCurrentDate] = useState<Date>(initialDate);
 
   const onDateChange = (date: Date) => {
     setSelectedDate(date);
+    setCurrentDate(date);
 
     const formattedDate = format(date, 'yyyy-MM-dd');
     navigate(`/appointment/weekly/${formattedDate}`, { replace: true });
@@ -30,10 +33,10 @@ const WeeklyContent: React.FC = () => {
     <SectionWrapper>
       <Wrapper>
         <WeeklyCalendar
-          selectedDate={selectedDate}
+          selectedDate={currentDate}
           onDateChange={onDateChange}
         />
-        <ScheduleDetail selectedDate={selectedDate} />
+        <ScheduleDetail selectedDate={currentDate} />
       </Wrapper>
     </SectionWrapper>
   );

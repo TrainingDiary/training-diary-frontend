@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { format } from 'date-fns';
+import { useQuery } from 'react-query';
 
-import {
-  ScheduleStatus,
-  ScheduleType,
-  scheduleList,
-} from 'src/mocks/data/scheduleList';
+import Modal from '@components/Common/Modal/Modal';
 import { generateTimes } from 'src/utils/generateTimes';
 import useModals from 'src/hooks/useModals';
-import Modal from '@components/Common/Modal/Modal';
+import CreateAppointmentApi from 'src/api/appointment';
 
 const Wrapper = styled.div`
   display: flex;
@@ -196,22 +194,68 @@ const Divider = styled.div`
   z-index: 0;
 `;
 
+export type ScheduleStatus =
+  | 'PAST'
+  | 'EMPTY'
+  | 'OPEN'
+  | 'RESERVE_APPLIED'
+  | 'RESERVED';
+
+export interface ScheduleDetailType {
+  scheduleId: number;
+  startTime: string;
+  trainerId: number;
+  trainerName: string;
+  traineeId: number | null;
+  traineeName: string | null;
+  scheduleStatus: ScheduleStatus;
+}
+
+export interface ScheduleType {
+  startDate: string;
+  existReserved: boolean;
+  details: ScheduleDetailType[];
+}
+
 interface ScheduleDetailProps {
   selectedDate: Date;
 }
 
 const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
+  const navigate = useNavigate();
+  const AppointmentApi = CreateAppointmentApi(navigate);
   const { openModal, closeModal, isOpen } = useModals();
   const [schedules, setSchedules] = useState<ScheduleType[]>([]);
 
-  useEffect(() => {
-    // selectedDate로 스케줄 상세 조회 API 요청 단계 추가
+  const fetchSchedules = async () => {
+    const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+    const response = await AppointmentApi.getSchedules(
+      formattedDate,
+      formattedDate
+    );
+    return response?.data;
+  };
 
-    setSchedules([scheduleList[2]]);
-  }, [selectedDate]);
+  const { data, error, isLoading, refetch } = useQuery(
+    ['schedules', selectedDate],
+    fetchSchedules,
+    {
+      keepPreviousData: true,
+    }
+  );
+
+  useEffect(() => {
+    refetch();
+  }, [selectedDate, refetch]);
+
+  useEffect(() => {
+    if (data) {
+      setSchedules(data);
+    }
+  }, [data]);
 
   const times = generateTimes();
-  const now = new Date('2024-07-05T11:00:00'); // 추후 현재시간으로 수정
+  const now = new Date();
 
   const getScheduleDetail = (
     time: string
@@ -224,18 +268,24 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
     );
 
     const timeDate = new Date(
-      `${format('2024-07-05', 'yyyy-MM-dd')}T${time}:00`
+      `${format(selectedDate, 'yyyy-MM-dd')}T${time}:00`
     );
 
     if (schedule) {
-      $status = schedule.status;
+      $status = schedule.scheduleStatus;
       detailText =
-        schedule.status === 'OPEN'
+        schedule.scheduleStatus === 'OPEN'
           ? '-'
           : `${schedule.trainerName} - ${schedule.traineeName}`;
     }
 
-    if (timeDate <= now) $status = 'PAST';
+    if (timeDate <= now) {
+      $status = 'PAST';
+      detailText =
+        schedule?.scheduleStatus === 'RESERVED'
+          ? `${schedule.trainerName} - ${schedule.traineeName}`
+          : '';
+    }
 
     return {
       $status,
@@ -290,38 +340,41 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
 
   return (
     <Wrapper>
-      {times.map((time, idx) => {
-        const { $status, detailText } = getScheduleDetail(time.shortTime);
-        return (
-          <ScheduleTable key={idx}>
-            <TimeBox>
-              <Time>{time.fullTime}</Time>
-              <Dot />
-            </TimeBox>
-            <InfoBox $status={$status}>
-              <Detail $status={$status}>{detailText}</Detail>
-              {$status !== 'PAST' && (
-                <ButtonBox>
-                  <StatusButton
-                    $status={$status}
-                    onClick={() => handleModal($status, 'open')}
-                  >
-                    {getButtonText($status)}
-                  </StatusButton>
-                  {$status === 'RESERVE_APPLIED' && (
-                    <RejectButton
+      {isLoading && <div>Loading...</div>}
+      {!isLoading &&
+        !error &&
+        times.map((time, idx) => {
+          const { $status, detailText } = getScheduleDetail(time.shortTime);
+          return (
+            <ScheduleTable key={idx}>
+              <TimeBox>
+                <Time>{time.fullTime}</Time>
+                <Dot />
+              </TimeBox>
+              <InfoBox $status={$status}>
+                <Detail $status={$status}>{detailText}</Detail>
+                {$status !== 'PAST' && (
+                  <ButtonBox>
+                    <StatusButton
                       $status={$status}
-                      onClick={() => openModal('rejectModal')}
+                      onClick={() => handleModal($status, 'open')}
                     >
-                      거절
-                    </RejectButton>
-                  )}
-                </ButtonBox>
-              )}
-            </InfoBox>
-          </ScheduleTable>
-        );
-      })}
+                      {getButtonText($status)}
+                    </StatusButton>
+                    {$status === 'RESERVE_APPLIED' && (
+                      <RejectButton
+                        $status={$status}
+                        onClick={() => openModal('rejectModal')}
+                      >
+                        거절
+                      </RejectButton>
+                    )}
+                  </ButtonBox>
+                )}
+              </InfoBox>
+            </ScheduleTable>
+          );
+        })}
       <Divider />
       <Modal
         title="수업일 오픈"
@@ -376,4 +429,5 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
     </Wrapper>
   );
 };
+
 export default ScheduleDetail;
