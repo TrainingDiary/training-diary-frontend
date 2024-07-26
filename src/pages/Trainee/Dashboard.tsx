@@ -241,7 +241,10 @@ export interface TraineeInfoData {
   weightHistory: WeightHistory[];
   bodyFatHistory: BodyFatHistory[];
   muscleMassHistory: MuscleMassHistory[];
-  targetType: 'TARGET_WEIGHT' | 'TARGET_BODY_FAT' | 'TARGET_MUSCLE_MASS'; // targetType은 정의된 타입만 허용
+  targetType:
+    | 'TARGET_WEIGHT'
+    | 'TARGET_BODY_FAT_PERCENTAGE'
+    | 'TARGET_SKELETAL_MUSCLE_MASS'; // targetType은 정의된 타입만 허용
   targetValue: number;
   targetReward: string;
 }
@@ -418,21 +421,31 @@ const Dashboard: React.FC = () => {
   const saveTraineeInfo = async () => {
     if (traineeInfo?.remainingSession === null) {
       setErrorAlert('잔여 횟수를 입력해주세요');
+      return;
     } else if (traineeInfo?.birthDate === '') {
       setErrorAlert('생년월일을 입력해주세요');
+      return;
     } else if (traineeInfo?.gender === '') {
       setErrorAlert('성별을 입력해주세요');
+      return;
     } else if (traineeInfo?.height === null) {
       setErrorAlert('키를 입력해주세요');
+      return;
+    } else if (traineeInfo?.targetType === null) {
+      setErrorAlert('목표 타입을 선택해주세요');
+      return;
     } else if (traineeInfo?.targetValue === null) {
       setErrorAlert('목표 수치를 입력해주세요');
+      return;
     } else if (traineeInfo?.targetReward === '') {
       setErrorAlert('목표 보상을 입력해주세요');
+      return;
     }
     if (traineeInfo) {
       try {
         await traineeApi.updateTraineeInfo(traineeInfo);
         setEditInfo(true);
+        console.log('트레이니 정보 추가 성공');
       } catch (error) {
         console.error('트레이니 정보 수정 에러:', error);
       }
@@ -471,6 +484,7 @@ const Dashboard: React.FC = () => {
           : null
       );
       closeModal('inbodyModal');
+      console.log('인바디 정보 추가 성공');
     } catch (error) {
       console.error('트레이니 인바디정보 추가 에러:', error);
     }
@@ -537,10 +551,10 @@ const Dashboard: React.FC = () => {
 
   const getUnit = (targetType: string) => {
     switch (targetType) {
-      case 'TARGET_BODY_FAT':
+      case 'TARGET_BODY_FAT_PERCENTAGE':
         return '%';
       case 'TARGET_WEIGHT':
-      case 'TARGET_MUSCLE_MASS':
+      case 'TARGET_SKELETAL_MUSCLE_MASS':
         return 'kg';
       default:
         return '';
@@ -660,7 +674,7 @@ const Dashboard: React.FC = () => {
                   value={
                     traineeInfo.targetType === 'TARGET_WEIGHT'
                       ? '몸무게'
-                      : traineeInfo.targetType === 'TARGET_BODY_FAT'
+                      : traineeInfo.targetType === 'TARGET_BODY_FAT_PERCENTAGE'
                         ? '체지방률'
                         : '근골격량'
                   }
@@ -675,8 +689,8 @@ const Dashboard: React.FC = () => {
                   $editMode={!editInfo}
                 >
                   <option value="TARGET_WEIGHT">몸무게</option>
-                  <option value="TARGET_BODY_FAT">체지방률</option>
-                  <option value="TARGET_MUSCLE_MASS">근골격량</option>
+                  <option value="TARGET_BODY_FAT_PERCENTAGE">체지방률</option>
+                  <option value="TARGET_SKELETAL_MUSCLE_MASS">근골격량</option>
                 </Select>
               )}
             </InfoItem>
@@ -704,6 +718,7 @@ const Dashboard: React.FC = () => {
                 readOnly={editInfo}
                 onChange={handleTextAreaChange}
                 $editMode={!editInfo}
+                placeholder="목표 보상을 적어주세요."
               ></TextArea>
             </InfoItem>
           </InfoGroup>
