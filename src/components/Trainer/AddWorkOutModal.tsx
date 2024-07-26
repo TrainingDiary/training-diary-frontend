@@ -128,11 +128,6 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
       setErrorAlert('주의사항을 입력해주세요.');
       return;
     } else if (
-      'weightInputRequired' in formState &&
-      'setInputRequired' in formState &&
-      'repInputRequired' in formState &&
-      'timeInputRequired' in formState &&
-      'speedInputRequired' in formState &&
       !formState.weightInputRequired &&
       !formState.setInputRequired &&
       !formState.repInputRequired &&
