@@ -4,7 +4,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import useUserStore from 'src/stores/userStore';
 
 const PublicRoute: React.FC = () => {
-  const user = useUserStore(state => state.user);
+  const { user } = useUserStore();
 
   if (user) {
     return <Navigate to="/" />;

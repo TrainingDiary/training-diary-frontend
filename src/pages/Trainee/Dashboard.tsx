@@ -212,7 +212,7 @@ export interface InfoData {
 }
 
 const Dashboard: React.FC = () => {
-  const user = useUserStore(state => state.user);
+  const { user } = useUserStore();
   const [editInfo, setEditInfo] = useState(true);
   const { openModal, closeModal, isOpen } = useModals();
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());

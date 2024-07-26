@@ -14,7 +14,7 @@ const today = new Date();
 const initialStartDate = format(subDays(startOfMonth(today), 10), 'yyyy-MM-dd');
 const initialEndDate = format(addDays(endOfMonth(today), 10), 'yyyy-MM-dd');
 
-export const useCalendarStore = create<CalendarState>(set => ({
+const useCalendarStore = create<CalendarState>(set => ({
   selectedDate: today,
   startDate: initialStartDate,
   endDate: initialEndDate,
@@ -22,3 +22,5 @@ export const useCalendarStore = create<CalendarState>(set => ({
   setStartDate: startDate => set({ startDate }),
   setEndDate: endDate => set({ endDate }),
 }));
+
+export default useCalendarStore;

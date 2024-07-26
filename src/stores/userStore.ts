@@ -2,7 +2,7 @@ import { StateCreator, create } from 'zustand';
 import { PersistOptions, persist } from 'zustand/middleware';
 
 export interface User {
-  id: string;
+  id: number;
   role: 'TRAINEE' | 'TRAINER';
   unreadNotification: boolean;
 }

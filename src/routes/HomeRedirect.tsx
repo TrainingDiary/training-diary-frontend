@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 import useUserStore from 'src/stores/userStore';
 
 const HomeRedirect: React.FC = () => {
-  const user = useUserStore(state => state.user);
+  const { user } = useUserStore();
 
   if (!user) {
     return <Navigate to="/login" />;
