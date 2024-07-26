@@ -1,7 +1,10 @@
 import { NavigateFunction } from 'react-router-dom';
 
 import { axiosInstance, createInterceptor } from './axiosInstance';
-import { WorkoutDataType } from '@pages/Trainer/WorkOutManagement';
+import {
+  AddWorkoutDataType,
+  EditWorkoutDataType,
+} from '@pages/Trainer/WorkOutManagement';
 
 let isInterceptorCreated = false;
 
@@ -35,10 +38,10 @@ const CreateTrainerApi = (navigate: NavigateFunction) => {
         },
       }),
 
-    addWorkouts: (workoutData: WorkoutDataType) =>
+    addWorkouts: (workoutData: AddWorkoutDataType) =>
       axiosInstance.post('/workout-types', workoutData),
 
-    editWorkouts: (workoutData: WorkoutDataType) =>
+    editWorkouts: (workoutData: EditWorkoutDataType) =>
       axiosInstance.put('/workout-types', workoutData),
 
     deleteWorkouts: (id: number) =>

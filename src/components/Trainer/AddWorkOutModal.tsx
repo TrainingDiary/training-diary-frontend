@@ -3,7 +3,11 @@ import styled from 'styled-components';
 
 import Modal from '@components/Common/Modal/Modal';
 import Alert from '@components/Common/Alert/Alert';
-import { WorkoutDataType } from '@pages/Trainer/WorkOutManagement';
+import {
+  AddWorkoutDataType,
+  EditWorkoutDataType,
+  WorkoutDataType,
+} from '@pages/Trainer/WorkOutManagement';
 
 // 스타일 정의
 const FormGroup = styled.div`
@@ -78,10 +82,12 @@ const CheckboxLabel = styled.label`
 interface AddWorkOutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (workout: WorkoutDataType) => void;
-  onEdit: (workout: WorkoutDataType) => void;
-  formState: WorkoutDataType;
-  setFormState: React.Dispatch<React.SetStateAction<WorkoutDataType>>;
+  onSave: (workout: AddWorkoutDataType) => void;
+  onEdit: (workout: EditWorkoutDataType) => void;
+  formState: AddWorkoutDataType | WorkoutDataType;
+  setFormState: React.Dispatch<
+    React.SetStateAction<WorkoutDataType | AddWorkoutDataType>
+  >;
 }
 
 const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
@@ -94,14 +100,17 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
 }) => {
   const [errorAlert, setErrorAlert] = useState<string>('');
 
-  const handleInputChange = (field: keyof WorkoutDataType, value: string) => {
+  const handleInputChange = (
+    field: keyof AddWorkoutDataType,
+    value: string
+  ) => {
     setFormState(prev => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleAttributeChange = (attr: keyof WorkoutDataType) => {
+  const handleAttributeChange = (attr: keyof AddWorkoutDataType) => {
     setFormState(prev => ({
       ...prev,
       [attr]: !prev[attr] as boolean,
@@ -129,15 +138,15 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
       return;
     }
 
-    const newWorkout: WorkoutDataType = {
-      ...formState,
-      id: formState.id || Date.now(), // 새로 추가하는 경우에만 임시 ID 할당
-    };
-
-    if (formState.id) {
-      onEdit(newWorkout);
+    if ('id' in formState) {
+      onEdit({
+        workoutTypeId: formState.id,
+        name: formState.name,
+        targetMuscle: formState.targetMuscle,
+        remarks: formState.remarks,
+      });
     } else {
-      onSave(newWorkout);
+      onSave(formState as AddWorkoutDataType);
     }
     onClose();
   };
@@ -146,12 +155,12 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
 
   return (
     <Modal
-      title={formState.id ? '운동 종류 수정' : '운동 종류 추가'}
+      title={'id' in formState ? '운동 종류 수정' : '운동 종류 추가'}
       type="custom"
       isOpen={isOpen}
       onClose={onClose}
       onSave={handleSave}
-      btnConfirm={formState.id ? '수정' : '추가'}
+      btnConfirm={'id' in formState ? '수정' : '추가'}
     >
       <FormGroup>
         <Label>운동명:</Label>
@@ -176,7 +185,7 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
           onChange={e => handleInputChange('remarks', e.target.value)}
         ></TextArea>
       </FormGroup>
-      {formState.id ? null : (
+      {'id' in formState ? null : (
         <FormGroup>
           <Label>속성 값:</Label>
           <CheckboxGroup>
@@ -190,16 +199,18 @@ const AddWorkOutModal: React.FC<AddWorkOutModalProps> = ({
               <CheckboxLabel
                 key={attr}
                 className={
-                  formState[attr as keyof WorkoutDataType] ? 'selected' : ''
+                  formState[attr as keyof AddWorkoutDataType] ? 'selected' : ''
                 }
               >
                 <input
                   type="checkbox"
-                  checked={formState[attr as keyof WorkoutDataType] as boolean}
-                  onChange={() =>
-                    handleAttributeChange(attr as keyof WorkoutDataType)
+                  checked={
+                    formState[attr as keyof AddWorkoutDataType] as boolean
                   }
-                  disabled={formState.id ? true : false}
+                  onChange={() =>
+                    handleAttributeChange(attr as keyof AddWorkoutDataType)
+                  }
+                  disabled={'id' in formState ? true : false}
                 />
                 {attr === 'weightInputRequired' && '무게'}
                 {attr === 'setInputRequired' && '세트'}
