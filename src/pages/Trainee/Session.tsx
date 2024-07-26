@@ -99,7 +99,7 @@ const sessions: Session[] = [
 ];
 
 const Session: React.FC = () => {
-  const user = useUserStore(state => state.user);
+  const { user } = useUserStore();
   const [images, setImages] = useState<ImageWithSession[]>([]);
   const observerRef = useRef<HTMLDivElement | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);

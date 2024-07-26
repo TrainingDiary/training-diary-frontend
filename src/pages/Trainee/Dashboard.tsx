@@ -254,8 +254,7 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const traineeApi = CreateTraineeApi(navigate);
   const { traineeId } = useParams<{ traineeId: string }>();
-  // const { user } = useUserStore(); // 변경 예정
-  const user = useUserStore(state => state.user);
+  const { user } = useUserStore();
   const { openModal, closeModal, isOpen } = useModals();
   const [editInfo, setEditInfo] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());

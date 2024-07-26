@@ -5,7 +5,7 @@ import useUserStore from 'src/stores/userStore';
 
 const ProtectedRoute: React.FC = () => {
   const location = useLocation();
-  const user = useUserStore(state => state.user);
+  const { user } = useUserStore();
 
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} />;

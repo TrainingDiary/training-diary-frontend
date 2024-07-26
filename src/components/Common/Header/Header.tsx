@@ -60,7 +60,7 @@ const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const AuthApi = CreateAuthApi(navigate);
-  const user = useUserStore(state => state.user);
+  const { user, clearUser } = useUserStore();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
   const toggleDrawer = () => {
@@ -78,7 +78,7 @@ const Header: React.FC = () => {
   const handleLogout = async () => {
     try {
       await AuthApi.logout();
-      useUserStore.getState().clearUser();
+      clearUser();
     } catch (error) {
       console.error('로그아웃 에러: ', error);
     }
