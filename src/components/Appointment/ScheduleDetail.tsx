@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { format } from 'date-fns';
 import { useQuery } from 'react-query';
 
@@ -102,15 +102,15 @@ const ButtonBox = styled.div<{ role?: string }>`
   display: flex;
   justify-content: right;
   gap: 10px;
-  width: 170px;
+  width: ${({ role }) => (role === 'TRAINER' ? '170px' : '80px')};
 
   ${({ role }) =>
     role === 'TRAINER' &&
-    `
-    @media (max-width: 410px) {
-      width: auto;
-    }
-  `}
+    css`
+      @media (max-width: 410px) {
+        width: auto;
+      }
+    `}
 `;
 
 const StatusButton = styled.button<{ $status: ScheduleStatus; role?: string }>`
