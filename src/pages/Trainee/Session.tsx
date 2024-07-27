@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useInfiniteQuery } from 'react-query';
+import { format } from 'date-fns';
 
 import addBtn from '@icons/home/addbtn.svg';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
@@ -105,31 +106,20 @@ const Session: React.FC = () => {
   const { openModal, closeModal, isOpen } = useModals();
   const [formState, setFormState] = useState<SessionDataType>({
     traineeId: traineeId,
-    sessionDate: new Date(),
+    sessionDate: format(new Date(), 'yyyy-MM-dd'),
     sessionNumber: 0,
     specialNote: '',
     workouts: [
-      { type: '', weight: '', speed: '', time: '', sets: '', rep: '' },
+      { workoutTypeId: 0, weight: '', speed: '', time: '', sets: '', rep: '' },
     ],
   });
-  const [workoutTypes] = useState<
-    {
-      id: number;
-      name: string;
-      weightInputRequired: boolean;
-      setInputRequired: boolean;
-      repInputRequired: boolean;
-      timeInputRequired: boolean;
-      speedInputRequired: boolean;
-    }[]
-  >([]);
 
   const fetchSessions = async ({ pageParam = 0 }) => {
     const res = await traineeApi.getSessionsList(traineeId, pageParam, 20);
     return res.data;
   };
 
-  const { data, fetchNextPage, hasNextPage } = useInfiniteQuery(
+  const { data, fetchNextPage, hasNextPage, refetch } = useInfiniteQuery(
     'sessions',
     fetchSessions,
     {
@@ -237,9 +227,8 @@ const Session: React.FC = () => {
     };
   }, []);
 
-  const handleSaveSession = (session: SessionDataType) => {
-    console.log(session);
-    // Handle the save logic
+  const handleSaveSession = () => {
+    refetch();
   };
 
   const handleImageClick = (sessionId: number) => {
@@ -288,7 +277,6 @@ const Session: React.FC = () => {
         onSave={handleSaveSession}
         formState={formState}
         setFormState={setFormState}
-        workoutTypes={workoutTypes}
         traineeId={traineeId}
       />
     </SectionWrapper>
