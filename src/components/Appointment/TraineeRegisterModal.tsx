@@ -109,7 +109,7 @@ const TraineeRegisterModal: React.FC<TraineeRegisterModalProps> = ({
 
   const onClickTrainee = (trainee: TraineeDataType) => {
     if (trainee.remainingSession === 0) {
-      setErrorAlert('잔여 횟수가 없습니다.');
+      setErrorAlert('남은 PT 횟수가 부족합니다.');
       return;
     }
 

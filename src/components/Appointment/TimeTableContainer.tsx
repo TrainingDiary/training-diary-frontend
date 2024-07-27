@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { format, isBefore, parse } from 'date-fns';
 
 import { generateTimes } from 'src/utils/generateTimes';
 import { hexToRgba } from 'src/utils/hexToRgba';
@@ -113,20 +114,43 @@ const TimeTableContainer: React.FC<TimeTableContainerProps> = ({
   onTimeClick,
 }) => {
   const times = generateTimes();
+  const today = format(new Date(), 'yyyy-MM-dd');
+
+  const isTimeDisabled = (
+    selectedButton: string | null,
+    selectedDates: string[],
+    reservedAndAppliedDates: { startDate: string; notAllowedTimes: string[] }[],
+    time: string,
+    today: string
+  ) => {
+    return (
+      selectedButton === 'register' &&
+      selectedDates.some(selectedDate => {
+        const reserved = reservedAndAppliedDates.find(
+          date => date.startDate === selectedDate
+        );
+        return (
+          reserved?.notAllowedTimes.includes(time) ||
+          (selectedDate === today &&
+            isBefore(parse(time, 'HH:mm', new Date()), new Date()))
+        );
+      })
+    );
+  };
 
   return (
     <Wrapper>
       <Text>선택 가능 시간</Text>
       <TimeTable>
         {times.map((time, index) => {
-          const isDisabled =
-            selectedButton === 'register' &&
-            selectedDates.some(selectedDate => {
-              const reserved = reservedAndAppliedDates.find(
-                date => date.startDate === selectedDate
-              );
-              return reserved?.notAllowedTimes.includes(time.shortTime);
-            });
+          const isDisabled = isTimeDisabled(
+            selectedButton,
+            selectedDates,
+            reservedAndAppliedDates,
+            time.shortTime,
+            today
+          );
+
           const isSelected = selectedTimes.includes(time.shortTime);
 
           return (

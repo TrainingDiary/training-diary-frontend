@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { format } from 'date-fns';
+import { useQuery } from 'react-query';
 
-import {
-  ScheduleStatus,
-  ScheduleType,
-  scheduleList,
-} from 'src/mocks/data/scheduleList';
+import Modal from '@components/Common/Modal/Modal';
+import Alert from '@components/Common/Alert/Alert';
 import { generateTimes } from 'src/utils/generateTimes';
 import useModals from 'src/hooks/useModals';
-import Modal from '@components/Common/Modal/Modal';
+import CreateAppointmentApi from 'src/api/appointment';
+import useUserStore from 'src/stores/userStore';
 
 const Wrapper = styled.div`
   display: flex;
@@ -50,7 +50,7 @@ const InfoBox = styled.div<{
   align-items: center;
   justify-content: space-between;
   flex: 1;
-  height: 60px;
+  height: 50px;
   padding: 0 10px;
   border-radius: 5px;
   border: 1px solid
@@ -98,80 +98,140 @@ const Detail = styled.span<{
   }};
 `;
 
-const ButtonBox = styled.div`
+const ButtonBox = styled.div<{ role?: string }>`
   display: flex;
   justify-content: right;
   gap: 10px;
   width: 170px;
 
-  @media (max-width: 410px) {
-    width: auto;
-  }
+  ${({ role }) =>
+    role === 'TRAINER' &&
+    `
+    @media (max-width: 410px) {
+      width: auto;
+    }
+  `}
 `;
 
-const StatusButton = styled.button<{ $status: ScheduleStatus }>`
+const StatusButton = styled.button<{ $status: ScheduleStatus; role?: string }>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 8px;
   border-radius: 0.5rem;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   cursor: pointer;
   width: 100%;
   max-width: 80px;
   white-space: nowrap;
-  background-color: ${({ theme, $status }) => {
-    switch ($status) {
-      case 'PAST':
-        return;
-      case 'EMPTY':
-        return theme.colors.main500;
-      case 'OPEN':
-        return theme.colors.gray700;
-      case 'RESERVE_APPLIED':
-        return theme.colors.main500;
-      case 'RESERVED':
-        return theme.colors.gray100;
-    }
-  }};
-  color: ${({ theme, $status }) => {
-    switch ($status) {
-      case 'PAST':
-        return;
-      case 'EMPTY':
-      case 'OPEN':
-      case 'RESERVE_APPLIED':
-        return theme.colors.white;
-      case 'RESERVED':
-        return theme.colors.gray600;
-    }
-  }};
-  border: ${({ theme, $status }) => {
-    switch ($status) {
-      case 'PAST':
-        return;
-      case 'EMPTY':
-      case 'OPEN':
-      case 'RESERVE_APPLIED':
-        return 'none';
-      case 'RESERVED':
-        return `1px solid ${theme.colors.gray300}`;
-    }
-  }};
-
-  &:active {
-    background-color: ${({ theme, $status }) => {
+  background-color: ${({ theme, $status, role }) => {
+    if (role === 'TRAINER') {
       switch ($status) {
         case 'PAST':
           return;
         case 'EMPTY':
-          return theme.colors.main700;
+          return theme.colors.main500;
         case 'OPEN':
-          return theme.colors.gray900;
+          return theme.colors.gray700;
         case 'RESERVE_APPLIED':
-          return theme.colors.main700;
+          return theme.colors.main500;
         case 'RESERVED':
-          return theme.colors.gray300;
+          return theme.colors.gray100;
+      }
+    } else if (role === 'TRAINEE') {
+      switch ($status) {
+        case 'PAST':
+        case 'EMPTY':
+          return;
+        case 'OPEN':
+          return theme.colors.main500;
+        case 'RESERVE_APPLIED':
+          return theme.colors.gray100;
+        case 'RESERVED':
+          return theme.colors.red400;
+      }
+    }
+  }};
+  color: ${({ theme, $status, role }) => {
+    if (role === 'TRAINER') {
+      switch ($status) {
+        case 'PAST':
+          return;
+        case 'EMPTY':
+        case 'OPEN':
+        case 'RESERVE_APPLIED':
+          return theme.colors.white;
+        case 'RESERVED':
+          return theme.colors.gray600;
+      }
+    } else if (role === 'TRAINEE') {
+      switch ($status) {
+        case 'PAST':
+        case 'EMPTY':
+          return;
+        case 'OPEN':
+          return theme.colors.white;
+        case 'RESERVE_APPLIED':
+          return theme.colors.gray600;
+        case 'RESERVED':
+          return theme.colors.white;
+      }
+    }
+  }};
+  border: ${({ theme, $status, role }) => {
+    if (role === 'TRAINER') {
+      switch ($status) {
+        case 'PAST':
+          return;
+        case 'EMPTY':
+        case 'OPEN':
+        case 'RESERVE_APPLIED':
+          return 'none';
+        case 'RESERVED':
+          return `1px solid ${theme.colors.gray300}`;
+      }
+    } else if (role === 'TRAINEE') {
+      switch ($status) {
+        case 'PAST':
+        case 'EMPTY':
+          return;
+        case 'OPEN':
+          return 'none';
+        case 'RESERVE_APPLIED':
+          return `1px solid ${theme.colors.gray300}`;
+        case 'RESERVED':
+          return 'none';
+      }
+    }
+  }};
+
+  &:active {
+    background-color: ${({ theme, $status, role }) => {
+      if (role === 'TRAINER') {
+        switch ($status) {
+          case 'PAST':
+            return;
+          case 'EMPTY':
+            return theme.colors.main700;
+          case 'OPEN':
+            return theme.colors.gray900;
+          case 'RESERVE_APPLIED':
+            return theme.colors.main700;
+          case 'RESERVED':
+            return theme.colors.gray300;
+        }
+      } else if (role === 'TRAINEE') {
+        switch ($status) {
+          case 'PAST':
+          case 'EMPTY':
+            return;
+          case 'OPEN':
+            return theme.colors.main700;
+          case 'RESERVE_APPLIED':
+            return theme.colors.gray300;
+          case 'RESERVED':
+            return theme.colors.red600;
+        }
       }
     }};
     color: ${({ theme }) => theme.colors.white};
@@ -180,6 +240,7 @@ const StatusButton = styled.button<{ $status: ScheduleStatus }>`
 
 const RejectButton = styled(StatusButton)`
   background-color: ${({ theme }) => theme.colors.red400};
+  border: none;
   color: ${({ theme }) => theme.colors.white};
 
   &:active {
@@ -196,71 +257,146 @@ const Divider = styled.div`
   z-index: 0;
 `;
 
+export type ScheduleStatus =
+  | 'PAST'
+  | 'EMPTY'
+  | 'OPEN'
+  | 'RESERVE_APPLIED'
+  | 'RESERVED';
+
+export interface ScheduleDetailType {
+  scheduleId: number;
+  startTime: string;
+  trainerId: number;
+  trainerName: string;
+  traineeId: number | null;
+  traineeName: string | null;
+  scheduleStatus: ScheduleStatus;
+}
+
+export interface ScheduleType {
+  startDate: string;
+  existReserved: boolean;
+  details: ScheduleDetailType[];
+}
+
 interface ScheduleDetailProps {
   selectedDate: Date;
 }
 
 const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
+  const { user } = useUserStore();
+  const navigate = useNavigate();
+  const AppointmentApi = CreateAppointmentApi(navigate);
   const { openModal, closeModal, isOpen } = useModals();
   const [schedules, setSchedules] = useState<ScheduleType[]>([]);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [errorAlert, setErrorAlert] = useState<string>('');
+
+  const fetchSchedules = async () => {
+    const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+    const response = await AppointmentApi.getSchedules(
+      formattedDate,
+      formattedDate
+    );
+    return response?.data;
+  };
+
+  const { data, error, isLoading, refetch } = useQuery(
+    ['schedules', selectedDate],
+    fetchSchedules,
+    {
+      keepPreviousData: true,
+    }
+  );
 
   useEffect(() => {
-    // selectedDate로 스케줄 상세 조회 API 요청 단계 추가
+    refetch();
+  }, [selectedDate, refetch]);
 
-    setSchedules([scheduleList[2]]);
-  }, [selectedDate]);
+  useEffect(() => {
+    if (data) {
+      setSchedules(data);
+    }
+  }, [data]);
 
   const times = generateTimes();
-  const now = new Date('2024-07-05T11:00:00'); // 추후 현재시간으로 수정
+  const now = new Date();
 
   const getScheduleDetail = (
     time: string
-  ): { $status: ScheduleStatus; detailText: string } => {
+  ): { $status: ScheduleStatus; detailText: string; scheduleId?: number } => {
     let $status: ScheduleStatus = 'EMPTY';
     let detailText: string = '';
+    let scheduleId: number | undefined;
 
     const schedule = schedules[0]?.details.find(
       detail => detail.startTime === time
     );
 
     const timeDate = new Date(
-      `${format('2024-07-05', 'yyyy-MM-dd')}T${time}:00`
+      `${format(selectedDate, 'yyyy-MM-dd')}T${time}:00`
     );
 
     if (schedule) {
-      $status = schedule.status;
+      $status = schedule.scheduleStatus;
+      scheduleId = schedule.scheduleId;
       detailText =
-        schedule.status === 'OPEN'
+        schedule.scheduleStatus === 'OPEN'
           ? '-'
           : `${schedule.trainerName} - ${schedule.traineeName}`;
     }
 
-    if (timeDate <= now) $status = 'PAST';
+    if (timeDate <= now) {
+      $status = 'PAST';
+      detailText =
+        schedule?.scheduleStatus === 'RESERVED'
+          ? `${schedule.trainerName} - ${schedule.traineeName}`
+          : '';
+    }
 
     return {
       $status,
       detailText,
+      scheduleId,
     };
   };
 
   const getButtonText = ($status: ScheduleStatus) => {
-    switch ($status) {
-      case 'PAST':
-        return;
-      case 'EMPTY':
-        return '오픈';
-      case 'OPEN':
-        return '닫기';
-      case 'RESERVE_APPLIED':
-        return '확정';
-      case 'RESERVED':
-        return '취소';
+    if (user?.role === 'TRAINER') {
+      switch ($status) {
+        case 'PAST':
+          return;
+        case 'EMPTY':
+          return '오픈';
+        case 'OPEN':
+          return '닫기';
+        case 'RESERVE_APPLIED':
+          return '확정';
+        case 'RESERVED':
+          return '취소';
+      }
+    } else if (user?.role === 'TRAINEE') {
+      switch ($status) {
+        case 'PAST':
+        case 'EMPTY':
+          return;
+        case 'OPEN':
+          return '신청';
+        case 'RESERVE_APPLIED':
+          return '신청취소';
+        case 'RESERVED':
+          return '취소';
+      }
     }
   };
 
-  const handleModal = (
+  const handleModal = async (
     $status: ScheduleStatus,
-    action: 'open' | 'close' | 'save'
+    action: 'open' | 'close' | 'save',
+    id?: number,
+    time?: string
   ) => {
     const modalTypeMap: Record<ScheduleStatus, string> = {
       PAST: '',
@@ -272,57 +408,158 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
 
     const modalType = modalTypeMap[$status];
 
-    if (modalType) {
-      switch (action) {
-        case 'open':
-          openModal(modalType);
-          break;
-        case 'close':
+    if (!modalType) return;
+
+    switch (action) {
+      case 'open':
+        setSelectedId(id || null);
+        setSelectedTime(time || null);
+        openModal(modalType);
+        break;
+      case 'close':
+        closeModal(modalType);
+        break;
+      case 'save':
+        try {
+          if (user?.role === 'TRAINER') {
+            await handleTrainerActions($status);
+          } else if (user?.role === 'TRAINEE') {
+            await handleTraineeActions($status);
+          }
+          refetch();
+        } catch (error: any) {
+          handleError(error, $status);
+        } finally {
           closeModal(modalType);
-          break;
-        case 'save':
-          // 각 버튼에 맞는 API 요청 단계 추가
-          closeModal(modalType);
-          break;
-      }
+        }
+        break;
     }
   };
 
+  const handleTrainerActions = async ($status: ScheduleStatus) => {
+    if ($status === 'EMPTY' && selectedTime) {
+      const startDate = format(selectedDate, 'yyyy-MM-dd');
+      const startTimes = [selectedTime];
+      await AppointmentApi.openSchedules([{ startDate, startTimes }]);
+    } else if ($status === 'OPEN' && selectedId) {
+      await AppointmentApi.closeSchedules([selectedId]);
+    } else if ($status === 'RESERVE_APPLIED' && selectedId) {
+      await AppointmentApi.acceptSchedule(selectedId);
+    } else if ($status === 'RESERVED' && selectedId) {
+      await AppointmentApi.cancelSchedule(selectedId);
+    }
+  };
+
+  const handleTraineeActions = async ($status: ScheduleStatus) => {
+    if ($status === 'OPEN' && selectedId) {
+      await AppointmentApi.applySchedule(selectedId);
+    } else if ($status === 'RESERVE_APPLIED' && selectedId) {
+      await AppointmentApi.cancelSchedule(selectedId);
+    } else if ($status === 'RESERVED' && selectedId) {
+      await AppointmentApi.cancelSchedule(selectedId);
+    }
+  };
+
+  const handleError = (error: any, $status: ScheduleStatus) => {
+    if ($status === 'OPEN' && user?.role === 'TRAINEE') {
+      if (error.response?.status === 400) {
+        setErrorAlert('1시간 내 시작하는 수업은 신청할 수 없습니다.');
+      } else if (error.response?.status === 406) {
+        setErrorAlert('남은 PT 횟수가 부족합니다.');
+      }
+    } else if ($status === 'RESERVED' && user?.role === 'TRAINEE') {
+      if (error.response?.status === 400) {
+        setErrorAlert('24시간 내 시작하는 수업은 취소할 수 없습니다.');
+      }
+    } else {
+      console.error('일정 관련 버튼 에러: ', error);
+    }
+  };
+
+  const handleRejectModal = async (
+    action: 'open' | 'close' | 'save',
+    id?: number
+  ) => {
+    switch (action) {
+      case 'open':
+        setSelectedId(id || null);
+        openModal('rejectModal');
+        break;
+      case 'close':
+        closeModal('rejectModal');
+        break;
+      case 'save':
+        try {
+          if (selectedId) {
+            await AppointmentApi.rejectSchedule(selectedId);
+            refetch();
+          }
+        } catch (error: any) {
+          console.error('일정 관련 버튼 에러: ', error);
+        } finally {
+          closeModal('rejectModal');
+        }
+        break;
+    }
+  };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
+
   return (
     <Wrapper>
-      {times.map((time, idx) => {
-        const { $status, detailText } = getScheduleDetail(time.shortTime);
-        return (
-          <ScheduleTable key={idx}>
-            <TimeBox>
-              <Time>{time.fullTime}</Time>
-              <Dot />
-            </TimeBox>
-            <InfoBox $status={$status}>
-              <Detail $status={$status}>{detailText}</Detail>
-              {$status !== 'PAST' && (
-                <ButtonBox>
-                  <StatusButton
-                    $status={$status}
-                    onClick={() => handleModal($status, 'open')}
-                  >
-                    {getButtonText($status)}
-                  </StatusButton>
-                  {$status === 'RESERVE_APPLIED' && (
-                    <RejectButton
-                      $status={$status}
-                      onClick={() => openModal('rejectModal')}
-                    >
-                      거절
-                    </RejectButton>
+      {isLoading && <div>Loading...</div>}
+      {!isLoading &&
+        !error &&
+        times.map((time, idx) => {
+          const { $status, detailText, scheduleId } = getScheduleDetail(
+            time.shortTime
+          );
+          return (
+            <ScheduleTable key={idx}>
+              <TimeBox>
+                <Time>{time.fullTime}</Time>
+                <Dot />
+              </TimeBox>
+              <InfoBox $status={$status}>
+                <Detail $status={$status}>{detailText}</Detail>
+                {$status !== 'PAST' &&
+                  !(user?.role === 'TRAINEE' && $status === 'EMPTY') && (
+                    <ButtonBox role={user?.role}>
+                      <StatusButton
+                        $status={$status}
+                        role={user?.role}
+                        onClick={() =>
+                          handleModal(
+                            $status,
+                            'open',
+                            scheduleId,
+                            time.shortTime
+                          )
+                        }
+                      >
+                        {getButtonText($status)}
+                      </StatusButton>
+                      {$status === 'RESERVE_APPLIED' &&
+                        user?.role === 'TRAINER' && (
+                          <RejectButton
+                            $status={$status}
+                            onClick={() =>
+                              handleRejectModal('open', scheduleId)
+                            }
+                          >
+                            거절
+                          </RejectButton>
+                        )}
+                    </ButtonBox>
                   )}
-                </ButtonBox>
-              )}
-            </InfoBox>
-          </ScheduleTable>
-        );
-      })}
+              </InfoBox>
+            </ScheduleTable>
+          );
+        })}
       <Divider />
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
       <Modal
         title="수업일 오픈"
         type="confirm"
@@ -334,14 +571,16 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
         선택한 시간에 수업을 오픈할까요?
       </Modal>
       <Modal
-        title="수업일 닫기"
+        title={user?.role === 'TRAINER' ? '수업일 닫기' : '수업 신청'}
         type="confirm"
         isOpen={isOpen('closeModal')}
         onClose={() => handleModal('OPEN', 'close')}
         onSave={() => handleModal('OPEN', 'save')}
         btnConfirm="저장"
       >
-        선택한 시간에 수업을 닫을까요?
+        {user?.role === 'TRAINER'
+          ? '선택한 시간에 수업을 닫을까요?'
+          : '선택한 시간에 수업을 신청할까요?'}
       </Modal>
       <Modal
         title="수업 취소"
@@ -354,21 +593,23 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
         선택한 시간에 수업을 취소할까요?
       </Modal>
       <Modal
-        title="수업 확정"
+        title={user?.role === 'TRAINER' ? '수업 확정' : '수업 신청 취소'}
         type="confirm"
         isOpen={isOpen('confirmModal')}
         onClose={() => handleModal('RESERVE_APPLIED', 'close')}
         onSave={() => handleModal('RESERVE_APPLIED', 'save')}
         btnConfirm="저장"
       >
-        선택한 시간에 수업을 확정할까요?
+        {user?.role === 'TRAINER'
+          ? '선택한 시간에 수업을 확정할까요?'
+          : '아직 확정되지 않은 수업입니다. 수업 신청을 취소할까요?'}
       </Modal>
       <Modal
         title="수업 거절"
         type="confirm"
         isOpen={isOpen('rejectModal')}
-        onClose={() => closeModal('rejectModal')}
-        onSave={() => closeModal('rejectModal')}
+        onClose={() => handleRejectModal('close')}
+        onSave={() => handleRejectModal('save')}
         btnConfirm="저장"
       >
         선택한 시간에 수업을 거절할까요?
@@ -376,4 +617,5 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
     </Wrapper>
   );
 };
+
 export default ScheduleDetail;
