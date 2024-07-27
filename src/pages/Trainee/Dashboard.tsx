@@ -126,7 +126,7 @@ const Input = styled.input<{ $unit?: string; $editMode?: boolean }>`
     $editMode ? theme.colors.gray900 : theme.colors.gray600};
   width: 100%;
   max-width: 220px;
-  text-align: right;
+  text-align: ${({ $editMode }) => ($editMode ? 'left' : 'right')};
   outline: none;
   transition: border-color 0.3s;
   cursor: ${({ $editMode }) => ($editMode ? 'auto' : 'not-allowed')};
@@ -167,7 +167,7 @@ const TextArea = styled.textarea<{ $unit?: string; $editMode?: boolean }>`
     $editMode ? theme.colors.gray900 : theme.colors.gray600};
   width: 100%;
   max-width: 220px;
-  text-align: right;
+  text-align: ${({ $editMode }) => ($editMode ? 'left' : 'right')};
   outline: none;
   transition: border-color 0.3s;
   cursor: ${({ $editMode }) => ($editMode ? 'auto' : 'not-allowed')};
@@ -235,7 +235,7 @@ export interface TraineeInfoData {
   name: string;
   age: number;
   gender: string; // gender는 MALE 또는 FEMALE만 허용
-  height: number;
+  height: number | null;
   birthDate: string;
   remainingSession: number;
   weightHistory: WeightHistory[];
@@ -245,7 +245,7 @@ export interface TraineeInfoData {
     | 'TARGET_WEIGHT'
     | 'TARGET_BODY_FAT_PERCENTAGE'
     | 'TARGET_SKELETAL_MUSCLE_MASS'; // targetType은 정의된 타입만 허용
-  targetValue: number;
+  targetValue: number | null;
   targetReward: string;
 }
 
@@ -320,12 +320,21 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     if (traineeInfo) {
-      const targetTypeLabel =
-        traineeInfo.targetType === 'TARGET_WEIGHT'
-          ? '몸무게'
-          : traineeInfo.targetType === 'TARGET_BODY_FAT_PERCENTAGE'
-            ? '체지방률'
-            : '근골격량';
+      let targetTypeLabel;
+
+      switch (traineeInfo.targetType) {
+        case 'TARGET_WEIGHT':
+          targetTypeLabel = '몸무게';
+          break;
+        case 'TARGET_BODY_FAT_PERCENTAGE':
+          targetTypeLabel = '체지방률';
+          break;
+        case 'TARGET_SKELETAL_MUSCLE_MASS':
+          targetTypeLabel = '근골격량';
+          break;
+        default:
+          targetTypeLabel = '';
+      }
 
       setChartData({
         labels: traineeInfo.weightHistory.map(
@@ -363,7 +372,7 @@ const Dashboard: React.FC = () => {
           {
             label: `목표수치(${targetTypeLabel})`,
             data: Array(traineeInfo.weightHistory.length).fill(
-              traineeInfo.targetValue
+              traineeInfo.targetValue ?? 0
             ),
             borderColor: '#89DAC1',
             pointBackgroundColor: '#89DAC1',
@@ -378,21 +387,21 @@ const Dashboard: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setTraineeInfo(prevInfo =>
-      prevInfo ? { ...prevInfo, [name]: value } : null
+      prevInfo ? { ...prevInfo, [name]: value || null } : null
     );
   };
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setTraineeInfo(prevInfo =>
-      prevInfo ? { ...prevInfo, [name]: value } : null
+      prevInfo ? { ...prevInfo, [name]: value || null } : null
     );
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setTraineeInfo(prevInfo =>
-      prevInfo ? { ...prevInfo, [name]: value } : null
+      prevInfo ? { ...prevInfo, [name]: value || null } : null
     );
   };
 
@@ -439,13 +448,16 @@ const Dashboard: React.FC = () => {
     } else if (traineeInfo?.gender === '') {
       setErrorAlert('성별을 입력해주세요');
       return;
-    } else if (traineeInfo?.height === null) {
+    } else if (traineeInfo?.height === null || traineeInfo?.height <= 0) {
       setErrorAlert('키를 입력해주세요');
       return;
     } else if (traineeInfo?.targetType === null) {
       setErrorAlert('목표 타입을 선택해주세요');
       return;
-    } else if (traineeInfo?.targetValue === null) {
+    } else if (
+      traineeInfo?.targetValue === null ||
+      traineeInfo?.targetValue <= 0
+    ) {
       setErrorAlert('목표 수치를 입력해주세요');
       return;
     } else if (traineeInfo?.targetReward === '') {
@@ -473,21 +485,30 @@ const Dashboard: React.FC = () => {
               weightHistory: [
                 ...prevInfo.weightHistory,
                 {
-                  addedDate: format(new Date(), 'yyyy-MM-dd'),
+                  addedDate: format(
+                    new Date(inbodyData.addedDate),
+                    'yyyy-MM-dd'
+                  ),
                   weight: inbodyData.weight,
                 },
               ],
               bodyFatHistory: [
                 ...prevInfo.bodyFatHistory,
                 {
-                  addedDate: format(new Date(), 'yyyy-MM-dd'),
+                  addedDate: format(
+                    new Date(inbodyData.addedDate),
+                    'yyyy-MM-dd'
+                  ),
                   bodyFatPercentage: inbodyData.bodyFatPercentage,
                 },
               ],
               muscleMassHistory: [
                 ...prevInfo.muscleMassHistory,
                 {
-                  addedDate: format(new Date(), 'yyyy-MM-dd'),
+                  addedDate: format(
+                    new Date(inbodyData.addedDate),
+                    'yyyy-MM-dd'
+                  ),
                   muscleMass: inbodyData.skeletalMuscleMass,
                 },
               ],
@@ -511,7 +532,7 @@ const Dashboard: React.FC = () => {
       return setErrorAlert('근골격량을 입력해주세요');
     }
 
-    const formattedDate = format(new Date(), 'MM.dd');
+    const formattedDate = format(new Date(inbodyData.addedDate), 'MM.dd');
     setChartData(prevData => ({
       ...prevData,
       labels: [...prevData.labels, formattedDate],
@@ -537,7 +558,7 @@ const Dashboard: React.FC = () => {
         if (dataset.label.startsWith('목표수치')) {
           return {
             ...dataset,
-            data: [...dataset.data, traineeInfo!.targetValue],
+            data: [...dataset.data, traineeInfo?.targetValue ?? 0],
           };
         }
         return dataset;
@@ -669,7 +690,7 @@ const Dashboard: React.FC = () => {
                 name="height"
                 value={
                   editInfo
-                    ? `${traineeInfo.height} cm`
+                    ? `${traineeInfo.height ?? 0} cm`
                     : traineeInfo.height || 0
                 }
                 readOnly={editInfo}
@@ -712,8 +733,8 @@ const Dashboard: React.FC = () => {
                 name="targetValue"
                 value={
                   editInfo
-                    ? `${traineeInfo.targetValue} ${getUnit(traineeInfo.targetType || '')}`
-                    : `${traineeInfo.targetValue}`
+                    ? `${traineeInfo.targetValue ?? 0} ${getUnit(traineeInfo.targetType || '')}`
+                    : `${traineeInfo.targetValue ?? 0}`
                 }
                 readOnly={editInfo}
                 onChange={handleInputChange}
