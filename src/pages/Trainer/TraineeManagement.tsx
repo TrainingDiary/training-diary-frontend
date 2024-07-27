@@ -203,6 +203,8 @@ const TraineeManagement: React.FC = () => {
         setErrorAlert('이미 등록된 트레이니 입니다.');
       } else if (error.response.status === 406) {
         setErrorAlert('이메일을 확인해주세요.');
+      } else if (error.response.status === 410) {
+        setErrorAlert('등록할 수 없는 트레이니 입니다.');
       }
       console.error('트레이니 추가 에러: ', error);
     }
@@ -275,7 +277,7 @@ const TraineeManagement: React.FC = () => {
                     alignItems: 'center',
                   }}
                 >
-                  트레이너를 등록해주세요.
+                  트레이니를 등록해주세요.
                 </li>
               )}
             </TraineeList>
