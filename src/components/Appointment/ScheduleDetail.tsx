@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { useQuery } from 'react-query';
 
 import Modal from '@components/Common/Modal/Modal';
+import Alert from '@components/Common/Alert/Alert';
 import { generateTimes } from 'src/utils/generateTimes';
 import useModals from 'src/hooks/useModals';
 import CreateAppointmentApi from 'src/api/appointment';
@@ -143,7 +144,7 @@ const StatusButton = styled.button<{ $status: ScheduleStatus; role?: string }>`
         case 'RESERVE_APPLIED':
           return theme.colors.gray100;
         case 'RESERVED':
-          return theme.colors.gray100;
+          return theme.colors.red400;
       }
     }
   }};
@@ -167,8 +168,9 @@ const StatusButton = styled.button<{ $status: ScheduleStatus; role?: string }>`
         case 'OPEN':
           return theme.colors.white;
         case 'RESERVE_APPLIED':
-        case 'RESERVED':
           return theme.colors.gray600;
+        case 'RESERVED':
+          return theme.colors.white;
       }
     }
   }};
@@ -192,8 +194,9 @@ const StatusButton = styled.button<{ $status: ScheduleStatus; role?: string }>`
         case 'OPEN':
           return 'none';
         case 'RESERVE_APPLIED':
-        case 'RESERVED':
           return `1px solid ${theme.colors.gray300}`;
+        case 'RESERVED':
+          return 'none';
       }
     }
   }};
@@ -221,8 +224,9 @@ const StatusButton = styled.button<{ $status: ScheduleStatus; role?: string }>`
           case 'OPEN':
             return theme.colors.main700;
           case 'RESERVE_APPLIED':
-          case 'RESERVED':
             return theme.colors.gray300;
+          case 'RESERVED':
+            return theme.colors.red600;
         }
       }
     }};
@@ -232,6 +236,7 @@ const StatusButton = styled.button<{ $status: ScheduleStatus; role?: string }>`
 
 const RejectButton = styled(StatusButton)`
   background-color: ${({ theme }) => theme.colors.red400};
+  border: none;
   color: ${({ theme }) => theme.colors.white};
 
   &:active {
@@ -283,6 +288,7 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
   const [schedules, setSchedules] = useState<ScheduleType[]>([]);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [errorAlert, setErrorAlert] = useState<string>('');
 
   const fetchSchedules = async () => {
     const formattedDate = format(selectedDate, 'yyyy-MM-dd');
@@ -375,6 +381,7 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
         case 'OPEN':
           return '신청';
         case 'RESERVE_APPLIED':
+          return '신청취소';
         case 'RESERVED':
           return '취소';
       }
@@ -410,23 +417,52 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
         break;
       case 'save':
         try {
-          if ($status === 'EMPTY' && selectedTime) {
-            const startDate = format(selectedDate, 'yyyy-MM-dd');
-            const startTimes = [selectedTime];
-            await AppointmentApi.openSchedules([{ startDate, startTimes }]);
-          } else if ($status === 'OPEN' && selectedId) {
-            await AppointmentApi.closeSchedules([selectedId]);
+          if (user?.role === 'TRAINER') {
+            await handleTrainerActions($status);
+          } else if (user?.role === 'TRAINEE') {
+            await handleTraineeActions($status);
           }
           refetch();
-        } catch (error) {
-          console.error('API 요청 에러: ', error);
+        } catch (error: any) {
+          handleError(error, $status);
         } finally {
           closeModal(modalType);
         }
-
         break;
     }
   };
+
+  const handleTrainerActions = async ($status: ScheduleStatus) => {
+    if ($status === 'EMPTY' && selectedTime) {
+      const startDate = format(selectedDate, 'yyyy-MM-dd');
+      const startTimes = [selectedTime];
+      await AppointmentApi.openSchedules([{ startDate, startTimes }]);
+    } else if ($status === 'OPEN' && selectedId) {
+      await AppointmentApi.closeSchedules([selectedId]);
+    }
+  };
+
+  const handleTraineeActions = async ($status: ScheduleStatus) => {
+    if ($status === 'OPEN' && selectedId) {
+      await AppointmentApi.applySchedule(selectedId);
+    } else if ($status === 'RESERVE_APPLIED' && selectedId) {
+      await AppointmentApi.cancelSchedule(selectedId);
+    }
+  };
+
+  const handleError = (error: any, $status: ScheduleStatus) => {
+    if ($status === 'OPEN' && user?.role === 'TRAINEE') {
+      if (error.response?.status === 400) {
+        setErrorAlert('1시간 내 시작하는 수업은 신청할 수 없습니다.');
+      } else if (error.response?.status === 406) {
+        setErrorAlert('남은 PT 횟수가 부족합니다.');
+      }
+    } else {
+      console.error('일정 관련 버튼 에러: ', error);
+    }
+  };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
 
   return (
     <Wrapper>
@@ -462,14 +498,15 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
                       >
                         {getButtonText($status)}
                       </StatusButton>
-                      {$status === 'RESERVE_APPLIED' && (
-                        <RejectButton
-                          $status={$status}
-                          onClick={() => openModal('rejectModal')}
-                        >
-                          거절
-                        </RejectButton>
-                      )}
+                      {$status === 'RESERVE_APPLIED' &&
+                        user?.role === 'TRAINER' && (
+                          <RejectButton
+                            $status={$status}
+                            onClick={() => openModal('rejectModal')}
+                          >
+                            거절
+                          </RejectButton>
+                        )}
                     </ButtonBox>
                   )}
               </InfoBox>
@@ -477,6 +514,9 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
           );
         })}
       <Divider />
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
       <Modal
         title="수업일 오픈"
         type="confirm"

@@ -34,6 +34,17 @@ const CreateAppointmentApi = (navigate: NavigateFunction) => {
     closeSchedules: (scheduleIds: number[]) =>
       axiosInstance.post('/schedules/trainers/close', { scheduleIds }),
 
+    applySchedule: (scheduleId: number) =>
+      axiosInstance.post('/schedules/trainees/apply', { scheduleId }),
+
+    cancelSchedule: (scheduleId: number) => {
+      if (user?.role === 'TRAINER') {
+        return axiosInstance.post('/schedules/trainers/cancel', { scheduleId });
+      } else if (user?.role === 'TRAINEE') {
+        return axiosInstance.post('/schedules/trainees/cancel', { scheduleId });
+      }
+    },
+
     getSchedules: (startDate: string, endDate: string) => {
       if (user?.role === 'TRAINER') {
         return axiosInstance.get('/schedules/trainers', {
