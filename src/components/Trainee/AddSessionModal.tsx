@@ -32,6 +32,14 @@ const FormGroup = styled.div`
     top: 110% !important;
   }
 
+  .react-datepicker__navigation {
+    top: 15px;
+
+    .react-datepicker__navigation-icon::before {
+      border-color: ${({ theme }) => theme.colors.white};
+    }
+  }
+
   .react-datepicker-popper[data-placement^='bottom']
     .react-datepicker__triangle {
     left: 10% !important;
@@ -42,6 +50,13 @@ const FormGroup = styled.div`
 
   h2.react-datepicker__current-month {
     font-size: 1.5rem;
+    color: ${({ theme }) => theme.colors.white};
+    padding: 10px;
+  }
+
+  .react-datepicker__day-name {
+    color: ${({ theme }) => theme.colors.white};
+    font-family: 'NanumSquareBold';
   }
 `;
 
