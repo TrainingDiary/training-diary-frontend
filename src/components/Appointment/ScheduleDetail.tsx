@@ -50,7 +50,7 @@ const InfoBox = styled.div<{
   align-items: center;
   justify-content: space-between;
   flex: 1;
-  height: 60px;
+  height: 50px;
   padding: 0 10px;
   border-radius: 5px;
   border: 1px solid
@@ -98,15 +98,19 @@ const Detail = styled.span<{
   }};
 `;
 
-const ButtonBox = styled.div`
+const ButtonBox = styled.div<{ role?: string }>`
   display: flex;
   justify-content: right;
   gap: 10px;
   width: 170px;
 
-  @media (max-width: 410px) {
-    width: auto;
-  }
+  ${({ role }) =>
+    role === 'TRAINER' &&
+    `
+    @media (max-width: 410px) {
+      width: auto;
+    }
+  `}
 `;
 
 const StatusButton = styled.button<{ $status: ScheduleStatus; role?: string }>`
@@ -115,7 +119,7 @@ const StatusButton = styled.button<{ $status: ScheduleStatus; role?: string }>`
   justify-content: center;
   padding: 8px;
   border-radius: 0.5rem;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   cursor: pointer;
   width: 100%;
   max-width: 80px;
@@ -520,7 +524,7 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
                 <Detail $status={$status}>{detailText}</Detail>
                 {$status !== 'PAST' &&
                   !(user?.role === 'TRAINEE' && $status === 'EMPTY') && (
-                    <ButtonBox>
+                    <ButtonBox role={user?.role}>
                       <StatusButton
                         $status={$status}
                         role={user?.role}
