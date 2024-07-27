@@ -112,7 +112,7 @@ const Session: React.FC = () => {
       { type: '', weight: '', speed: '', time: '', sets: '', rep: '' },
     ],
   });
-  const [workoutTypes, setWorkoutTypes] = useState<
+  const [workoutTypes] = useState<
     {
       id: number;
       name: string;
@@ -129,10 +129,13 @@ const Session: React.FC = () => {
     return res.data;
   };
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
-    useInfiniteQuery('sessions', fetchSessions, {
-      getNextPageParam: (lastPage, allPages) => lastPage.nextPage ?? false,
-    });
+  const { data, fetchNextPage, hasNextPage } = useInfiniteQuery(
+    'sessions',
+    fetchSessions,
+    {
+      getNextPageParam: lastPage => lastPage.nextPage ?? false,
+    }
+  );
 
   const sessions = data?.pages.flatMap(page => page.content) ?? [];
   const images = sessions.flatMap((session: SessionData) =>

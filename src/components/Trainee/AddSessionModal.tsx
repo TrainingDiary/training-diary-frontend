@@ -6,8 +6,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Modal from '@components/Common/Modal/Modal';
 import Alert from '@components/Common/Alert/Alert';
 import { DatePickerWrapper } from './Calendar';
-import { useNavigate } from 'react-router-dom';
 import CreateTraineeApi from 'src/api/trainee';
+import { useNavigate } from 'react-router-dom';
 
 const FormGroup = styled.div`
   display: flex;
@@ -257,7 +257,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
 
   const [errorAlert, setErrorAlert] = useState<string>('');
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (formState.sessionDate === null)
       return setErrorAlert('날짜를 입력해주세요.');
 
@@ -293,9 +293,17 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
       }
     }
 
-    onSave(formState);
-    setFormState(initialFormState);
-    onClose();
+    // 운동 기록 생성 API 호출
+    try {
+      const response = await traineeApi.addSession(formState);
+      console.log('운동 기록 생성 성공:', response.data);
+      onSave(formState);
+      setFormState(initialFormState);
+      onClose();
+    } catch (error) {
+      console.error('운동 기록 생성 실패:', error);
+      setErrorAlert('운동 기록 생성에 실패했습니다.');
+    }
   };
 
   const handleClose = () => {
