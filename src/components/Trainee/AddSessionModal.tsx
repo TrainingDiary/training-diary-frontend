@@ -331,6 +331,10 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
     if (formState.specialNote.trim() === '')
       return setErrorAlert('특이사항을 입력해주세요.');
 
+    if (formState.workouts.length === 0) {
+      return setErrorAlert('운동 종류를 하나 이상 선택해주세요.');
+    }
+
     // 운동 종류 기록 유효성 검사 로직
     for (let i = 0; i < formState.workouts.length; i++) {
       const workout = formState.workouts[i];
