@@ -90,11 +90,6 @@ interface SessionData {
   thumbnailUrls: string[];
 }
 
-interface ImageWithSession {
-  src: string;
-  sessionId: number;
-}
-
 const Session: React.FC = () => {
   useFetchUser();
   const navigate = useNavigate();
