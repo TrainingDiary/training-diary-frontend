@@ -104,15 +104,6 @@ const Session: React.FC = () => {
   const startXRef = useRef(0);
   const scrollLeftRef = useRef(0);
   const { openModal, closeModal, isOpen } = useModals();
-  const [formState, setFormState] = useState<SessionDataType>({
-    traineeId: traineeId,
-    sessionDate: format(new Date(), 'yyyy-MM-dd'),
-    sessionNumber: 0,
-    specialNote: '',
-    workouts: [
-      { workoutTypeId: 0, weight: '', speed: '', time: '', sets: '', rep: '' },
-    ],
-  });
 
   const fetchSessions = async ({ pageParam = 0 }) => {
     const res = await traineeApi.getSessionsList(traineeId, pageParam, 20);
@@ -134,6 +125,16 @@ const Session: React.FC = () => {
       sessionId: session.sessionId,
     }))
   );
+
+  const [formState, setFormState] = useState<SessionDataType>({
+    traineeId: traineeId,
+    sessionDate: format(new Date(), 'yyyy-MM-dd'),
+    sessionNumber: sessions.length + 1,
+    specialNote: '',
+    workouts: [
+      { workoutTypeId: 0, weight: '', speed: '', time: '', sets: '', rep: '' },
+    ],
+  });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -231,8 +232,17 @@ const Session: React.FC = () => {
     refetch();
   };
 
+  const handleOpenModal = async () => {
+    await refetch(); // 모달을 열기 전에 세션 목록을 다시 로드
+    setFormState({
+      ...formState,
+      sessionNumber: sessions.length + 1,
+    });
+    openModal('addSessionModal');
+  };
+
   const handleImageClick = (sessionId: number) => {
-    navigate(`/trainee/${traineeId}/session/${sessionId}`); // traineeID
+    navigate(`/trainee/${traineeId}/session/${sessionId}`);
   };
 
   return (
@@ -267,7 +277,7 @@ const Session: React.FC = () => {
         </RecordBox>
       </Wrapper>
       {user?.role === 'TRAINER' ? (
-        <AddButton onClick={() => openModal('addSessionModal')}>
+        <AddButton onClick={handleOpenModal}>
           <img src={addBtn} alt="add button" />
         </AddButton>
       ) : null}
@@ -278,6 +288,7 @@ const Session: React.FC = () => {
         formState={formState}
         setFormState={setFormState}
         traineeId={traineeId}
+        sessionAutoNumber={sessions.length + 1}
       />
     </SectionWrapper>
   );

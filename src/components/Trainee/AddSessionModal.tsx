@@ -193,6 +193,7 @@ interface AddSessionModalProps {
   onSave: (session: SessionDataType) => void;
   formState: SessionDataType;
   setFormState: React.Dispatch<React.SetStateAction<SessionDataType>>;
+  sessionAutoNumber: number;
 }
 
 const AddSessionModal: React.FC<AddSessionModalProps> = ({
@@ -202,6 +203,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
   formState,
   setFormState,
   traineeId,
+  sessionAutoNumber,
 }) => {
   const navigate = useNavigate();
   const traineeApi = CreateTraineeApi(navigate);
@@ -222,7 +224,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
   const initialFormState: SessionDataType = {
     traineeId: traineeId,
     sessionDate: format(new Date(), 'yyyy-MM-dd'),
-    sessionNumber: 0,
+    sessionNumber: sessionAutoNumber,
     specialNote: '',
     workouts: [
       {
