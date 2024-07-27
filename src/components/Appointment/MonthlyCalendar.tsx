@@ -8,6 +8,7 @@ import {
   addMonths,
   format,
   isBefore,
+  isSameDay,
   startOfDay,
   startOfMonth,
 } from 'date-fns';
@@ -109,6 +110,10 @@ const FullCalendarWrapper = styled.div`
     color: ${({ theme }) => theme.colors.white};
   }
 
+  .fc-daygrid-day-number.fc-today {
+    border: 1px solid ${({ theme }) => theme.colors.main800};
+  }
+
   .fc-scrollgrid,
   table,
   td,
@@ -205,10 +210,15 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
           'active-enabled',
           'fc-reserved-number',
           'fc-has-event-number',
-          'fc-selected-number'
+          'fc-selected-number',
+          'fc-today'
         );
 
         if (selectedButton === null) {
+          if (isSameDay(new Date(date), startOfDay(new Date()))) {
+            dayNumberElement.classList.add('fc-today');
+          }
+
           dayNumberElement.classList.add('active-enabled');
           if (reservedDates.includes(formattedDate)) {
             dayNumberElement.classList.add('fc-reserved-number');
