@@ -571,14 +571,16 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
         선택한 시간에 수업을 오픈할까요?
       </Modal>
       <Modal
-        title="수업일 닫기"
+        title={user?.role === 'TRAINER' ? '수업일 닫기' : '수업 신청'}
         type="confirm"
         isOpen={isOpen('closeModal')}
         onClose={() => handleModal('OPEN', 'close')}
         onSave={() => handleModal('OPEN', 'save')}
         btnConfirm="저장"
       >
-        선택한 시간에 수업을 닫을까요?
+        {user?.role === 'TRAINER'
+          ? '선택한 시간에 수업을 닫을까요?'
+          : '선택한 시간에 수업을 신청할까요?'}
       </Modal>
       <Modal
         title="수업 취소"
@@ -591,14 +593,16 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
         선택한 시간에 수업을 취소할까요?
       </Modal>
       <Modal
-        title="수업 확정"
+        title={user?.role === 'TRAINER' ? '수업 확정' : '수업 신청 취소'}
         type="confirm"
         isOpen={isOpen('confirmModal')}
         onClose={() => handleModal('RESERVE_APPLIED', 'close')}
         onSave={() => handleModal('RESERVE_APPLIED', 'save')}
         btnConfirm="저장"
       >
-        선택한 시간에 수업을 확정할까요?
+        {user?.role === 'TRAINER'
+          ? '선택한 시간에 수업을 확정할까요?'
+          : '아직 확정되지 않은 수업입니다. 수업 신청을 취소할까요?'}
       </Modal>
       <Modal
         title="수업 거절"
