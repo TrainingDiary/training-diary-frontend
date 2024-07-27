@@ -189,10 +189,12 @@ const MonthlyContent: React.FC = () => {
       ) => {
         const merged = [...combinedReservedAndAppliedDates];
         newDates.forEach(newDate => {
-          const exists = merged.some(
+          const index = merged.findIndex(
             existingDate => existingDate.startDate === newDate.startDate
           );
-          if (!exists) {
+          if (index !== -1) {
+            merged[index] = newDate;
+          } else {
             merged.push(newDate);
           }
         });

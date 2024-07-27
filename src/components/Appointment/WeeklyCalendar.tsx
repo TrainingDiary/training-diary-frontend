@@ -122,7 +122,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   const onWheelScroll = (e: WheelEvent) => {
     if (calendarRef.current) {
       e.preventDefault();
-      calendarRef.current.scrollLeft += e.deltaY;
+      calendarRef.current.scrollLeft += e.deltaY + e.deltaX;
     }
   };
 

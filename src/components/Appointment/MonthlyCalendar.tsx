@@ -4,7 +4,14 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { DatesSetArg, DayHeaderContentArg } from '@fullcalendar/core';
-import { addMonths, format, isBefore, startOfMonth } from 'date-fns';
+import {
+  addMonths,
+  format,
+  isBefore,
+  isSameDay,
+  startOfDay,
+  startOfMonth,
+} from 'date-fns';
 
 import { hexToRgba } from 'src/utils/hexToRgba';
 import useCalendarStore from 'src/stores/calendarStore';
@@ -103,6 +110,10 @@ const FullCalendarWrapper = styled.div`
     color: ${({ theme }) => theme.colors.white};
   }
 
+  .fc-daygrid-day-number.fc-today {
+    border: 1px solid ${({ theme }) => theme.colors.main800};
+  }
+
   .fc-scrollgrid,
   table,
   td,
@@ -148,8 +159,15 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
     const formattedDate = format(info.date, 'yyyy-MM-dd');
 
     if (
-      selectedButton !== null &&
+      selectedButton === 'open' &&
       isBefore(new Date(formattedDate), new Date())
+    ) {
+      return;
+    }
+
+    if (
+      selectedButton === 'register' &&
+      isBefore(new Date(formattedDate), startOfDay(new Date()))
     ) {
       return;
     }
@@ -192,10 +210,15 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
           'active-enabled',
           'fc-reserved-number',
           'fc-has-event-number',
-          'fc-selected-number'
+          'fc-selected-number',
+          'fc-today'
         );
 
         if (selectedButton === null) {
+          if (isSameDay(new Date(date), startOfDay(new Date()))) {
+            dayNumberElement.classList.add('fc-today');
+          }
+
           dayNumberElement.classList.add('active-enabled');
           if (reservedDates.includes(formattedDate)) {
             dayNumberElement.classList.add('fc-reserved-number');
@@ -203,8 +226,15 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         }
 
         if (
-          selectedButton !== null &&
+          selectedButton === 'open' &&
           isBefore(new Date(formattedDate), new Date())
+        ) {
+          dayNumberElement.classList.add('fc-has-event-number');
+        }
+
+        if (
+          selectedButton === 'register' &&
+          isBefore(new Date(formattedDate), startOfDay(new Date()))
         ) {
           dayNumberElement.classList.add('fc-has-event-number');
         }

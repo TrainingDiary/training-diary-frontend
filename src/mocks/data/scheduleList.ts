@@ -1,25 +1,4 @@
-export type ScheduleStatus =
-  | 'PAST'
-  | 'EMPTY'
-  | 'OPEN'
-  | 'RESERVE_APPLIED'
-  | 'RESERVED';
-
-export interface ScheduleDetailType {
-  scheduleId: number;
-  startTime: string;
-  trainerId: number;
-  trainerName: string;
-  traineeId: number | null;
-  traineeName: string | null;
-  status: ScheduleStatus;
-}
-
-export interface ScheduleType {
-  startDate: string;
-  existReserved: boolean;
-  details: ScheduleDetailType[];
-}
+import { ScheduleType } from '@components/Appointment/ScheduleDetail';
 
 export const scheduleList: ScheduleType[] = [
   {
@@ -33,7 +12,7 @@ export const scheduleList: ScheduleType[] = [
         trainerName: '이근육',
         traineeId: null,
         traineeName: null,
-        status: 'OPEN',
+        scheduleStatus: 'OPEN',
       },
       {
         scheduleId: 13,
@@ -42,7 +21,7 @@ export const scheduleList: ScheduleType[] = [
         trainerName: '이근육',
         traineeId: 2,
         traineeName: '미나리',
-        status: 'RESERVED',
+        scheduleStatus: 'RESERVED',
       },
     ],
   },
@@ -57,7 +36,7 @@ export const scheduleList: ScheduleType[] = [
         trainerName: '이근육',
         traineeId: 2,
         traineeName: '미나리',
-        status: 'RESERVE_APPLIED',
+        scheduleStatus: 'RESERVE_APPLIED',
       },
     ],
   },
@@ -72,7 +51,7 @@ export const scheduleList: ScheduleType[] = [
         trainerName: '이근육',
         traineeId: 1,
         traineeName: '김열심',
-        status: 'RESERVED',
+        scheduleStatus: 'RESERVED',
       },
       {
         scheduleId: 16,
@@ -81,7 +60,7 @@ export const scheduleList: ScheduleType[] = [
         trainerName: '이근육',
         traineeId: 2,
         traineeName: '미나리',
-        status: 'RESERVED',
+        scheduleStatus: 'RESERVED',
       },
       {
         scheduleId: 17,
@@ -90,7 +69,7 @@ export const scheduleList: ScheduleType[] = [
         trainerName: '이근육',
         traineeId: null,
         traineeName: null,
-        status: 'OPEN',
+        scheduleStatus: 'OPEN',
       },
       {
         scheduleId: 18,
@@ -99,7 +78,7 @@ export const scheduleList: ScheduleType[] = [
         trainerName: '이근육',
         traineeId: 2,
         traineeName: '미나리',
-        status: 'RESERVE_APPLIED',
+        scheduleStatus: 'RESERVE_APPLIED',
       },
       {
         scheduleId: 19,
@@ -108,7 +87,7 @@ export const scheduleList: ScheduleType[] = [
         trainerName: '이근육',
         traineeId: 2,
         traineeName: '미나리',
-        status: 'RESERVED',
+        scheduleStatus: 'RESERVED',
       },
     ],
   },
