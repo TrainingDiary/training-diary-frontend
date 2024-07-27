@@ -6,7 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Modal from '@components/Common/Modal/Modal';
 import Alert from '@components/Common/Alert/Alert';
 import { DatePickerWrapper } from './Calendar';
-import { SessionDetailType } from 'src/mocks/data/workoutSessionList';
+import { SessionDetailType } from '@pages/Trainee/SessionDetail';
 import { WorkoutsType } from './AddSessionModal';
 
 const FormGroup = styled.div`
