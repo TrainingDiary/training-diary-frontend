@@ -7,6 +7,7 @@ import WeeklyCalendar from '@components/Appointment/WeeklyCalendar';
 import ScheduleDetail from '@components/Appointment/ScheduleDetail';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
 import useCalendarStore from 'src/stores/calendarStore';
+import useFetchUser from 'src/hooks/useFetchUser';
 
 const Wrapper = styled.div`
   display: flex;
@@ -15,6 +16,7 @@ const Wrapper = styled.div`
 `;
 
 const WeeklyContent: React.FC = () => {
+  useFetchUser();
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
   const { selectedDate, setSelectedDate } = useCalendarStore();

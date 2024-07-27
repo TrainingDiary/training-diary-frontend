@@ -287,7 +287,7 @@ interface ScheduleDetailProps {
 const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
   const { user } = useUserStore();
   const navigate = useNavigate();
-  const AppointmentApi = CreateAppointmentApi(navigate);
+  const appointmentApi = CreateAppointmentApi(navigate);
   const { openModal, closeModal, isOpen } = useModals();
   const [schedules, setSchedules] = useState<ScheduleType[]>([]);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -296,7 +296,7 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
 
   const fetchSchedules = async () => {
     const formattedDate = format(selectedDate, 'yyyy-MM-dd');
-    const response = await AppointmentApi.getSchedules(
+    const response = await appointmentApi.getSchedules(
       formattedDate,
       formattedDate
     );
@@ -440,23 +440,23 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
     if ($status === 'EMPTY' && selectedTime) {
       const startDate = format(selectedDate, 'yyyy-MM-dd');
       const startTimes = [selectedTime];
-      await AppointmentApi.openSchedules([{ startDate, startTimes }]);
+      await appointmentApi.openSchedules([{ startDate, startTimes }]);
     } else if ($status === 'OPEN' && selectedId) {
-      await AppointmentApi.closeSchedules([selectedId]);
+      await appointmentApi.closeSchedules([selectedId]);
     } else if ($status === 'RESERVE_APPLIED' && selectedId) {
-      await AppointmentApi.acceptSchedule(selectedId);
+      await appointmentApi.acceptSchedule(selectedId);
     } else if ($status === 'RESERVED' && selectedId) {
-      await AppointmentApi.cancelSchedule(selectedId);
+      await appointmentApi.cancelSchedule(selectedId);
     }
   };
 
   const handleTraineeActions = async ($status: ScheduleStatus) => {
     if ($status === 'OPEN' && selectedId) {
-      await AppointmentApi.applySchedule(selectedId);
+      await appointmentApi.applySchedule(selectedId);
     } else if ($status === 'RESERVE_APPLIED' && selectedId) {
-      await AppointmentApi.cancelSchedule(selectedId);
+      await appointmentApi.cancelSchedule(selectedId);
     } else if ($status === 'RESERVED' && selectedId) {
-      await AppointmentApi.cancelSchedule(selectedId);
+      await appointmentApi.cancelSchedule(selectedId);
     }
   };
 
@@ -491,7 +491,7 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
       case 'save':
         try {
           if (selectedId) {
-            await AppointmentApi.rejectSchedule(selectedId);
+            await appointmentApi.rejectSchedule(selectedId);
             refetch();
           }
         } catch (error: any) {

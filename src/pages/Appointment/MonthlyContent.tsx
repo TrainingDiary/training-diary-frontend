@@ -60,7 +60,7 @@ const MonthlyContent: React.FC = () => {
   const { setSelectedDate, startDate, endDate } = useCalendarStore();
   const { data, isLoading, refetch } = useFetchSchedules(startDate, endDate);
   const { openModal, closeModal, isOpen } = useModals();
-  const AppointmentApi = CreateAppointmentApi(navigate);
+  const appointmentApi = CreateAppointmentApi(navigate);
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
@@ -144,7 +144,7 @@ const MonthlyContent: React.FC = () => {
           [] as { startDate: string; startTimes: string[] }[]
         );
 
-        await AppointmentApi.openSchedules(dateTimes);
+        await appointmentApi.openSchedules(dateTimes);
         refetch({ force: true });
       } catch (error) {
         console.error('수업 일괄 오픈 에러: ', error);
@@ -164,7 +164,7 @@ const MonthlyContent: React.FC = () => {
           [] as { startDate: string; startTimes: string[] }[]
         );
 
-        await AppointmentApi.registerSchedules({
+        await appointmentApi.registerSchedules({
           traineeId: selectedTraineeId,
           dateTimes: dateTimes,
         });

@@ -23,7 +23,7 @@ interface FormState {
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const AuthApi = CreateAuthApi(navigate);
+  const authApi = CreateAuthApi(navigate);
   const { setUser } = useUserStore();
 
   const [isLoading, setLoading] = useState<boolean>(false);
@@ -66,7 +66,7 @@ const Login: React.FC = () => {
     try {
       setLoading(true);
 
-      const response = await AuthApi.login(email, password);
+      const response = await authApi.login(email, password);
       const user = {
         id: response.data.id,
         role: response.data.role,

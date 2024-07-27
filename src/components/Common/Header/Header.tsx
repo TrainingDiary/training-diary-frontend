@@ -59,7 +59,7 @@ const BackIcon = styled.div`
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const AuthApi = CreateAuthApi(navigate);
+  const authApi = CreateAuthApi(navigate);
   const { user, clearUser } = useUserStore();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
@@ -77,7 +77,7 @@ const Header: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await AuthApi.logout();
+      await authApi.logout();
       clearUser();
     } catch (error) {
       console.error('로그아웃 에러: ', error);
