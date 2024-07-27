@@ -104,6 +104,7 @@ const Session: React.FC = () => {
   const scrollLeftRef = useRef(0);
   const { openModal, closeModal, isOpen } = useModals();
   const [formState, setFormState] = useState<SessionDataType>({
+    traineeId: traineeId,
     sessionDate: new Date(),
     sessionNumber: 0,
     specialNote: '',
@@ -285,6 +286,7 @@ const Session: React.FC = () => {
         formState={formState}
         setFormState={setFormState}
         workoutTypes={workoutTypes}
+        traineeId={traineeId}
       />
     </SectionWrapper>
   );

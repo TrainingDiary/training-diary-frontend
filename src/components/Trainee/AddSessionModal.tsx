@@ -6,6 +6,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Modal from '@components/Common/Modal/Modal';
 import Alert from '@components/Common/Alert/Alert';
 import { DatePickerWrapper } from './Calendar';
+import { useNavigate } from 'react-router-dom';
+import CreateTraineeApi from 'src/api/trainee';
 
 const FormGroup = styled.div`
   display: flex;
@@ -144,6 +146,7 @@ export interface WorkoutsType {
 }
 
 export interface SessionDataType {
+  traineeId: string | undefined;
   sessionDate: Date | null;
   sessionNumber: number;
   specialNote: string;
@@ -151,6 +154,7 @@ export interface SessionDataType {
 }
 
 interface AddSessionModalProps {
+  traineeId: string | undefined;
   isOpen: boolean;
   onClose: () => void;
   onSave: (session: SessionDataType) => void;
@@ -174,8 +178,13 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
   formState,
   setFormState,
   workoutTypes,
+  traineeId,
 }) => {
+  const navigate = useNavigate();
+  const traineeApi = CreateTraineeApi(navigate);
+
   const initialFormState: SessionDataType = {
+    traineeId: traineeId,
     sessionDate: new Date() || null,
     sessionNumber: 0,
     specialNote: '',
