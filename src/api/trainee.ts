@@ -2,6 +2,7 @@ import { NavigateFunction } from 'react-router-dom';
 
 import { axiosInstance, createInterceptor } from './axiosInstance';
 import { AddInbodyData, TraineeInfoData } from '@pages/Trainee/Dashboard';
+import { SessionDataType } from '@components/Trainee/AddSessionModal';
 
 let isInterceptorCreated = false;
 
@@ -30,6 +31,9 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
           size,
         },
       }),
+
+    addSession: (sessionData: SessionDataType) =>
+      axiosInstance.post('workout-sessions', sessionData),
   };
 };
 

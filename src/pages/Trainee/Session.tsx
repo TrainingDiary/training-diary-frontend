@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useInfiniteQuery } from 'react-query';
 
 import addBtn from '@icons/home/addbtn.svg';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
@@ -107,7 +108,6 @@ const Session: React.FC = () => {
   const startXRef = useRef(0);
   const scrollLeftRef = useRef(0);
   const { openModal, closeModal, isOpen } = useModals();
-  const [images, setImages] = useState<ImageWithSession[]>([]);
   const [formState, setFormState] = useState<SessionDataType>({
     sessionDate: new Date(),
     sessionNumber: 0,
@@ -128,38 +128,29 @@ const Session: React.FC = () => {
     }[]
   >([]);
 
-  const [sessions, setSessions] = useState<SessionData[]>();
-
-  useEffect(() => {
-    const fetchSessions = async () => {
-      try {
-        const res = await traineeApi.getSessionsList(traineeId, 0, 20);
-        setSessions(res.data.content);
-        const sessionImages: ImageWithSession[] = res.data.content.flatMap(
-          (session: SessionData) =>
-            session.thumbnailUrls.map((url: string) => ({
-              src: url,
-              sessionId: session.sessionId,
-            }))
-        );
-        setImages(sessionImages);
-        console.log('운동 기록 조회 성공');
-      } catch (error) {
-        console.error('운동 기록 조회 실패: ', error);
-      }
-    };
-    fetchSessions();
-  }, []);
-
-  const loadMoreImages = () => {
-    // Add logic to load more images if your API supports pagination
+  const fetchSessions = async ({ pageParam = 0 }) => {
+    const res = await traineeApi.getSessionsList(traineeId, pageParam, 20);
+    return res.data;
   };
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
+    useInfiniteQuery('sessions', fetchSessions, {
+      getNextPageParam: (lastPage, allPages) => lastPage.nextPage ?? false,
+    });
+
+  const sessions = data?.pages.flatMap(page => page.content) ?? [];
+  const images = sessions.flatMap((session: SessionData) =>
+    session.thumbnailUrls.map((url: string) => ({
+      src: url,
+      sessionId: session.sessionId,
+    }))
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting) {
-          loadMoreImages();
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
         }
       },
       {
@@ -178,7 +169,7 @@ const Session: React.FC = () => {
         observer.unobserve(observerRef.current);
       }
     };
-  }, []);
+  }, [hasNextPage, fetchNextPage]);
 
   useEffect(() => {
     const container = imageContainerRef.current;
@@ -276,7 +267,7 @@ const Session: React.FC = () => {
         <RecordBox>
           <SectionTitle>운동 기록 목록</SectionTitle>
           <RecordList>
-            {sessions?.map((session, index) => (
+            {sessions.map((session, index) => (
               <Link to={`${session.sessionId}`} key={index}>
                 <RecordItem>
                   <div>{session.sessionDate}</div>
