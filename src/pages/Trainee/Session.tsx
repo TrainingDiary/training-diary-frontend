@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import addBtn from '@icons/home/addbtn.svg';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
@@ -11,6 +10,8 @@ import AddSessionModal, {
 } from '@components/Trainee/AddSessionModal';
 import useUserStore from 'src/stores/userStore';
 import useModals from 'src/hooks/useModals';
+import useFetchUser from 'src/hooks/useFetchUser';
+import CreateTraineeApi from 'src/api/trainee';
 
 const Wrapper = styled.div`
   display: flex;
@@ -81,10 +82,11 @@ const RecordItem = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray300};
 `;
 
-interface Session {
+interface SessionData {
+  sessionId: number;
   sessionDate: string;
   sessionNumber: number;
-  sessionId: number;
+  thumbnailUrls: string[];
 }
 
 interface ImageWithSession {
@@ -92,15 +94,12 @@ interface ImageWithSession {
   sessionId: number;
 }
 
-const sessions: Session[] = [
-  { sessionDate: '2024. 00. 00', sessionNumber: 3, sessionId: 3 },
-  { sessionDate: '2024. 00. 00', sessionNumber: 2, sessionId: 2 },
-  { sessionDate: '2024. 00. 00', sessionNumber: 1, sessionId: 1 },
-];
-
 const Session: React.FC = () => {
+  useFetchUser();
+  const navigate = useNavigate();
+  const traineeApi = CreateTraineeApi(navigate);
   const { user } = useUserStore();
-  const [images, setImages] = useState<ImageWithSession[]>([]);
+  const { traineeId } = useParams<{ traineeId: string }>();
   const observerRef = useRef<HTMLDivElement | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const touchStartXRef = useRef<number | null>(null);
@@ -108,6 +107,7 @@ const Session: React.FC = () => {
   const startXRef = useRef(0);
   const scrollLeftRef = useRef(0);
   const { openModal, closeModal, isOpen } = useModals();
+  const [images, setImages] = useState<ImageWithSession[]>([]);
   const [formState, setFormState] = useState<SessionDataType>({
     sessionDate: new Date(),
     sessionNumber: 0,
@@ -127,27 +127,35 @@ const Session: React.FC = () => {
       speedInputRequired: boolean;
     }[]
   >([]);
-  const navigate = useNavigate();
 
-  const getMoreImages = (count = 9) => {
-    const newImages = [];
-    for (let i = 0; i < count; i++) {
-      newImages.push({
-        src: `https://via.placeholder.com/200x250?text=Image${Math.floor(
-          Math.random() * 100
-        )}`,
-        sessionId: Math.floor(Math.random() * 3) + 1, // 임의로 세션 ID를 할당
-      });
-    }
-    return newImages;
-  };
+  const [sessions, setSessions] = useState<SessionData[]>();
+
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        const res = await traineeApi.getSessionsList(traineeId, 0, 20);
+        setSessions(res.data.content);
+        const sessionImages: ImageWithSession[] = res.data.content.flatMap(
+          (session: SessionData) =>
+            session.thumbnailUrls.map((url: string) => ({
+              src: url,
+              sessionId: session.sessionId,
+            }))
+        );
+        setImages(sessionImages);
+        console.log('운동 기록 조회 성공');
+      } catch (error) {
+        console.error('운동 기록 조회 실패: ', error);
+      }
+    };
+    fetchSessions();
+  }, []);
 
   const loadMoreImages = () => {
-    setImages(prevImages => [...prevImages, ...getMoreImages()]);
+    // Add logic to load more images if your API supports pagination
   };
 
   useEffect(() => {
-    setImages(getMoreImages(20));
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting) {
@@ -239,25 +247,13 @@ const Session: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const fetchWorkoutTypes = async () => {
-      try {
-        const response = await axios.get('/api/workout-types');
-        setWorkoutTypes(response.data);
-      } catch (error) {
-        console.error('Failed to fetch workout types', error);
-      }
-    };
-    fetchWorkoutTypes();
-  }, []);
-
   const handleSaveSession = (session: SessionDataType) => {
     console.log(session);
     // Handle the save logic
   };
 
   const handleImageClick = (sessionId: number) => {
-    navigate(`/trainee/1/session/${sessionId}`); // traineeID
+    navigate(`/trainee/${traineeId}/session/${sessionId}`); // traineeID
   };
 
   return (
@@ -280,7 +276,7 @@ const Session: React.FC = () => {
         <RecordBox>
           <SectionTitle>운동 기록 목록</SectionTitle>
           <RecordList>
-            {sessions.map((session, index) => (
+            {sessions?.map((session, index) => (
               <Link to={`${session.sessionId}`} key={index}>
                 <RecordItem>
                   <div>{session.sessionDate}</div>
