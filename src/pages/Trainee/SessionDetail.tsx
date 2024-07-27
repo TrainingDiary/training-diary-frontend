@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 
 import { SectionWrapper } from '@components/Common/SectionWrapper';
 import Modal from '@components/Common/Modal/Modal';
@@ -11,10 +10,10 @@ import VideoUploadModal from '@components/Trainee/VideoUploadModal';
 import EditSessionModal from '@components/Trainee/EditSessionModal';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import useModals from 'src/hooks/useModals';
-import {
-  sessionDetails,
-  SessionDetailType,
-} from 'src/mocks/data/workoutSessionList';
+import { sessionDetails } from 'src/mocks/data/workoutSessionList';
+import CreateTraineeApi from 'src/api/trainee';
+import CreateTrainerApi from 'src/api/trainer';
+import useFetchUser from 'src/hooks/useFetchUser';
 
 const DetailWrapper = styled.div`
   display: flex;
@@ -171,15 +170,41 @@ const VideoContainer = styled(ScrollContainer)`
   }
 `;
 
+export interface Workout {
+  workoutId: number;
+  workoutTypeName: string;
+  targetMuscle: string;
+  remarks: string;
+  weight: number;
+  rep: number;
+  sets: number;
+  time: number;
+  speed: number;
+}
+
+export interface SessionDetailType {
+  sessionId: number;
+  sessionDate: string;
+  sessionNumber: number;
+  specialNote: string;
+  workouts: Workout[];
+  photoUrls: string[];
+  videoUrls: string[];
+}
+
 const SessionDetail: React.FC = () => {
+  useFetchUser();
+  const navigate = useNavigate();
+  const traineeApi = CreateTraineeApi(navigate);
+  const trainerApi = CreateTrainerApi(navigate);
   const { traineeId, sessionId } = useParams<{
     traineeId: string;
     sessionId: string;
   }>();
+  const { openModal, closeModal, isOpen } = useModals();
   const [sessionData, setSessionData] = useState<SessionDetailType | null>(
     null
   );
-  const { openModal, closeModal, isOpen } = useModals();
   const [workoutTypes, setWorkoutTypes] = useState<
     {
       id: number;
@@ -193,7 +218,6 @@ const SessionDetail: React.FC = () => {
     }[]
   >([]);
   const [formState, setFormState] = useState<SessionDetailType | null>(null);
-  const navigate = useNavigate();
 
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -202,10 +226,11 @@ const SessionDetail: React.FC = () => {
     // Fetch workout types
     const fetchWorkoutTypes = async () => {
       try {
-        const response = await axios.get('/api/workout-types');
-        setWorkoutTypes(response.data);
+        const res = await trainerApi.getWorkouts();
+        setWorkoutTypes(res.data.content);
+        console.log(res.data.content);
       } catch (error) {
-        console.error('Failed to fetch workout types', error);
+        console.error('운동 종류 가져오기 실패 : ', error);
       }
     };
     fetchWorkoutTypes();
@@ -215,6 +240,8 @@ const SessionDetail: React.FC = () => {
       setSessionData(sessionDetails[+sessionId - 1]);
     }
   }, [traineeId, sessionId]);
+
+  console.log(traineeApi);
 
   const handleHorizontalScroll = (container: HTMLDivElement | null) => {
     if (!container) return;

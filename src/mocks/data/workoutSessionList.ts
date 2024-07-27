@@ -1,25 +1,6 @@
 // 타입 정의
-export interface Workout {
-  workoutId: number;
-  workoutTypeName: string;
-  targetMuscle: string;
-  remarks: string;
-  weight: number;
-  rep: number;
-  sets: number;
-  time: number;
-  speed: number;
-}
 
-export interface SessionDetailType {
-  sessionId: number;
-  sessionDate: string;
-  sessionNumber: number;
-  specialNote: string;
-  workouts: Workout[];
-  photoUrls: string[];
-  videoUrls: string[];
-}
+import { SessionDetailType } from '@pages/Trainee/SessionDetail';
 
 // 샘플 데이터
 export const sessionDetails: SessionDetailType[] = [
