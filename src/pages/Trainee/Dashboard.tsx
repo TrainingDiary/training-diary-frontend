@@ -453,7 +453,11 @@ const Dashboard: React.FC = () => {
     } else if (traineeInfo?.gender === '') {
       setErrorAlert('성별을 입력해주세요');
       return;
-    } else if (traineeInfo?.height === null || traineeInfo?.height <= 0) {
+    } else if (
+      traineeInfo?.height === null ||
+      traineeInfo?.height === undefined ||
+      traineeInfo?.height <= 0
+    ) {
       setErrorAlert('키를 입력해주세요');
       return;
     } else if (traineeInfo?.targetType === null) {
@@ -461,6 +465,7 @@ const Dashboard: React.FC = () => {
       return;
     } else if (
       traineeInfo?.targetValue === null ||
+      traineeInfo?.targetValue === undefined ||
       traineeInfo?.targetValue <= 0
     ) {
       setErrorAlert('목표 수치를 입력해주세요');
