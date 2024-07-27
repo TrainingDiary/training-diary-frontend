@@ -126,7 +126,7 @@ const Input = styled.input<{ $unit?: string; $editMode?: boolean }>`
     $editMode ? theme.colors.gray900 : theme.colors.gray600};
   width: 100%;
   max-width: 220px;
-  text-align: right;
+  text-align: ${({ $editMode }) => ($editMode ? 'left' : 'right')};
   outline: none;
   transition: border-color 0.3s;
   cursor: ${({ $editMode }) => ($editMode ? 'auto' : 'not-allowed')};
@@ -167,7 +167,7 @@ const TextArea = styled.textarea<{ $unit?: string; $editMode?: boolean }>`
     $editMode ? theme.colors.gray900 : theme.colors.gray600};
   width: 100%;
   max-width: 220px;
-  text-align: right;
+  text-align: ${({ $editMode }) => ($editMode ? 'left' : 'right')};
   outline: none;
   transition: border-color 0.3s;
   cursor: ${({ $editMode }) => ($editMode ? 'auto' : 'not-allowed')};
@@ -257,7 +257,7 @@ const Dashboard: React.FC = () => {
   const { user } = useUserStore();
   const { openModal, closeModal, isOpen } = useModals();
   const [editInfo, setEditInfo] = useState(true);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // 초기값 null로 수정
   const [errorAlert, setErrorAlert] = useState<string>('');
   const [inbodyData, setInbodyData] = useState<AddInbodyData>({
     traineeId: traineeId,
@@ -274,8 +274,13 @@ const Dashboard: React.FC = () => {
       try {
         const res = await traineeApi.getTraineeInfo(traineeId);
         setTraineeInfo(res.data);
-      } catch (error) {
-        console.error('트레이니 정보 조회 에러:', error);
+        setSelectedDate(new Date(res.data.birthDate)); // 생년월일 설정
+      } catch (error: any) {
+        if (error.response && error.response.status === 403) {
+          console.error('접근 권한이 없습니다.');
+        } else {
+          console.error('트레이니 정보 조회 에러:', error);
+        }
       }
     }
   };
@@ -320,12 +325,21 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     if (traineeInfo) {
-      const targetTypeLabel =
-        traineeInfo.targetType === 'TARGET_WEIGHT'
-          ? '몸무게'
-          : traineeInfo.targetType === 'TARGET_BODY_FAT_PERCENTAGE'
-            ? '체지방률'
-            : '근골격량';
+      let targetTypeLabel;
+
+      switch (traineeInfo.targetType) {
+        case 'TARGET_WEIGHT':
+          targetTypeLabel = '몸무게';
+          break;
+        case 'TARGET_BODY_FAT_PERCENTAGE':
+          targetTypeLabel = '체지방률';
+          break;
+        case 'TARGET_SKELETAL_MUSCLE_MASS':
+          targetTypeLabel = '근골격량';
+          break;
+        default:
+          targetTypeLabel = '';
+      }
 
       setChartData({
         labels: traineeInfo.weightHistory.map(
@@ -378,21 +392,21 @@ const Dashboard: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setTraineeInfo(prevInfo =>
-      prevInfo ? { ...prevInfo, [name]: value } : null
+      prevInfo ? { ...prevInfo, [name]: value === '' ? null : value } : null
     );
   };
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setTraineeInfo(prevInfo =>
-      prevInfo ? { ...prevInfo, [name]: value } : null
+      prevInfo ? { ...prevInfo, [name]: value === '' ? null : value } : null
     );
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setTraineeInfo(prevInfo =>
-      prevInfo ? { ...prevInfo, [name]: value } : null
+      prevInfo ? { ...prevInfo, [name]: value === '' ? null : value } : null
     );
   };
 
@@ -439,13 +453,21 @@ const Dashboard: React.FC = () => {
     } else if (traineeInfo?.gender === '') {
       setErrorAlert('성별을 입력해주세요');
       return;
-    } else if (traineeInfo?.height === null) {
+    } else if (
+      traineeInfo?.height === null ||
+      traineeInfo?.height === undefined ||
+      traineeInfo?.height <= 0
+    ) {
       setErrorAlert('키를 입력해주세요');
       return;
     } else if (traineeInfo?.targetType === null) {
       setErrorAlert('목표 타입을 선택해주세요');
       return;
-    } else if (traineeInfo?.targetValue === null) {
+    } else if (
+      traineeInfo?.targetValue === null ||
+      traineeInfo?.targetValue === undefined ||
+      traineeInfo?.targetValue <= 0
+    ) {
       setErrorAlert('목표 수치를 입력해주세요');
       return;
     } else if (traineeInfo?.targetReward === '') {
@@ -473,21 +495,30 @@ const Dashboard: React.FC = () => {
               weightHistory: [
                 ...prevInfo.weightHistory,
                 {
-                  addedDate: format(new Date(), 'yyyy-MM-dd'),
+                  addedDate: format(
+                    new Date(inbodyData.addedDate),
+                    'yyyy-MM-dd'
+                  ), // 지정한 날짜로 설정
                   weight: inbodyData.weight,
                 },
               ],
               bodyFatHistory: [
                 ...prevInfo.bodyFatHistory,
                 {
-                  addedDate: format(new Date(), 'yyyy-MM-dd'),
+                  addedDate: format(
+                    new Date(inbodyData.addedDate),
+                    'yyyy-MM-dd'
+                  ), // 지정한 날짜로 설정
                   bodyFatPercentage: inbodyData.bodyFatPercentage,
                 },
               ],
               muscleMassHistory: [
                 ...prevInfo.muscleMassHistory,
                 {
-                  addedDate: format(new Date(), 'yyyy-MM-dd'),
+                  addedDate: format(
+                    new Date(inbodyData.addedDate),
+                    'yyyy-MM-dd'
+                  ), // 지정한 날짜로 설정
                   muscleMass: inbodyData.skeletalMuscleMass,
                 },
               ],
@@ -511,7 +542,7 @@ const Dashboard: React.FC = () => {
       return setErrorAlert('근골격량을 입력해주세요');
     }
 
-    const formattedDate = format(new Date(), 'MM.dd');
+    const formattedDate = format(new Date(inbodyData.addedDate), 'MM.dd'); // 수정
     setChartData(prevData => ({
       ...prevData,
       labels: [...prevData.labels, formattedDate],
@@ -572,8 +603,20 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  if (!traineeInfo) {
-    return <div>Loading...</div>;
+  if (!traineeInfo || traineeInfo === undefined) {
+    return (
+      <div
+        style={{
+          fontSize: '1.4rem',
+          display: 'flex',
+          justifyContent: 'center',
+          height: '50vh',
+          alignItems: 'center',
+        }}
+      >
+        Loading...
+      </div>
+    );
   }
 
   return (

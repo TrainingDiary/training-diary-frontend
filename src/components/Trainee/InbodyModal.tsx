@@ -37,7 +37,7 @@ const Input = styled.input<{ $unit?: string }>`
   color: ${({ theme }) => theme.colors.gray900};
   width: 100%;
   max-width: 220px;
-  text-align: right;
+  text-align: left;
   outline: none;
   ${({ $unit }) =>
     $unit &&

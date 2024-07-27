@@ -277,7 +277,7 @@ const TraineeManagement: React.FC = () => {
                     alignItems: 'center',
                   }}
                 >
-                  트레이너를 등록해주세요.
+                  트레이니를 등록해주세요.
                 </li>
               )}
             </TraineeList>
