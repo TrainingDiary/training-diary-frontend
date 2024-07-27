@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { format, parse } from 'date-fns';
@@ -17,12 +17,10 @@ const Wrapper = styled.div`
 const WeeklyContent: React.FC = () => {
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
-  const { setSelectedDate } = useCalendarStore();
-  const initialDate = date ? parse(date, 'yyyy-MM-dd', new Date()) : new Date();
-  const [currentDate, setCurrentDate] = useState<Date>(initialDate);
+  const { selectedDate, setSelectedDate } = useCalendarStore();
 
   const onDateChange = (date: Date) => {
-    setCurrentDate(date);
+    setSelectedDate(date);
 
     const formattedDate = format(date, 'yyyy-MM-dd');
     navigate(`/appointment/weekly/${formattedDate}`, { replace: true });
@@ -39,10 +37,10 @@ const WeeklyContent: React.FC = () => {
     <SectionWrapper>
       <Wrapper>
         <WeeklyCalendar
-          selectedDate={currentDate}
+          selectedDate={selectedDate}
           onDateChange={onDateChange}
         />
-        <ScheduleDetail selectedDate={currentDate} />
+        <ScheduleDetail selectedDate={selectedDate} />
       </Wrapper>
     </SectionWrapper>
   );

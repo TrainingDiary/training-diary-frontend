@@ -166,7 +166,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
         calendar.removeEventListener('mouseleave', onMouseUp);
       };
     }
-  }, []);
+  }, [selectedDate]);
 
   return (
     <CalendarWrapper ref={calendarRef} onScroll={onInfiniteScroll}>

@@ -57,7 +57,7 @@ const MonthlyContent: React.FC = () => {
   useFetchUser();
   const navigate = useNavigate();
   const { user } = useUserStore();
-  const { startDate, endDate } = useCalendarStore();
+  const { setSelectedDate, startDate, endDate } = useCalendarStore();
   const { data, isLoading, refetch } = useFetchSchedules(startDate, endDate);
   const { openModal, closeModal, isOpen } = useModals();
   const AppointmentApi = CreateAppointmentApi(navigate);
@@ -84,6 +84,7 @@ const MonthlyContent: React.FC = () => {
   };
 
   const onDateClick = (date: Date) => {
+    setSelectedDate(date);
     const formattedDate = format(date, 'yyyy-MM-dd');
 
     if (!selectedButton) {
