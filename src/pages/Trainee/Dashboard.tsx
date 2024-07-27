@@ -235,7 +235,7 @@ export interface TraineeInfoData {
   name: string;
   age: number;
   gender: string; // gender는 MALE 또는 FEMALE만 허용
-  height: number | null;
+  height: number;
   birthDate: string;
   remainingSession: number;
   weightHistory: WeightHistory[];
@@ -245,7 +245,7 @@ export interface TraineeInfoData {
     | 'TARGET_WEIGHT'
     | 'TARGET_BODY_FAT_PERCENTAGE'
     | 'TARGET_SKELETAL_MUSCLE_MASS'; // targetType은 정의된 타입만 허용
-  targetValue: number | null;
+  targetValue: number;
   targetReward: string;
 }
 
@@ -257,7 +257,7 @@ const Dashboard: React.FC = () => {
   const { user } = useUserStore();
   const { openModal, closeModal, isOpen } = useModals();
   const [editInfo, setEditInfo] = useState(true);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // 초기값 null로 수정
   const [errorAlert, setErrorAlert] = useState<string>('');
   const [inbodyData, setInbodyData] = useState<AddInbodyData>({
     traineeId: traineeId,
@@ -274,8 +274,13 @@ const Dashboard: React.FC = () => {
       try {
         const res = await traineeApi.getTraineeInfo(traineeId);
         setTraineeInfo(res.data);
-      } catch (error) {
-        console.error('트레이니 정보 조회 에러:', error);
+        setSelectedDate(new Date(res.data.birthDate)); // 생년월일 설정
+      } catch (error: any) {
+        if (error.response && error.response.status === 403) {
+          console.error('접근 권한이 없습니다.');
+        } else {
+          console.error('트레이니 정보 조회 에러:', error);
+        }
       }
     }
   };
@@ -372,7 +377,7 @@ const Dashboard: React.FC = () => {
           {
             label: `목표수치(${targetTypeLabel})`,
             data: Array(traineeInfo.weightHistory.length).fill(
-              traineeInfo.targetValue ?? 0
+              traineeInfo.targetValue
             ),
             borderColor: '#89DAC1',
             pointBackgroundColor: '#89DAC1',
@@ -387,21 +392,21 @@ const Dashboard: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setTraineeInfo(prevInfo =>
-      prevInfo ? { ...prevInfo, [name]: value || null } : null
+      prevInfo ? { ...prevInfo, [name]: value === '' ? null : value } : null
     );
   };
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setTraineeInfo(prevInfo =>
-      prevInfo ? { ...prevInfo, [name]: value || null } : null
+      prevInfo ? { ...prevInfo, [name]: value === '' ? null : value } : null
     );
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setTraineeInfo(prevInfo =>
-      prevInfo ? { ...prevInfo, [name]: value || null } : null
+      prevInfo ? { ...prevInfo, [name]: value === '' ? null : value } : null
     );
   };
 
@@ -488,7 +493,7 @@ const Dashboard: React.FC = () => {
                   addedDate: format(
                     new Date(inbodyData.addedDate),
                     'yyyy-MM-dd'
-                  ),
+                  ), // 지정한 날짜로 설정
                   weight: inbodyData.weight,
                 },
               ],
@@ -498,7 +503,7 @@ const Dashboard: React.FC = () => {
                   addedDate: format(
                     new Date(inbodyData.addedDate),
                     'yyyy-MM-dd'
-                  ),
+                  ), // 지정한 날짜로 설정
                   bodyFatPercentage: inbodyData.bodyFatPercentage,
                 },
               ],
@@ -508,7 +513,7 @@ const Dashboard: React.FC = () => {
                   addedDate: format(
                     new Date(inbodyData.addedDate),
                     'yyyy-MM-dd'
-                  ),
+                  ), // 지정한 날짜로 설정
                   muscleMass: inbodyData.skeletalMuscleMass,
                 },
               ],
@@ -532,7 +537,7 @@ const Dashboard: React.FC = () => {
       return setErrorAlert('근골격량을 입력해주세요');
     }
 
-    const formattedDate = format(new Date(inbodyData.addedDate), 'MM.dd');
+    const formattedDate = format(new Date(inbodyData.addedDate), 'MM.dd'); // 수정
     setChartData(prevData => ({
       ...prevData,
       labels: [...prevData.labels, formattedDate],
@@ -558,7 +563,7 @@ const Dashboard: React.FC = () => {
         if (dataset.label.startsWith('목표수치')) {
           return {
             ...dataset,
-            data: [...dataset.data, traineeInfo?.targetValue ?? 0],
+            data: [...dataset.data, traineeInfo!.targetValue],
           };
         }
         return dataset;
@@ -593,8 +598,20 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  if (!traineeInfo) {
-    return <div>Loading...</div>;
+  if (!traineeInfo || traineeInfo === undefined) {
+    return (
+      <div
+        style={{
+          fontSize: '1.4rem',
+          display: 'flex',
+          justifyContent: 'center',
+          height: '50vh',
+          alignItems: 'center',
+        }}
+      >
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -690,7 +707,7 @@ const Dashboard: React.FC = () => {
                 name="height"
                 value={
                   editInfo
-                    ? `${traineeInfo.height ?? 0} cm`
+                    ? `${traineeInfo.height} cm`
                     : traineeInfo.height || 0
                 }
                 readOnly={editInfo}
@@ -733,8 +750,8 @@ const Dashboard: React.FC = () => {
                 name="targetValue"
                 value={
                   editInfo
-                    ? `${traineeInfo.targetValue ?? 0} ${getUnit(traineeInfo.targetType || '')}`
-                    : `${traineeInfo.targetValue ?? 0}`
+                    ? `${traineeInfo.targetValue} ${getUnit(traineeInfo.targetType || '')}`
+                    : `${traineeInfo.targetValue}`
                 }
                 readOnly={editInfo}
                 onChange={handleInputChange}
