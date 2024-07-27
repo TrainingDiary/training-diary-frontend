@@ -45,6 +45,12 @@ const CreateAppointmentApi = (navigate: NavigateFunction) => {
       }
     },
 
+    acceptSchedule: (scheduleId: number) =>
+      axiosInstance.post('/schedules/trainers/accept', { scheduleId }),
+
+    rejectSchedule: (scheduleId: number) =>
+      axiosInstance.post('/schedules/trainers/reject', { scheduleId }),
+
     getSchedules: (startDate: string, endDate: string) => {
       if (user?.role === 'TRAINER') {
         return axiosInstance.get('/schedules/trainers', {

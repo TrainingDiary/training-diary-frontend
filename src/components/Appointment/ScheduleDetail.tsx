@@ -439,6 +439,10 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
       await AppointmentApi.openSchedules([{ startDate, startTimes }]);
     } else if ($status === 'OPEN' && selectedId) {
       await AppointmentApi.closeSchedules([selectedId]);
+    } else if ($status === 'RESERVE_APPLIED' && selectedId) {
+      await AppointmentApi.acceptSchedule(selectedId);
+    } else if ($status === 'RESERVED' && selectedId) {
+      await AppointmentApi.cancelSchedule(selectedId);
     }
   };
 
@@ -446,6 +450,8 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
     if ($status === 'OPEN' && selectedId) {
       await AppointmentApi.applySchedule(selectedId);
     } else if ($status === 'RESERVE_APPLIED' && selectedId) {
+      await AppointmentApi.cancelSchedule(selectedId);
+    } else if ($status === 'RESERVED' && selectedId) {
       await AppointmentApi.cancelSchedule(selectedId);
     }
   };
@@ -457,8 +463,39 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
       } else if (error.response?.status === 406) {
         setErrorAlert('남은 PT 횟수가 부족합니다.');
       }
+    } else if ($status === 'RESERVED' && user?.role === 'TRAINEE') {
+      if (error.response?.status === 400) {
+        setErrorAlert('24시간 내 시작하는 수업은 취소할 수 없습니다.');
+      }
     } else {
       console.error('일정 관련 버튼 에러: ', error);
+    }
+  };
+
+  const handleRejectModal = async (
+    action: 'open' | 'close' | 'save',
+    id?: number
+  ) => {
+    switch (action) {
+      case 'open':
+        setSelectedId(id || null);
+        openModal('rejectModal');
+        break;
+      case 'close':
+        closeModal('rejectModal');
+        break;
+      case 'save':
+        try {
+          if (selectedId) {
+            await AppointmentApi.rejectSchedule(selectedId);
+            refetch();
+          }
+        } catch (error: any) {
+          console.error('일정 관련 버튼 에러: ', error);
+        } finally {
+          closeModal('rejectModal');
+        }
+        break;
     }
   };
 
@@ -502,7 +539,9 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
                         user?.role === 'TRAINER' && (
                           <RejectButton
                             $status={$status}
-                            onClick={() => openModal('rejectModal')}
+                            onClick={() =>
+                              handleRejectModal('open', scheduleId)
+                            }
                           >
                             거절
                           </RejectButton>
@@ -561,8 +600,8 @@ const ScheduleDetail: React.FC<ScheduleDetailProps> = ({ selectedDate }) => {
         title="수업 거절"
         type="confirm"
         isOpen={isOpen('rejectModal')}
-        onClose={() => closeModal('rejectModal')}
-        onSave={() => closeModal('rejectModal')}
+        onClose={() => handleRejectModal('close')}
+        onSave={() => handleRejectModal('save')}
         btnConfirm="저장"
       >
         선택한 시간에 수업을 거절할까요?
