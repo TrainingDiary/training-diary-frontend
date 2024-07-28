@@ -42,6 +42,11 @@ export const sessionDetails: SessionDetailType[] = [
       'https://example.com/video1.mp4',
       'https://example.com/video2.mp4',
     ],
+    thumbnailUrls: [
+      'https://dummyjson.com/image/360x300/282828',
+      'https://dummyjson.com/image/330x330/282828',
+      'https://dummyjson.com/image/300x250/282828',
+    ],
   },
   {
     sessionId: 2,
@@ -63,6 +68,11 @@ export const sessionDetails: SessionDetailType[] = [
     ],
     photoUrls: ['https://example.com/photo2.jpg'],
     videoUrls: ['https://example.com/video2.mp4'],
+    thumbnailUrls: [
+      'https://dummyjson.com/image/360x300/282828',
+      'https://dummyjson.com/image/330x330/282828',
+      'https://dummyjson.com/image/300x250/282828',
+    ],
   },
   {
     sessionId: 3,
@@ -84,5 +94,10 @@ export const sessionDetails: SessionDetailType[] = [
     ],
     photoUrls: ['https://example.com/photo3.jpg'],
     videoUrls: ['https://example.com/video3.mp4'],
+    thumbnailUrls: [
+      'https://dummyjson.com/image/360x300/282828',
+      'https://dummyjson.com/image/330x330/282828',
+      'https://dummyjson.com/image/300x250/282828',
+    ],
   },
 ];
