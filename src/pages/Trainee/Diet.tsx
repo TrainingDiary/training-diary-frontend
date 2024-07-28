@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import { useInfiniteQuery } from 'react-query';
 
 import addBtn from '@icons/home/addbtn.svg';
 import { AddButton } from '@components/Common/AddButton';
@@ -14,7 +14,7 @@ import CreateTraineeApi from 'src/api/trainee';
 import useUserStore from 'src/stores/userStore';
 
 const Wrapper = styled.div`
-  height: calc(100vh - 150px);
+  height: calc(100dvh - 150px);
   overflow: auto;
 `;
 
@@ -37,17 +37,19 @@ const Image = styled.img`
   object-fit: cover;
 `;
 
-// pixabay에서 제공하는 150px 크기의 무료 이미지 링크 (추후 API 연동시 삭제)
-const getMoreImages = (count = 9) => {
-  const images = [];
-  for (let i = 0; i < count; i++) {
-    images.push(
-      `https://via.placeholder.com/150?text=Image${Math.floor(Math.random() * 100)}`
-    );
-  }
+interface Diet {
+  dietId: number;
+  thumbnailUrl: string;
+}
 
-  return images;
-};
+interface DietResponse {
+  content: Diet[];
+  pageable: {
+    pageNumber: number;
+  };
+  totalPages: number;
+  last: boolean;
+}
 
 const Diet: React.FC = () => {
   useFetchUser();
@@ -56,21 +58,40 @@ const Diet: React.FC = () => {
   const traineeApi = CreateTraineeApi(navigate);
   const { traineeId } = useParams<{ traineeId: string }>();
   const { openModal, closeModal, isOpen } = useModals();
-  const [images, setImages] = useState<string[]>([]);
+  const observerRef = useRef<IntersectionObserver | null>(null);
   const [formData, setFormData] = useState<{
     photo: FileList | null;
     content: string;
   }>({ photo: null, content: '' });
   const [preview, setPreview] = useState<string | null>(null);
-  const [isLoading, setLoading] = useState<boolean>(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [errorAlert, setErrorAlert] = useState<string>('');
 
-  const fetchMoreImages = async () => {
-    if (isLoading) return;
-    setLoading(true);
+  const fetchDiets = async ({ pageParam = 0 }): Promise<DietResponse> => {
+    const response = await traineeApi.getDiets(
+      parseInt(traineeId!),
+      pageParam,
+      3
+    );
+    return response.data;
+  };
 
-    setImages(prevImages => [...prevImages, ...getMoreImages()]);
-    setLoading(false);
+  const { data, fetchNextPage, hasNextPage, refetch } =
+    useInfiniteQuery<DietResponse>('diets', fetchDiets, {
+      getNextPageParam: lastPage =>
+        lastPage.last ? null : lastPage.pageable.pageNumber + 1,
+    });
+
+  const diets = data?.pages.flatMap(page => page.content) || [];
+
+  const loadMoreRef = (node: HTMLElement | null) => {
+    if (observerRef.current) observerRef.current.disconnect();
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage();
+      }
+    });
+    if (node) observerRef.current.observe(node);
   };
 
   const onClickDiet = (dietId: number) => {
@@ -95,34 +116,32 @@ const Diet: React.FC = () => {
     const photo = formData.photo[0];
 
     try {
+      setIsUploading(true);
       await traineeApi.addDiet(photo, formData.content);
+      refetch();
       closeModal('addModal');
     } catch (error) {
       console.error('식단 추가 에러: ', error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const onCloseErrorAlert = () => setErrorAlert('');
 
-  useEffect(() => setImages(getMoreImages(24)), []);
-
   return (
-    <Wrapper id="scrollDiv">
-      <InfiniteScroll
-        dataLength={images.length}
-        next={fetchMoreImages}
-        hasMore={true}
-        loader={<h4>Loading...</h4>}
-        scrollableTarget="scrollDiv"
-      >
-        <Gallery>
-          {images.map((src, index) => (
-            <ImageWrapper key={index} onClick={() => onClickDiet(index)}>
-              <Image src={src} alt={`image ${index}`} loading="lazy" />
-            </ImageWrapper>
-          ))}
-        </Gallery>
-      </InfiniteScroll>
+    <Wrapper>
+      <Gallery>
+        {diets.map((diet, index) => (
+          <ImageWrapper
+            key={diet.dietId}
+            onClick={() => onClickDiet(diet.dietId)}
+            ref={diets.length === index + 1 ? loadMoreRef : null}
+          >
+            <Image src={diet.thumbnailUrl} alt={`diet image`} loading="lazy" />
+          </ImageWrapper>
+        ))}
+      </Gallery>
       {user?.role === 'TRAINEE' && (
         <React.Fragment>
           <AddButton onClick={onClickAddButton}>
@@ -134,7 +153,7 @@ const Diet: React.FC = () => {
             isOpen={isOpen('addModal')}
             onClose={() => closeModal('addModal')}
             onSave={() => onSaveAddModal()}
-            btnConfirm="등록"
+            btnConfirm={isUploading ? '등록 중...' : '등록'}
           >
             <DietUploadModal
               formData={formData}
