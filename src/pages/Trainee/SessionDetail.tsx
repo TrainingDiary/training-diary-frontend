@@ -235,7 +235,7 @@ const SessionDetail: React.FC = () => {
     };
     fetchWorkoutTypes();
 
-    // Fetch session data
+    //TODO: data를 불러오는 api 연동 현재 더미데이터 가져오는 중
     if (sessionId !== undefined) {
       setSessionData(sessionDetails[+sessionId - 1]);
     }
