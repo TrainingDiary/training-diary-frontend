@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from 'react-query';
 
 import threeDots from '@icons/diet/threeDots.svg';
 import commentAvatar from '@icons/diet/commentAvatar.svg';
@@ -10,7 +11,11 @@ import { SectionWrapper } from '@components/Common/SectionWrapper';
 import Modal from '@components/Common/Modal/Modal';
 import Alert from '@components/Common/Alert/Alert';
 import { hexToRgba } from 'src/utils/hexToRgba';
+import formatDate from 'src/utils/formatDate';
 import useModals from 'src/hooks/useModals';
+import useFetchUser from 'src/hooks/useFetchUser';
+import CreateTraineeApi from 'src/api/trainee';
+import useUserStore from 'src/stores/userStore';
 
 const Wrapper = styled.div`
   display: flex;
@@ -210,9 +215,29 @@ const SendCommentButton = styled.div<{
   }
 `;
 
+interface Comment {
+  id: number;
+  comment: string;
+  createdDate: string;
+}
+
+interface DietDetailData {
+  id: number;
+  imageUrl: string;
+  content: string;
+  comments: Comment[];
+  createdDate: string;
+}
+
 const DietDetail: React.FC = () => {
+  useFetchUser();
+  const { user } = useUserStore();
   const navigate = useNavigate();
-  const { traineeId } = useParams<{ traineeId: string }>();
+  const traineeApi = CreateTraineeApi(navigate);
+  const { traineeId, dietId } = useParams<{
+    traineeId: string;
+    dietId: string;
+  }>();
   const { openModal, closeModal, isOpen } = useModals();
   const [postMenuVisible, setPostMenuVisible] = useState<boolean>(false);
   const [commentMenuVisible, setCommentMenuVisible] = useState<boolean>(false);
@@ -220,6 +245,16 @@ const DietDetail: React.FC = () => {
   const [commentText, setCommentText] = useState<string>('');
   const [newComment, setNewComment] = useState<string>('');
   const [errorAlert, setErrorAlert] = useState<string>('');
+
+  const fetchDietDetail = async (): Promise<DietDetailData> => {
+    const response = await traineeApi.getDietDetail(parseInt(dietId!));
+    return response.data;
+  };
+
+  const { data: dietDetail, isLoading } = useQuery<DietDetailData>(
+    ['dietDetail', dietId],
+    fetchDietDetail
+  );
 
   const togglePostMenu = () => {
     setPostMenuVisible(!postMenuVisible);
@@ -272,35 +307,36 @@ const DietDetail: React.FC = () => {
 
   const onCloseErrorAlert = () => setErrorAlert('');
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <SectionWrapper>
       <Wrapper>
         <ImgContainer>
-          <img
-            src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?q=80&w=3751&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="diet image"
-          />
+          <img src={dietDetail!.imageUrl} alt="diet image" />
         </ImgContainer>
         <ContentsContainer>
-          <PostDate>2024. 07. 12.</PostDate>
+          <PostDate>{formatDate(dietDetail!.createdDate)}</PostDate>
           <ContentsBox>
-            <Contents>
-              오늘은 샐러드를 먹는 중입니다.
-              <br />
-              영양가 있는 샐러드를 먹으니 몸이 건강해지는 느낌입니다.
-              <br />
-              다음에는 더 맛있는 걸 먹고 싶습니다.
-            </Contents>
-            <DotButton onClick={togglePostMenu}>
-              <img src={threeDots} alt="Button group: Delete options" />
-              {postMenuVisible && (
-                <DropdownMenu>
-                  <MenuItem onClick={() => openModal('deletePostModal')}>
-                    삭제
-                  </MenuItem>
-                </DropdownMenu>
-              )}
-            </DotButton>
+            <Contents
+              dangerouslySetInnerHTML={{
+                __html: dietDetail!.content.replace(/\n/g, '<br />'),
+              }}
+            />
+            {user?.role === 'TRAINEE' && (
+              <DotButton onClick={togglePostMenu}>
+                <img src={threeDots} alt="Button group: Delete options" />
+                {postMenuVisible && (
+                  <DropdownMenu>
+                    <MenuItem onClick={() => openModal('deletePostModal')}>
+                      삭제
+                    </MenuItem>
+                  </DropdownMenu>
+                )}
+              </DotButton>
+            )}
           </ContentsBox>
         </ContentsContainer>
         <CommentContainer>
@@ -323,56 +359,67 @@ const DietDetail: React.FC = () => {
                 조금 더 노력하면 더 좋은 결과를 얻을 수 있을 것 같습니다.
               </CommentText>
               <PostDate>2024. 07. 12.</PostDate>
-              <DotButton onClick={toggleCommentMenu}>
-                <img
-                  src={threeDots}
-                  alt="Button group: Edit and delete options"
-                />
-                {commentMenuVisible && (
-                  <DropdownMenu>
-                    <MenuItem onClick={onEditComment}>수정</MenuItem>
-                    <MenuItem onClick={() => openModal('deleteCommentModal')}>
-                      삭제
-                    </MenuItem>
-                  </DropdownMenu>
-                )}
-              </DotButton>
+              {user?.role === 'TRAINER' && (
+                <DotButton onClick={toggleCommentMenu}>
+                  <img
+                    src={threeDots}
+                    alt="Button group: Edit and delete options"
+                  />
+                  {commentMenuVisible && (
+                    <DropdownMenu>
+                      <MenuItem onClick={onEditComment}>수정</MenuItem>
+                      <MenuItem onClick={() => openModal('deleteCommentModal')}>
+                        삭제
+                      </MenuItem>
+                    </DropdownMenu>
+                  )}
+                </DotButton>
+              )}
             </React.Fragment>
           )}
         </CommentContainer>
-        <SendCommentInputWrapper $hasContent={!!newComment}>
-          <SendCommentInput
-            value={newComment}
-            onChange={e => setNewComment(e.target.value)}
-            placeholder="Comment"
-          />
-          <SendCommentButton onClick={onAddComment} $hasContent={!!newComment}>
-            <img
-              src={!!newComment ? activeSendComment : inactiveSendComment}
-              alt="send comment button"
+        {user?.role === 'TRAINER' && (
+          <SendCommentInputWrapper $hasContent={!!newComment}>
+            <SendCommentInput
+              value={newComment}
+              onChange={e => setNewComment(e.target.value)}
+              placeholder="Comment"
             />
-          </SendCommentButton>
-        </SendCommentInputWrapper>
-        <Modal
-          title="게시글 삭제"
-          type="confirm"
-          isOpen={isOpen('deletePostModal')}
-          onClose={() => closeModal('deletePostModal')}
-          onSave={() => onSaveModal('deletePostModal')}
-          btnConfirm="삭제"
-        >
-          선택한 게시글을 삭제할까요?
-        </Modal>
-        <Modal
-          title="댓글 삭제"
-          type="confirm"
-          isOpen={isOpen('deleteCommentModal')}
-          onClose={() => closeModal('deleteCommentModal')}
-          onSave={() => onSaveModal('deleteCommentModal')}
-          btnConfirm="삭제"
-        >
-          선택한 댓글을 삭제할까요?
-        </Modal>
+            <SendCommentButton
+              onClick={onAddComment}
+              $hasContent={!!newComment}
+            >
+              <img
+                src={!!newComment ? activeSendComment : inactiveSendComment}
+                alt="send comment button"
+              />
+            </SendCommentButton>
+          </SendCommentInputWrapper>
+        )}
+        {user?.role === 'TRAINEE' && (
+          <Modal
+            title="게시글 삭제"
+            type="confirm"
+            isOpen={isOpen('deletePostModal')}
+            onClose={() => closeModal('deletePostModal')}
+            onSave={() => onSaveModal('deletePostModal')}
+            btnConfirm="삭제"
+          >
+            선택한 게시글을 삭제할까요?
+          </Modal>
+        )}
+        {user?.role === 'TRAINER' && (
+          <Modal
+            title="댓글 삭제"
+            type="confirm"
+            isOpen={isOpen('deleteCommentModal')}
+            onClose={() => closeModal('deleteCommentModal')}
+            onSave={() => onSaveModal('deleteCommentModal')}
+            btnConfirm="삭제"
+          >
+            선택한 댓글을 삭제할까요?
+          </Modal>
+        )}
         {errorAlert && (
           <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
         )}

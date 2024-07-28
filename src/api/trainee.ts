@@ -39,6 +39,8 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
       axiosInstance.get(`/diets/${id}`, {
         params: { page, size },
       }),
+
+    getDietDetail: (id: number) => axiosInstance.get(`/diets/${id}/details`),
   };
 };
 
