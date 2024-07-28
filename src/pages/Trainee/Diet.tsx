@@ -71,7 +71,7 @@ const Diet: React.FC = () => {
     const response = await traineeApi.getDiets(
       parseInt(traineeId!),
       pageParam,
-      3
+      9
     );
     return response.data;
   };
@@ -131,17 +131,36 @@ const Diet: React.FC = () => {
 
   return (
     <Wrapper>
-      <Gallery>
-        {diets.map((diet, index) => (
-          <ImageWrapper
-            key={diet.dietId}
-            onClick={() => onClickDiet(diet.dietId)}
-            ref={diets.length === index + 1 ? loadMoreRef : null}
-          >
-            <Image src={diet.thumbnailUrl} alt={`diet image`} loading="lazy" />
-          </ImageWrapper>
-        ))}
-      </Gallery>
+      {diets.length === 0 ? (
+        <div
+          style={{
+            fontSize: '1.4rem',
+            display: 'flex',
+            justifyContent: 'center',
+            height: '50vh',
+            alignItems: 'center',
+          }}
+        >
+          식단이 없습니다.
+        </div>
+      ) : (
+        <Gallery>
+          {diets.map((diet, index) => (
+            <ImageWrapper
+              key={diet.dietId}
+              onClick={() => onClickDiet(diet.dietId)}
+              ref={diets.length === index + 1 ? loadMoreRef : null}
+            >
+              <Image
+                src={diet.thumbnailUrl}
+                alt={`diet image`}
+                loading="lazy"
+              />
+            </ImageWrapper>
+          ))}
+        </Gallery>
+      )}
+
       {user?.role === 'TRAINEE' && (
         <React.Fragment>
           <AddButton onClick={onClickAddButton}>
