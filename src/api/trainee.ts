@@ -12,6 +12,7 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
   }
 
   return {
+    // Dashboard
     getTraineeInfo: (id: string | undefined) =>
       axiosInstance.get(`trainers/trainees/${id}`),
 
@@ -20,6 +21,19 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
 
     addInbodyInfo: (inbodyData: AddInbodyData) =>
       axiosInstance.post('trainers/trainees', inbodyData),
+
+    // Diet
+    addDiet: (image: File, content: string) => {
+      const formData = new FormData();
+      formData.append('image', image);
+      formData.append('content', JSON.stringify(content));
+
+      return axiosInstance.post('/diets/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    },
   };
 };
 

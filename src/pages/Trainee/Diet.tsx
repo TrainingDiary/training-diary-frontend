@@ -9,6 +9,9 @@ import Modal from '@components/Common/Modal/Modal';
 import Alert from '@components/Common/Alert/Alert';
 import DietUploadModal from '@components/Trainee/DietUploadModal';
 import useModals from 'src/hooks/useModals';
+import useFetchUser from 'src/hooks/useFetchUser';
+import CreateTraineeApi from 'src/api/trainee';
+import useUserStore from 'src/stores/userStore';
 
 const Wrapper = styled.div`
   height: calc(100vh - 150px);
@@ -47,7 +50,10 @@ const getMoreImages = (count = 9) => {
 };
 
 const Diet: React.FC = () => {
+  useFetchUser();
+  const { user } = useUserStore();
   const navigate = useNavigate();
+  const traineeApi = CreateTraineeApi(navigate);
   const { traineeId } = useParams<{ traineeId: string }>();
   const { openModal, closeModal, isOpen } = useModals();
   const [images, setImages] = useState<string[]>([]);
@@ -77,7 +83,7 @@ const Diet: React.FC = () => {
     openModal('addModal');
   };
 
-  const onSaveAddModal = () => {
+  const onSaveAddModal = async () => {
     if (!formData.photo) {
       return setErrorAlert('식단 사진을 추가해주세요.');
     }
@@ -86,10 +92,14 @@ const Diet: React.FC = () => {
       return setErrorAlert('식단 내용을 입력해주세요.');
     }
 
-    // 식단 추가 API 요청 단계 추가
-    console.log(formData);
+    const photo = formData.photo[0];
 
-    closeModal('addModal');
+    try {
+      await traineeApi.addDiet(photo, formData.content);
+      closeModal('addModal');
+    } catch (error) {
+      console.error('식단 추가 에러: ', error);
+    }
   };
 
   const onCloseErrorAlert = () => setErrorAlert('');
@@ -113,24 +123,28 @@ const Diet: React.FC = () => {
           ))}
         </Gallery>
       </InfiniteScroll>
-      <AddButton onClick={onClickAddButton}>
-        <img src={addBtn} alt="add button" />
-      </AddButton>
-      <Modal
-        title="식단 올리기"
-        type="custom"
-        isOpen={isOpen('addModal')}
-        onClose={() => closeModal('addModal')}
-        onSave={() => onSaveAddModal()}
-        btnConfirm="등록"
-      >
-        <DietUploadModal
-          formData={formData}
-          setFormData={setFormData}
-          preview={preview}
-          setPreview={setPreview}
-        />
-      </Modal>
+      {user?.role === 'TRAINEE' && (
+        <React.Fragment>
+          <AddButton onClick={onClickAddButton}>
+            <img src={addBtn} alt="add button" />
+          </AddButton>
+          <Modal
+            title="식단 올리기"
+            type="custom"
+            isOpen={isOpen('addModal')}
+            onClose={() => closeModal('addModal')}
+            onSave={() => onSaveAddModal()}
+            btnConfirm="등록"
+          >
+            <DietUploadModal
+              formData={formData}
+              setFormData={setFormData}
+              preview={preview}
+              setPreview={setPreview}
+            />
+          </Modal>
+        </React.Fragment>
+      )}
       {errorAlert && (
         <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
       )}
