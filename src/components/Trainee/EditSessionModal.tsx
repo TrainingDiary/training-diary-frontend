@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -8,6 +8,8 @@ import Alert from '@components/Common/Alert/Alert';
 import { DatePickerWrapper } from './Calendar';
 import { SessionDetailType } from '@pages/Trainee/SessionDetail';
 import { WorkoutsType } from './AddSessionModal';
+import { useNavigate } from 'react-router-dom';
+import CreateTraineeApi from 'src/api/trainee';
 
 const FormGroup = styled.div`
   display: flex;
@@ -173,6 +175,8 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
   setFormState,
   workoutTypes,
 }) => {
+  const navigate = useNavigate();
+  const traineeApi = CreateTraineeApi(navigate);
   const initialFormState: SessionDetailType = {
     sessionId: 0,
     sessionDate: new Date().toISOString().split('T')[0],
@@ -193,6 +197,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
     ],
     photoUrls: [],
     videoUrls: [],
+    thumbnailUrls: [],
   };
 
   const handleInputChange = (
@@ -264,7 +269,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
 
   const [errorAlert, setErrorAlert] = useState<string>('');
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (formState) {
       if (!formState.sessionDate) return setErrorAlert('날짜를 입력해주세요.');
       if (formState.sessionNumber <= 0)
@@ -296,6 +301,14 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
         if (selectedWorkout.speedInputRequired && workout.speed <= 0) {
           return setErrorAlert('속도를 입력해주세요.');
         }
+      }
+
+      try {
+        await traineeApi.updateSession(formState);
+      } catch (error) {
+        console.error('운동 기록 수정 에러: ', error);
+        setErrorAlert('운동 기록 수정에 실패했습니다.');
+        return;
       }
 
       onSave(formState);

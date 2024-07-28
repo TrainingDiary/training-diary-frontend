@@ -224,7 +224,7 @@ const SessionDetail: React.FC = () => {
   const videoContainerRef = useRef<HTMLDivElement>(null);
 
   // useQuery 데이터 불러오기
-  const { data, error, isLoading, refetch } = useQuery(
+  const { data, isLoading, refetch } = useQuery(
     ['sessionDetail', sessionId],
     () => traineeApi.getSessionDetail(Number(sessionId)),
     {
@@ -318,19 +318,31 @@ const SessionDetail: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  const handlePhotoUpload = (photos: string[]) => {
+  const handlePhotoUpload = async (images: string[]) => {
     // Handle uploaded photos
-    console.log('Uploaded Photos:', photos);
+    try {
+      await traineeApi.sessionPhotoUpload(sessionId, images);
+      console.log('이미지 업로드 성공 :', images);
+      refetch();
+    } catch (error) {
+      console.error('운동 기록 이미지 추가 에러: ', error);
+    }
     closeModal('photoUpload');
   };
 
-  const handleVideoUpload = (video: string) => {
+  const handleVideoUpload = async (video: string) => {
     // Handle uploaded video
-    console.log('Uploaded Video:', video);
+    try {
+      await traineeApi.sessionVideoUpload(sessionId, video);
+      console.log('동영상 업로드 성공 :', video);
+      refetch();
+    } catch (error) {
+      console.error('운동 기록 동영상 추가 에러: ', error);
+    }
     closeModal('videoUpload');
   };
 
-  const handleEditSession = () => {
+  const handleEditSession = async () => {
     setFormState(sessionData);
     openModal('editSessionModal');
   };
@@ -338,11 +350,18 @@ const SessionDetail: React.FC = () => {
   const handleSaveSession = (updatedSession: SessionDetailType) => {
     setSessionData(updatedSession);
     closeModal('editSessionModal');
+    refetch();
   };
 
   const handleDeleteSession = async () => {
     // TODO : 삭제 api 연동
     // await axios.delete(`/api/sessions/${sessionId}`);
+    try {
+      await traineeApi.deleteSession(sessionId);
+    } catch (error) {
+      console.error('운동 기록 삭제 에러: ', error);
+      return;
+    }
     navigate(`/trainee/${traineeId}/session`);
   };
 

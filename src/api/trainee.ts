@@ -2,6 +2,7 @@ import { NavigateFunction } from 'react-router-dom';
 
 import { axiosInstance, createInterceptor } from './axiosInstance';
 import { AddInbodyData, TraineeInfoData } from '@pages/Trainee/Dashboard';
+import { SessionDetailType } from '@pages/Trainee/SessionDetail';
 import { SessionDataType } from '@components/Trainee/AddSessionModal';
 
 let isInterceptorCreated = false;
@@ -39,6 +40,24 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
 
     getSessionDetail: (id: number) =>
       axiosInstance.get(`workout-sessions/${id}`),
+
+    updateSession: (sessionData: SessionDetailType) =>
+      axiosInstance.put('workout-sessions', sessionData),
+
+    deleteSession: (id: string | undefined) =>
+      axiosInstance.delete(`workout-sessions/${id}`),
+
+    sessionPhotoUpload: (sessionId: string | undefined, images: string[]) =>
+      axiosInstance.put('workout-sessions/photos', {
+        sessionId,
+        images,
+      }),
+
+    sessionVideoUpload: (sessionId: string | undefined, video: string) =>
+      axiosInstance.put('workout-sessions/videos', {
+        sessionId,
+        video,
+      }),
   };
 };
 
