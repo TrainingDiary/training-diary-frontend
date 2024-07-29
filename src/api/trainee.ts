@@ -46,6 +46,11 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
 
     addComment: (id: number, comment: string) =>
       axiosInstance.post('/comments/', { id, comment }),
+
+    editComment: (id: number, comment: string) =>
+      axiosInstance.put('/comments/', { id, comment }),
+
+    deleteComment: (id: number) => axiosInstance.delete(`/comments/${id}`),
   };
 };
 

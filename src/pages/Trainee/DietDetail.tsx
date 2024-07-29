@@ -240,8 +240,11 @@ const DietDetail: React.FC = () => {
   }>();
   const { openModal, closeModal, isOpen } = useModals();
   const [postMenuVisible, setPostMenuVisible] = useState<boolean>(false);
-  const [commentMenuVisible, setCommentMenuVisible] = useState<boolean>(false);
+  const [commentMenuVisible, setCommentMenuVisible] = useState<number | null>(
+    null
+  );
   const [editCommentId, setEditCommentId] = useState<number | null>(null);
+  const [deleteCommentId, setDeleteCommentId] = useState<number | null>(null);
   const [commentText, setCommentText] = useState<string>('');
   const [newComment, setNewComment] = useState<string>('');
   const [errorAlert, setErrorAlert] = useState<string>('');
@@ -261,8 +264,9 @@ const DietDetail: React.FC = () => {
     setPostMenuVisible(!postMenuVisible);
   };
 
-  const toggleCommentMenu = () => {
-    setCommentMenuVisible(!commentMenuVisible);
+  const toggleCommentMenu = (commentId: number) => {
+    setCommentMenuVisible(prev => (prev === commentId ? null : commentId));
+    setDeleteCommentId(commentId);
   };
 
   const onSaveModal = async (modalName: string) => {
@@ -274,26 +278,38 @@ const DietDetail: React.FC = () => {
         console.error('식단 삭제 에러: ', error);
       }
     } else if (modalName === 'deleteCommentModal') {
-      // 댓글 삭제 API 요청 단계 추가 (refetch)
+      try {
+        await traineeApi.deleteComment(deleteCommentId!);
+        setDeleteCommentId(null);
+        refetch();
+      } catch (error) {
+        console.error('댓글 삭제 에러: ', error);
+      }
     }
 
     closeModal(modalName);
   };
 
-  const onEditComment = () => {
-    setEditCommentId(1);
-    setCommentText('조금 더 노력하면 더 좋은 결과를 얻을 수 있을 것 같습니다.');
+  const onEditComment = (comment: Comment) => {
+    setEditCommentId(comment.id);
+    setCommentText(comment.comment);
   };
 
   const onCancelEdit = () => {
     setEditCommentId(null);
   };
 
-  const onSaveEdit = () => {
+  const onSaveEdit = async () => {
     if (!commentText) return setErrorAlert('댓글을 입력해주세요.');
 
-    // 댓글 수정 API 요청 단계 추가
-    setEditCommentId(null);
+    try {
+      await traineeApi.editComment(editCommentId!, commentText);
+      refetch();
+      setEditCommentId(null);
+      setCommentText('');
+    } catch (error) {
+      console.error('댓글 수정 에러: ', error);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -304,6 +320,7 @@ const DietDetail: React.FC = () => {
 
   const onAddComment = async () => {
     if (!newComment) return;
+
     try {
       await traineeApi.addComment(parseInt(dietId!), newComment);
       refetch();
@@ -367,14 +384,16 @@ const DietDetail: React.FC = () => {
                 <CommentText>{comment.comment}</CommentText>
                 <PostDate>{formatDate(comment.createdDate)}</PostDate>
                 {user?.role === 'TRAINER' && (
-                  <DotButton onClick={toggleCommentMenu}>
+                  <DotButton onClick={() => toggleCommentMenu(comment.id)}>
                     <img
                       src={threeDots}
                       alt="Button group: Edit and delete options"
                     />
-                    {commentMenuVisible && (
+                    {commentMenuVisible === comment.id && (
                       <DropdownMenu>
-                        <MenuItem onClick={onEditComment}>수정</MenuItem>
+                        <MenuItem onClick={() => onEditComment(comment)}>
+                          수정
+                        </MenuItem>
                         <MenuItem
                           onClick={() => openModal('deleteCommentModal')}
                         >
@@ -407,6 +426,7 @@ const DietDetail: React.FC = () => {
             </SendCommentButton>
           </SendCommentInputWrapper>
         )}
+
         {user?.role === 'TRAINEE' && (
           <Modal
             title="게시글 삭제"
