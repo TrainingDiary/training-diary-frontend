@@ -105,11 +105,9 @@ const Session: React.FC = () => {
   const startXRef = useRef(0);
   const scrollLeftRef = useRef(0);
   const { openModal, closeModal, isOpen } = useModals();
-  const [totalElements, setTotalElements] = useState(0);
 
   const fetchSessions = async ({ pageParam = 0 }) => {
     const res = await traineeApi.getSessionsList(traineeId, pageParam, 5);
-    setTotalElements(res.data.totalElements);
     return res.data;
   };
 
@@ -137,7 +135,7 @@ const Session: React.FC = () => {
   const [formState, setFormState] = useState<SessionDataType>({
     traineeId: traineeId,
     sessionDate: format(new Date(), 'yyyy-MM-dd'),
-    sessionNumber: totalElements + 1,
+    sessionNumber: 0,
     specialNote: '',
     workouts: [
       { workoutTypeId: 0, weight: '', speed: '', time: '', sets: '', rep: '' },
@@ -267,9 +265,16 @@ const Session: React.FC = () => {
 
   const handleOpenModal = async () => {
     await refetch(); // 모달을 열기 전에 세션 목록을 다시 로드
+
+    // 가장 마지막 회차 번호를 구하고, 1을 더해서 새로운 sessionNumber로 설정
+    const lastSessionNumber =
+      sessions.length > 0
+        ? Math.max(...sessions.map(session => session.sessionNumber))
+        : 0;
+
     setFormState({
       ...formState,
-      sessionNumber: totalElements + 1,
+      sessionNumber: lastSessionNumber + 1,
     });
     openModal('addSessionModal');
   };
