@@ -309,7 +309,7 @@ const Session: React.FC = () => {
                   marginLeft: '20px',
                 }}
               >
-                아직 자세 사진이 없습니다.
+                자세 사진이 없습니다.
               </div>
             )}
             <div ref={imageObserverRef} />
@@ -337,7 +337,7 @@ const Session: React.FC = () => {
                   alignItems: 'center',
                 }}
               >
-                아직 운동 기록이 없습니다.
+                운동 기록이 없습니다.
               </div>
             )}
             <div ref={listObserverRef} />
