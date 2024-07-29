@@ -43,6 +43,9 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
       }),
 
     getDietDetail: (id: number) => axiosInstance.get(`/diets/${id}/details`),
+
+    addComment: (id: number, comment: string) =>
+      axiosInstance.post('/comments/', { id, comment }),
   };
 };
 

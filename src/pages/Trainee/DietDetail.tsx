@@ -251,10 +251,11 @@ const DietDetail: React.FC = () => {
     return response.data;
   };
 
-  const { data: dietDetail, isLoading } = useQuery<DietDetailData>(
-    ['dietDetail', dietId],
-    fetchDietDetail
-  );
+  const {
+    data: dietDetail,
+    isLoading,
+    refetch,
+  } = useQuery<DietDetailData>(['dietDetail', dietId], fetchDietDetail);
 
   const togglePostMenu = () => {
     setPostMenuVisible(!postMenuVisible);
@@ -301,12 +302,15 @@ const DietDetail: React.FC = () => {
     }
   };
 
-  const onAddComment = () => {
+  const onAddComment = async () => {
     if (!newComment) return;
-
-    // 댓글 추가 API 요청 단계 추가
-    console.log(newComment);
-    setNewComment('');
+    try {
+      await traineeApi.addComment(parseInt(dietId!), newComment);
+      refetch();
+      setNewComment('');
+    } catch (error) {
+      console.error('댓글 추가 에러: ', error);
+    }
   };
 
   const onCloseErrorAlert = () => setErrorAlert('');
@@ -343,45 +347,48 @@ const DietDetail: React.FC = () => {
             )}
           </ContentsBox>
         </ContentsContainer>
-        <CommentContainer>
-          <img src={commentAvatar} alt="avatar image" />
-          {editCommentId ? (
-            <React.Fragment>
-              <CommentInput
-                value={commentText}
-                onChange={e => setCommentText(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
-              <ButtonContainer>
-                <SaveButton onClick={onSaveEdit}>수정</SaveButton>
-                <CancelButton onClick={onCancelEdit}>취소</CancelButton>
-              </ButtonContainer>
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              <CommentText>
-                조금 더 노력하면 더 좋은 결과를 얻을 수 있을 것 같습니다.
-              </CommentText>
-              <PostDate>2024. 07. 12.</PostDate>
-              {user?.role === 'TRAINER' && (
-                <DotButton onClick={toggleCommentMenu}>
-                  <img
-                    src={threeDots}
-                    alt="Button group: Edit and delete options"
-                  />
-                  {commentMenuVisible && (
-                    <DropdownMenu>
-                      <MenuItem onClick={onEditComment}>수정</MenuItem>
-                      <MenuItem onClick={() => openModal('deleteCommentModal')}>
-                        삭제
-                      </MenuItem>
-                    </DropdownMenu>
-                  )}
-                </DotButton>
-              )}
-            </React.Fragment>
-          )}
-        </CommentContainer>
+        {dietDetail!.comments.map(comment => (
+          <CommentContainer key={comment.id}>
+            <img src={commentAvatar} alt="avatar image" />
+            {editCommentId === comment.id ? (
+              <React.Fragment>
+                <CommentInput
+                  value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                <ButtonContainer>
+                  <SaveButton onClick={onSaveEdit}>수정</SaveButton>
+                  <CancelButton onClick={onCancelEdit}>취소</CancelButton>
+                </ButtonContainer>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <CommentText>{comment.comment}</CommentText>
+                <PostDate>{formatDate(comment.createdDate)}</PostDate>
+                {user?.role === 'TRAINER' && (
+                  <DotButton onClick={toggleCommentMenu}>
+                    <img
+                      src={threeDots}
+                      alt="Button group: Edit and delete options"
+                    />
+                    {commentMenuVisible && (
+                      <DropdownMenu>
+                        <MenuItem onClick={onEditComment}>수정</MenuItem>
+                        <MenuItem
+                          onClick={() => openModal('deleteCommentModal')}
+                        >
+                          삭제
+                        </MenuItem>
+                      </DropdownMenu>
+                    )}
+                  </DotButton>
+                )}
+              </React.Fragment>
+            )}
+          </CommentContainer>
+        ))}
+
         {user?.role === 'TRAINER' && (
           <SendCommentInputWrapper $hasContent={!!newComment}>
             <SendCommentInput
