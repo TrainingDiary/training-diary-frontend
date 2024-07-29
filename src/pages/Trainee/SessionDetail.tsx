@@ -15,6 +15,7 @@ import useFetchUser from 'src/hooks/useFetchUser';
 import useModals from 'src/hooks/useModals';
 import CreateTraineeApi from 'src/api/trainee';
 import CreateTrainerApi from 'src/api/trainer';
+import useUserStore from 'src/stores/userStore';
 
 const DetailWrapper = styled.div`
   display: flex;
@@ -197,6 +198,7 @@ export interface SessionDetailType {
 const SessionDetail: React.FC = () => {
   useFetchUser();
   const navigate = useNavigate();
+  const { user } = useUserStore();
   const traineeApi = CreateTraineeApi(navigate);
   const trainerApi = CreateTrainerApi(navigate);
   const { traineeId, sessionId } = useParams<{
@@ -241,15 +243,17 @@ const SessionDetail: React.FC = () => {
 
   useEffect(() => {
     // Fetch workout types
-    const fetchWorkoutTypes = async () => {
-      try {
-        const res = await trainerApi.getWorkouts();
-        setWorkoutTypes(res.data.content);
-      } catch (error) {
-        console.error('운동 종류 가져오기 실패 : ', error);
-      }
-    };
-    fetchWorkoutTypes();
+    if (user?.role === 'TRAINER') {
+      const fetchWorkoutTypes = async () => {
+        try {
+          const res = await trainerApi.getWorkouts();
+          setWorkoutTypes(res.data.content);
+        } catch (error) {
+          console.error('운동 종류 가져오기 실패 : ', error);
+        }
+      };
+      fetchWorkoutTypes();
+    }
   }, [traineeId, sessionId]);
 
   const handleHorizontalScroll = (container: HTMLDivElement | null) => {
@@ -382,14 +386,20 @@ const SessionDetail: React.FC = () => {
             <Title>
               {sessionData.sessionDate} / {sessionData.sessionNumber}회차
             </Title>
-            <ButtonGroup>
-              <Button $size="small" type="button" onClick={handleEditSession}>
-                수정
-              </Button>
-              <Button $size="small" type="button" onClick={handleConfirmDelete}>
-                삭제
-              </Button>
-            </ButtonGroup>
+            {user?.role === 'TRAINER' ? (
+              <ButtonGroup>
+                <Button $size="small" type="button" onClick={handleEditSession}>
+                  수정
+                </Button>
+                <Button
+                  $size="small"
+                  type="button"
+                  onClick={handleConfirmDelete}
+                >
+                  삭제
+                </Button>
+              </ButtonGroup>
+            ) : null}
           </Header>
           <Section>
             <Label>특이 사항</Label>
@@ -418,16 +428,20 @@ const SessionDetail: React.FC = () => {
             <ImageTitle>
               <LabelWrap>
                 <Label>자세 사진</Label>
-                <span>사진은 최대 10장 까지 등록 가능합니다.</span>
+                {user?.role === 'TRAINER' ? (
+                  <span>사진은 최대 10장 까지 등록 가능합니다.</span>
+                ) : null}
               </LabelWrap>
-              <Button
-                $size="small"
-                $variant="primary"
-                onClick={() => openModal('photoUpload')}
-                disabled={sessionData.photoUrls.length >= 10}
-              >
-                업로드
-              </Button>
+              {user?.role === 'TRAINER' ? (
+                <Button
+                  $size="small"
+                  $variant="primary"
+                  onClick={() => openModal('photoUpload')}
+                  disabled={sessionData.photoUrls.length >= 10}
+                >
+                  업로드
+                </Button>
+              ) : null}
             </ImageTitle>
             <ScrollContainer ref={imageContainerRef}>
               {sessionData.photoUrls.slice(0, 10).map((photo, index) => (
@@ -444,16 +458,20 @@ const SessionDetail: React.FC = () => {
             <ImageTitle>
               <LabelWrap>
                 <Label>운동 영상</Label>
-                <span>동영상은 최대 5개 까지 등록 가능합니다.</span>
+                {user?.role === 'TRAINER' ? (
+                  <span>동영상은 최대 5개 까지 등록 가능합니다.</span>
+                ) : null}
               </LabelWrap>
-              <Button
-                $size="small"
-                $variant="primary"
-                onClick={() => openModal('videoUpload')}
-                disabled={sessionData.videoUrls.length >= 5}
-              >
-                업로드
-              </Button>
+              {user?.role === 'TRAINER' ? (
+                <Button
+                  $size="small"
+                  $variant="primary"
+                  onClick={() => openModal('videoUpload')}
+                  disabled={sessionData.videoUrls.length >= 5}
+                >
+                  업로드
+                </Button>
+              ) : null}
             </ImageTitle>
             <VideoContainer ref={videoContainerRef}>
               {sessionData.videoUrls.slice(0, 5).map((video, index) => (

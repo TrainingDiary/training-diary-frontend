@@ -10,6 +10,7 @@ import Alert from '@components/Common/Alert/Alert';
 import { DatePickerWrapper } from './Calendar';
 import CreateTraineeApi from 'src/api/trainee';
 import CreateTrainerApi from 'src/api/trainer';
+import useUserStore from 'src/stores/userStore';
 
 const FormGroup = styled.div`
   display: flex;
@@ -206,6 +207,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
   sessionAutoNumber,
 }) => {
   const navigate = useNavigate();
+  const { user } = useUserStore();
   const traineeApi = CreateTraineeApi(navigate);
   const trainerApi = CreateTrainerApi(navigate);
   const [workoutTypes, setWorkoutTypes] = useState<
@@ -240,11 +242,13 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
 
   useEffect(() => {
     const fetchWorkoutTypes = async () => {
-      try {
-        const response = await trainerApi.getWorkouts();
-        setWorkoutTypes(response.data.content);
-      } catch (error) {
-        console.error('운동 종류 불러오기 실패:', error);
+      if (user?.role === 'TRAINER') {
+        try {
+          const response = await trainerApi.getWorkouts();
+          setWorkoutTypes(response.data.content);
+        } catch (error) {
+          console.error('운동 종류 불러오기 실패:', error);
+        }
       }
     };
     fetchWorkoutTypes();

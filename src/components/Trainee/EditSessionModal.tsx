@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useNavigate } from 'react-router-dom';
 
 import Modal from '@components/Common/Modal/Modal';
 import Alert from '@components/Common/Alert/Alert';
 import { DatePickerWrapper } from './Calendar';
 import { SessionDetailType } from '@pages/Trainee/SessionDetail';
 import { WorkoutsType } from './AddSessionModal';
-import { useNavigate } from 'react-router-dom';
 import CreateTraineeApi from 'src/api/trainee';
 
 const FormGroup = styled.div`
@@ -186,7 +186,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
     workouts: [
       {
         workoutId: 0,
-        workoutTypeId: 0, // 초기화 시 workoutTypeId 추가
+        workoutTypeId: 0,
         workoutTypeName: '',
         targetMuscle: '',
         remarks: '',
