@@ -12,6 +12,7 @@ export const sessionDetails: SessionDetailType[] = [
     workouts: [
       {
         workoutId: 1,
+        workoutTypeId: 2,
         workoutTypeName: '벤치 프레스',
         targetMuscle: '가슴',
         remarks: '가벼운 무게로 시작',
@@ -23,6 +24,7 @@ export const sessionDetails: SessionDetailType[] = [
       },
       {
         workoutId: 2,
+        workoutTypeId: 2,
         workoutTypeName: '스쿼트',
         targetMuscle: '다리',
         remarks: '폼 체크 필요',
@@ -56,6 +58,7 @@ export const sessionDetails: SessionDetailType[] = [
     workouts: [
       {
         workoutId: 2,
+        workoutTypeId: 2,
         workoutTypeName: '스쿼트',
         targetMuscle: '다리',
         remarks: '폼 체크 필요',
@@ -82,6 +85,7 @@ export const sessionDetails: SessionDetailType[] = [
     workouts: [
       {
         workoutId: 3,
+        workoutTypeId: 2,
         workoutTypeName: '데드리프트',
         targetMuscle: '등',
         remarks: '허리 조심',
