@@ -9,6 +9,7 @@ import Button from '@components/Common/Button/Button';
 import PhotoUploadModal from '@components/Trainee/PhotoUploadModal';
 import VideoUploadModal from '@components/Trainee/VideoUploadModal';
 import EditSessionModal from '@components/Trainee/EditSessionModal';
+import ImageModal from '@components/Trainee/ImageModal';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import useFetchUser from 'src/hooks/useFetchUser';
 import useModals from 'src/hooks/useModals';
@@ -151,6 +152,7 @@ const ImagePreview = styled.div`
   align-items: center;
   flex: 0 0 auto;
   user-select: none;
+  cursor: pointer;
 
   img {
     width: 100%;
@@ -219,7 +221,7 @@ const SessionDetail: React.FC = () => {
     }[]
   >([]);
   const [formState, setFormState] = useState<SessionDetailType | null>(null);
-
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
 
@@ -237,8 +239,6 @@ const SessionDetail: React.FC = () => {
       setSessionData(data.data);
     }
   }, [data]);
-
-  console.log(sessionData);
 
   useEffect(() => {
     // Fetch workout types
@@ -369,6 +369,11 @@ const SessionDetail: React.FC = () => {
     openModal('deleteSessionModal');
   };
 
+  const handleImageClick = (imageUrl: string) => {
+    setSelectedImageUrl(imageUrl);
+    openModal('imageModal');
+  };
+
   return (
     <SectionWrapper>
       {isLoading ? (
@@ -421,13 +426,17 @@ const SessionDetail: React.FC = () => {
                 $size="small"
                 $variant="primary"
                 onClick={() => openModal('photoUpload')}
+                disabled={sessionData.photoUrls.length >= 10}
               >
                 업로드
               </Button>
             </ImageTitle>
             <ScrollContainer ref={imageContainerRef}>
               {sessionData.photoUrls.slice(0, 10).map((photo, index) => (
-                <ImagePreview key={index}>
+                <ImagePreview
+                  key={index}
+                  onClick={() => handleImageClick(photo)}
+                >
                   <img src={photo} alt={`자세 사진 ${index}`} />
                 </ImagePreview>
               ))}
@@ -477,6 +486,11 @@ const SessionDetail: React.FC = () => {
         formState={formState}
         setFormState={setFormState}
         workoutTypes={workoutTypes}
+      />
+      <ImageModal
+        isOpen={isOpen('imageModal')}
+        onClose={() => closeModal('imageModal')}
+        imageUrl={selectedImageUrl || ''}
       />
       <Modal
         title="운동 기록 삭제"
