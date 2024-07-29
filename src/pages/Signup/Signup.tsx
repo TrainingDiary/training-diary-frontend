@@ -31,7 +31,7 @@ interface FormState {
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
-  const AuthApi = CreateAuthApi(navigate);
+  const authApi = CreateAuthApi(navigate);
   const { setUser } = useUserStore();
 
   const {
@@ -64,7 +64,7 @@ const Signup: React.FC = () => {
     try {
       setLoading(true);
 
-      const response = await AuthApi.signup(
+      const response = await authApi.signup(
         data.email,
         data.password,
         data.confirmPassword,
@@ -92,7 +92,7 @@ const Signup: React.FC = () => {
     try {
       setSendingEmail(true);
 
-      await AuthApi.checkEmail(email);
+      await authApi.checkEmail(email);
 
       setShowEmailCodeInput(true);
 
@@ -122,7 +122,7 @@ const Signup: React.FC = () => {
     }
 
     try {
-      await AuthApi.checkCode(email, verificationCode);
+      await authApi.checkCode(email, verificationCode);
       setIsCodeVerified(true);
       setSuccessAlert('이메일 인증에 성공했습니다.');
     } catch (error: any) {

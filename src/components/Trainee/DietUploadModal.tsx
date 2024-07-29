@@ -132,6 +132,9 @@ const DietUploadModal: React.FC<DietUploadModalProps> = ({
   const onRemoveImage = () => {
     setFormData({ ...formData, photo: null });
     setPreview(null);
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
   };
 
   return (

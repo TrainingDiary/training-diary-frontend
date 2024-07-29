@@ -33,9 +33,9 @@ const fetchSchedules = async (
   startDate: string,
   endDate: string
 ): Promise<ScheduleData> => {
-  const AppointmentApi = CreateAppointmentApi(navigate);
+  const appointmentApi = CreateAppointmentApi(navigate);
 
-  const response = await AppointmentApi.getSchedules(startDate, endDate);
+  const response = await appointmentApi.getSchedules(startDate, endDate);
   const scheduleList: Schedule[] = response?.data;
 
   const scheduled: string[] = [];

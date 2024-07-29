@@ -82,7 +82,7 @@ const TraineeRegisterModal: React.FC<TraineeRegisterModalProps> = ({
   onClick,
 }) => {
   const navigate = useNavigate();
-  const TrainerApi = CreateTrainerApi(navigate);
+  const trainerApi = CreateTrainerApi(navigate);
   const [items, setItems] = useState<TraineeDataType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorAlert, setErrorAlert] = useState<string>('');
@@ -93,7 +93,7 @@ const TraineeRegisterModal: React.FC<TraineeRegisterModalProps> = ({
         try {
           setIsLoading(true);
 
-          const response = await TrainerApi.getTrainees('NAME', 0, 30);
+          const response = await trainerApi.getTrainees('NAME', 0, 30);
 
           setItems(response.data.content);
         } catch (error) {
