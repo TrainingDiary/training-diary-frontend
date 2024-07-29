@@ -84,12 +84,12 @@ const LogOutBtn = styled.img``;
 const Navigation: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const AuthApi = CreateAuthApi(navigate);
+  const authApi = CreateAuthApi(navigate);
   const { clearUser } = useUserStore();
 
   const handleLogout = async () => {
     try {
-      await AuthApi.logout();
+      await authApi.logout();
       clearUser();
     } catch (error) {
       console.error('로그아웃 에러: ', error);

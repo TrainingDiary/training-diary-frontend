@@ -18,7 +18,7 @@ html, body{
   line-height: 1.5;
   font-family: 'NanumSquare', 'Noto Sans KR', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
-  height: 100vh;
+  height: 100dvh;
   background-color: ${({ theme }) => theme.colors.gray200};
 }
 

@@ -9,6 +9,9 @@ const queryClient = new QueryClient();
 
 // enableMocking 함수 정의
 async function enableMocking() {
+  // 모든환경에서 MSW 사용안함 (필요시 return 삭제)
+  return;
+
   if (process.env.NODE_ENV !== 'development') {
     return;
   }

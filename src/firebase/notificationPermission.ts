@@ -6,7 +6,7 @@ import { app } from 'src/firebase/initFirebase';
 
 const requestPermission = async (navigate: NavigateFunction) => {
   try {
-    const NotificationApi = CreateNotificationApi(navigate);
+    const notificationApi = CreateNotificationApi(navigate);
 
     const permission = await Notification.requestPermission();
     const messaging = getMessaging(app);
@@ -17,7 +17,7 @@ const requestPermission = async (navigate: NavigateFunction) => {
       });
 
       if (token) {
-        await NotificationApi.registerFCMToken(token);
+        await notificationApi.registerFCMToken(token);
       }
     }
   } catch (error) {

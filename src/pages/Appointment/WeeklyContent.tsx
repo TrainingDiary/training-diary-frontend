@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { format, parse } from 'date-fns';
@@ -7,6 +7,7 @@ import WeeklyCalendar from '@components/Appointment/WeeklyCalendar';
 import ScheduleDetail from '@components/Appointment/ScheduleDetail';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
 import useCalendarStore from 'src/stores/calendarStore';
+import useFetchUser from 'src/hooks/useFetchUser';
 
 const Wrapper = styled.div`
   display: flex;
@@ -15,28 +16,33 @@ const Wrapper = styled.div`
 `;
 
 const WeeklyContent: React.FC = () => {
+  useFetchUser();
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
-  const { setSelectedDate } = useCalendarStore();
-  const initialDate = date ? parse(date, 'yyyy-MM-dd', new Date()) : new Date();
-  const [currentDate, setCurrentDate] = useState<Date>(initialDate);
+  const { selectedDate, setSelectedDate } = useCalendarStore();
 
   const onDateChange = (date: Date) => {
     setSelectedDate(date);
-    setCurrentDate(date);
 
     const formattedDate = format(date, 'yyyy-MM-dd');
     navigate(`/appointment/weekly/${formattedDate}`, { replace: true });
   };
 
+  useEffect(() => {
+    if (!date) return;
+
+    const parsedDate = parse(date, 'yyyy-MM-dd', new Date());
+    setSelectedDate(parsedDate);
+  }, []);
+
   return (
     <SectionWrapper>
       <Wrapper>
         <WeeklyCalendar
-          selectedDate={currentDate}
+          selectedDate={selectedDate}
           onDateChange={onDateChange}
         />
-        <ScheduleDetail selectedDate={currentDate} />
+        <ScheduleDetail selectedDate={selectedDate} />
       </Wrapper>
     </SectionWrapper>
   );
