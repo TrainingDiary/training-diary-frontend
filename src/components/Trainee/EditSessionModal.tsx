@@ -413,7 +413,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                       {selectedWorkout.weightInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="무게"
+                          placeholder="무게(kg)"
                           value={exercise.weight || ''}
                           onChange={e =>
                             handleExerciseChange(
@@ -427,7 +427,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                       {selectedWorkout.speedInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="속도"
+                          placeholder="속도(m/s)"
                           value={exercise.speed || ''}
                           onChange={e =>
                             handleExerciseChange(
@@ -441,7 +441,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                       {selectedWorkout.timeInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="시간"
+                          placeholder="시간(초)"
                           value={exercise.time || ''}
                           onChange={e =>
                             handleExerciseChange(
@@ -455,7 +455,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                       {selectedWorkout.setInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="세트"
+                          placeholder="세트(세트)"
                           value={exercise.sets || ''}
                           onChange={e =>
                             handleExerciseChange(
@@ -469,7 +469,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                       {selectedWorkout.repInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="횟수"
+                          placeholder="횟수(회)"
                           value={exercise.rep || ''}
                           onChange={e =>
                             handleExerciseChange(

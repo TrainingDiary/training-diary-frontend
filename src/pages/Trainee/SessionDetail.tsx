@@ -400,9 +400,9 @@ const SessionDetail: React.FC = () => {
             {sessionData.workouts.map((workout, index) => (
               <NoteWrap key={index}>
                 <NoteHead>
-                  <p>운동명: {workout.workoutTypeName}</p>
+                  <p>운동명 : {workout.workoutTypeName}</p>
                   <p>/</p>
-                  <p>대상 근육: {workout.targetMuscle}</p>
+                  <p>대상 근육 : {workout.targetMuscle}</p>
                 </NoteHead>
                 <NoteBody>
                   {workout.weight > 0 && <p>무게: {workout.weight}kg</p>}
