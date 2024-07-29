@@ -30,7 +30,7 @@ const CreateTrainerApi = (navigate: NavigateFunction) => {
     deleteTrainee: (ptContractId: number) =>
       axiosInstance.post('/pt-contracts/terminate', { ptContractId }),
 
-    getWorkouts: (page: number, size: number) =>
+    getWorkouts: (page?: number, size?: number) =>
       axiosInstance.get('/workout-types', {
         params: {
           page,

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useInfiniteQuery } from 'react-query';
+import { format } from 'date-fns';
 
 import addBtn from '@icons/home/addbtn.svg';
 import { SectionWrapper } from '@components/Common/SectionWrapper';
@@ -11,6 +12,8 @@ import AddSessionModal, {
 } from '@components/Trainee/AddSessionModal';
 import useUserStore from 'src/stores/userStore';
 import useModals from 'src/hooks/useModals';
+import useFetchUser from 'src/hooks/useFetchUser';
+import CreateTraineeApi from 'src/api/trainee';
 
 const Wrapper = styled.div`
   display: flex;
@@ -81,77 +84,71 @@ const RecordItem = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray300};
 `;
 
-interface Session {
+interface SessionData {
+  sessionId: number;
   sessionDate: string;
   sessionNumber: number;
-  sessionId: number;
+  thumbnailUrls: string[];
 }
-
-interface ImageWithSession {
-  src: string;
-  sessionId: number;
-}
-
-const sessions: Session[] = [
-  { sessionDate: '2024. 00. 00', sessionNumber: 3, sessionId: 3 },
-  { sessionDate: '2024. 00. 00', sessionNumber: 2, sessionId: 2 },
-  { sessionDate: '2024. 00. 00', sessionNumber: 1, sessionId: 1 },
-];
 
 const Session: React.FC = () => {
+  useFetchUser();
+  const navigate = useNavigate();
+  const traineeApi = CreateTraineeApi(navigate);
   const { user } = useUserStore();
-  const [images, setImages] = useState<ImageWithSession[]>([]);
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const { traineeId } = useParams<{ traineeId: string }>();
+  const imageObserverRef = useRef<HTMLDivElement | null>(null);
+  const listObserverRef = useRef<HTMLDivElement | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const touchStartXRef = useRef<number | null>(null);
   const isDraggingRef = useRef(false);
   const startXRef = useRef(0);
   const scrollLeftRef = useRef(0);
   const { openModal, closeModal, isOpen } = useModals();
+  const [totalElements, setTotalElements] = useState(0);
+
+  const fetchSessions = async ({ pageParam = 0 }) => {
+    const res = await traineeApi.getSessionsList(traineeId, pageParam, 5);
+    setTotalElements(res.data.totalElements);
+    return res.data;
+  };
+
+  const { data, fetchNextPage, hasNextPage, refetch } = useInfiniteQuery(
+    'sessions',
+    fetchSessions,
+    {
+      getNextPageParam: page => {
+        if (page.pageable.pageNumber + 1 < page.totalPages) {
+          return page.pageable.pageNumber + 1;
+        }
+        return undefined;
+      },
+    }
+  );
+
+  const sessions = data?.pages.flatMap(page => page.content) ?? [];
+  const images = sessions.flatMap((session: SessionData) =>
+    session.thumbnailUrls.map((url: string) => ({
+      src: url,
+      sessionId: session.sessionId,
+    }))
+  );
+
   const [formState, setFormState] = useState<SessionDataType>({
-    sessionDate: new Date(),
-    sessionNumber: 0,
+    traineeId: traineeId,
+    sessionDate: format(new Date(), 'yyyy-MM-dd'),
+    sessionNumber: totalElements + 1,
     specialNote: '',
     workouts: [
-      { type: '', weight: '', speed: '', time: '', sets: '', rep: '' },
+      { workoutTypeId: 0, weight: '', speed: '', time: '', sets: '', rep: '' },
     ],
   });
-  const [workoutTypes, setWorkoutTypes] = useState<
-    {
-      id: number;
-      name: string;
-      weightInputRequired: boolean;
-      setInputRequired: boolean;
-      repInputRequired: boolean;
-      timeInputRequired: boolean;
-      speedInputRequired: boolean;
-    }[]
-  >([]);
-  const navigate = useNavigate();
-
-  const getMoreImages = (count = 9) => {
-    const newImages = [];
-    for (let i = 0; i < count; i++) {
-      newImages.push({
-        src: `https://via.placeholder.com/200x250?text=Image${Math.floor(
-          Math.random() * 100
-        )}`,
-        sessionId: Math.floor(Math.random() * 3) + 1, // 임의로 세션 ID를 할당
-      });
-    }
-    return newImages;
-  };
-
-  const loadMoreImages = () => {
-    setImages(prevImages => [...prevImages, ...getMoreImages()]);
-  };
 
   useEffect(() => {
-    setImages(getMoreImages(20));
-    const observer = new IntersectionObserver(
+    const imageObserver = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting) {
-          loadMoreImages();
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
         }
       },
       {
@@ -161,16 +158,41 @@ const Session: React.FC = () => {
       }
     );
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
+    if (imageObserverRef.current) {
+      imageObserver.observe(imageObserverRef.current);
     }
 
     return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
+      if (imageObserverRef.current) {
+        imageObserver.unobserve(imageObserverRef.current);
       }
     };
-  }, []);
+  }, [hasNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    const listObserver = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      },
+      {
+        root: null,
+        rootMargin: '10px',
+        threshold: 1.0,
+      }
+    );
+
+    if (listObserverRef.current) {
+      listObserver.observe(listObserverRef.current);
+    }
+
+    return () => {
+      if (listObserverRef.current) {
+        listObserver.unobserve(listObserverRef.current);
+      }
+    };
+  }, [hasNextPage, fetchNextPage]);
 
   useEffect(() => {
     const container = imageContainerRef.current;
@@ -239,25 +261,21 @@ const Session: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const fetchWorkoutTypes = async () => {
-      try {
-        const response = await axios.get('/api/workout-types');
-        setWorkoutTypes(response.data);
-      } catch (error) {
-        console.error('Failed to fetch workout types', error);
-      }
-    };
-    fetchWorkoutTypes();
-  }, []);
+  const handleSaveSession = () => {
+    refetch();
+  };
 
-  const handleSaveSession = (session: SessionDataType) => {
-    console.log(session);
-    // Handle the save logic
+  const handleOpenModal = async () => {
+    await refetch(); // 모달을 열기 전에 세션 목록을 다시 로드
+    setFormState({
+      ...formState,
+      sessionNumber: totalElements + 1,
+    });
+    openModal('addSessionModal');
   };
 
   const handleImageClick = (sessionId: number) => {
-    navigate(`/trainee/1/session/${sessionId}`); // traineeID
+    navigate(`/trainee/${traineeId}/session/${sessionId}`);
   };
 
   return (
@@ -266,33 +284,68 @@ const Session: React.FC = () => {
         <PhotoBox>
           <SectionTitle>자세 사진 목록</SectionTitle>
           <ImageContainer ref={imageContainerRef}>
-            {images.map((image, index) => (
-              <ImageLayout
-                key={index}
-                onClick={() => handleImageClick(image.sessionId)}
+            {images.length > 0 ? (
+              images.map((image, index) => (
+                <ImageLayout
+                  key={index}
+                  onClick={() => handleImageClick(image.sessionId)}
+                >
+                  <Image
+                    src={image.src}
+                    alt={`image ${index}`}
+                    loading="lazy"
+                  />
+                </ImageLayout>
+              ))
+            ) : (
+              <div
+                style={{
+                  fontSize: '1.4rem',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  width: '100%',
+                  minHeight: '150px',
+                  alignItems: 'center',
+                  marginLeft: '20px',
+                }}
               >
-                <Image src={image.src} alt={`image ${index}`} loading="lazy" />
-              </ImageLayout>
-            ))}
-            <div ref={observerRef} />
+                아직 자세 사진이 없습니다.
+              </div>
+            )}
+            <div ref={imageObserverRef} />
           </ImageContainer>
         </PhotoBox>
         <RecordBox>
           <SectionTitle>운동 기록 목록</SectionTitle>
           <RecordList>
-            {sessions.map((session, index) => (
-              <Link to={`${session.sessionId}`} key={index}>
-                <RecordItem>
-                  <div>{session.sessionDate}</div>
-                  <div>{session.sessionNumber}회차</div>
-                </RecordItem>
-              </Link>
-            ))}
+            {sessions.length > 0 ? (
+              sessions.map((session, index) => (
+                <Link to={`${session.sessionId}`} key={index}>
+                  <RecordItem>
+                    <div>{session.sessionDate}</div>
+                    <div>{session.sessionNumber}회차</div>
+                  </RecordItem>
+                </Link>
+              ))
+            ) : (
+              <div
+                style={{
+                  fontSize: '1.4rem',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  height: '50vh',
+                  alignItems: 'center',
+                }}
+              >
+                아직 운동 기록이 없습니다.
+              </div>
+            )}
+            <div ref={listObserverRef} />
           </RecordList>
         </RecordBox>
       </Wrapper>
       {user?.role === 'TRAINER' ? (
-        <AddButton onClick={() => openModal('addSessionModal')}>
+        <AddButton onClick={handleOpenModal}>
           <img src={addBtn} alt="add button" />
         </AddButton>
       ) : null}
@@ -302,7 +355,8 @@ const Session: React.FC = () => {
         onSave={handleSaveSession}
         formState={formState}
         setFormState={setFormState}
-        workoutTypes={workoutTypes}
+        traineeId={traineeId}
+        sessionAutoNumber={sessions.length + 1}
       />
     </SectionWrapper>
   );
