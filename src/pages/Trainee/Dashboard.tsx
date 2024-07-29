@@ -144,6 +144,8 @@ const Input = styled.input<{ $unit?: string; $editMode?: boolean }>`
 const RadioGroup = styled.div`
   display: flex;
   gap: 10px;
+  width: 100%;
+  max-width: 220px;
 `;
 
 const RadioLabel = styled.label`
@@ -188,7 +190,7 @@ const Select = styled.select<{ $editMode: boolean }>`
     $editMode ? theme.colors.gray900 : theme.colors.gray600};
   width: 100%;
   max-width: 220px;
-  text-align: right;
+  text-align: ${({ $editMode }) => ($editMode ? 'left' : 'right')};
   outline: none;
   transition: border-color 0.3s;
   cursor: ${({ $editMode }) => ($editMode ? 'auto' : 'not-allowed')};
@@ -209,35 +211,35 @@ const Graph = styled.div`
 
 export interface WeightHistory {
   addedDate: string;
-  weight: number;
+  weight: number | null;
 }
 
 export interface BodyFatHistory {
   addedDate: string;
-  bodyFatPercentage: number;
+  bodyFatPercentage: number | null;
 }
 
 export interface MuscleMassHistory {
   addedDate: string;
-  muscleMass: number;
+  muscleMass: number | null;
 }
 
 export interface AddInbodyData {
   traineeId: string | undefined;
-  weight: number;
-  bodyFatPercentage: number;
-  skeletalMuscleMass: number;
+  weight: number | null;
+  bodyFatPercentage: number | null;
+  skeletalMuscleMass: number | null;
   addedDate: string | Date;
 }
 
 export interface TraineeInfoData {
   traineeId: string | undefined;
   name: string;
-  age: number;
+  age: number | null;
   gender: string; // gender는 MALE 또는 FEMALE만 허용
-  height: number;
+  height: number | null;
   birthDate: string;
-  remainingSession: number;
+  remainingSession: number | null;
   weightHistory: WeightHistory[];
   bodyFatHistory: BodyFatHistory[];
   muscleMassHistory: MuscleMassHistory[];
@@ -245,7 +247,7 @@ export interface TraineeInfoData {
     | 'TARGET_WEIGHT'
     | 'TARGET_BODY_FAT_PERCENTAGE'
     | 'TARGET_SKELETAL_MUSCLE_MASS'; // targetType은 정의된 타입만 허용
-  targetValue: number;
+  targetValue: number | null;
   targetReward: string;
 }
 
@@ -350,7 +352,7 @@ const Dashboard: React.FC = () => {
           {
             label: '몸무게',
             data: traineeInfo.weightHistory.map(
-              (w: { weight: number }) => w.weight
+              (w: { weight: number | null }) => w.weight
             ),
             borderColor: '#FF3B3B',
             pointBackgroundColor: '#FF3B3B',
@@ -359,7 +361,7 @@ const Dashboard: React.FC = () => {
           {
             label: '체지방률',
             data: traineeInfo.bodyFatHistory.map(
-              (b: { bodyFatPercentage: number }) => b.bodyFatPercentage
+              (b: { bodyFatPercentage: number | null }) => b.bodyFatPercentage
             ),
             borderColor: '#3B98FF',
             pointBackgroundColor: '#3B98FF',
@@ -368,7 +370,7 @@ const Dashboard: React.FC = () => {
           {
             label: '근골격량',
             data: traineeInfo.muscleMassHistory.map(
-              (m: { muscleMass: number }) => m.muscleMass
+              (m: { muscleMass: number | null }) => m.muscleMass
             ),
             borderColor: '#ADB5BD',
             pointBackgroundColor: '#ADB5BD',
@@ -534,11 +536,11 @@ const Dashboard: React.FC = () => {
   // inbody 정보 모달 저장 로직
   const handleSaveModal = async () => {
     const { weight, bodyFatPercentage, skeletalMuscleMass } = inbodyData;
-    if (weight === 0) {
+    if (weight === 0 || weight === null) {
       return setErrorAlert('몸무게를 입력해주세요');
-    } else if (bodyFatPercentage === 0) {
+    } else if (bodyFatPercentage === 0 || bodyFatPercentage === null) {
       return setErrorAlert('체지방을 입력해주세요');
-    } else if (skeletalMuscleMass === 0) {
+    } else if (skeletalMuscleMass === 0 || skeletalMuscleMass === null) {
       return setErrorAlert('근골격량을 입력해주세요');
     }
 
@@ -547,25 +549,28 @@ const Dashboard: React.FC = () => {
       ...prevData,
       labels: [...prevData.labels, formattedDate],
       datasets: prevData.datasets.map(dataset => {
-        if (dataset.label === '몸무게') {
+        if (dataset.label === '몸무게' && weight !== null) {
           return {
             ...dataset,
             data: [...dataset.data, weight],
           };
         }
-        if (dataset.label === '체지방률') {
+        if (dataset.label === '체지방률' && bodyFatPercentage !== null) {
           return {
             ...dataset,
             data: [...dataset.data, bodyFatPercentage],
           };
         }
-        if (dataset.label === '근골격량') {
+        if (dataset.label === '근골격량' && skeletalMuscleMass !== null) {
           return {
             ...dataset,
             data: [...dataset.data, skeletalMuscleMass],
           };
         }
-        if (dataset.label.startsWith('목표수치')) {
+        if (
+          dataset.label.startsWith('목표수치') &&
+          traineeInfo!.targetValue !== null
+        ) {
           return {
             ...dataset,
             data: [...dataset.data, traineeInfo!.targetValue],
@@ -581,9 +586,9 @@ const Dashboard: React.FC = () => {
   const handleAddInbody = () => {
     setInbodyData({
       addedDate: format(new Date(), 'yyyy-MM-dd'),
-      weight: 0,
-      bodyFatPercentage: 0,
-      skeletalMuscleMass: 0,
+      weight: null,
+      bodyFatPercentage: null,
+      skeletalMuscleMass: null,
       traineeId: traineeId,
     });
     openModal('inbodyModal');
