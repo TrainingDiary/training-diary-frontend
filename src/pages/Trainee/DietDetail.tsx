@@ -264,10 +264,14 @@ const DietDetail: React.FC = () => {
     setCommentMenuVisible(!commentMenuVisible);
   };
 
-  const onSaveModal = (modalName: string) => {
+  const onSaveModal = async (modalName: string) => {
     if (modalName === 'deletePostModal') {
-      // 식단 삭제 API 요청 단계 추가
-      navigate(`/trainee/${traineeId}/diet`);
+      try {
+        await traineeApi.deleteDiet(parseInt(dietId!));
+        navigate(`/trainee/${traineeId}/diet`);
+      } catch (error) {
+        console.error('식단 삭제 에러: ', error);
+      }
     } else if (modalName === 'deleteCommentModal') {
       // 댓글 삭제 API 요청 단계 추가 (refetch)
     }

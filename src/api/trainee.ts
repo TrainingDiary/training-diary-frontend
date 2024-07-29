@@ -35,6 +35,8 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
       });
     },
 
+    deleteDiet: (id: number) => axiosInstance.delete(`/diets/${id}`),
+
     getDiets: (id: number, page: number, size: number) =>
       axiosInstance.get(`/diets/${id}`, {
         params: { page, size },
