@@ -45,17 +45,29 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
     deleteSession: (id: string | undefined) =>
       axiosInstance.delete(`workout-sessions/${id}`),
 
-    sessionPhotoUpload: (sessionId: string | undefined, images: string[]) =>
-      axiosInstance.put('workout-sessions/photos', {
-        sessionId,
-        images,
-      }),
+    sessionPhotoUpload: (sessionId: string | undefined, images: File[]) => {
+      const formData = new FormData();
+      formData.append('sessionId', sessionId as string);
+      Array.from(images).forEach(image => {
+        formData.append('images', image);
+      });
+      return axiosInstance.put('workout-sessions/photos', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    },
 
-    sessionVideoUpload: (sessionId: string | undefined, video: string) =>
-      axiosInstance.put('workout-sessions/videos', {
-        sessionId,
-        video,
-      }),
+    sessionVideoUpload: (sessionId: string | undefined, video: File) => {
+      const formData = new FormData();
+      formData.append('sessionId', sessionId as string);
+      formData.append('video', video);
+      return axiosInstance.put('workout-sessions/videos', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    },
   };
 };
 

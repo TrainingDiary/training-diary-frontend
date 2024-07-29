@@ -64,7 +64,7 @@ const VideoPreview = styled.div`
 interface VideoUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (video: string) => void;
+  onUpload: (video: File) => void;
 }
 
 const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
@@ -72,7 +72,7 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
   onClose,
   onUpload,
 }) => {
-  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
   const [errorAlert, setErrorAlert] = useState<string>('');
   const MAX_VIDEO_SIZE_MB = 200; // 용량 회의 후 변경
 
@@ -88,7 +88,7 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
         return;
       }
 
-      setSelectedVideo(URL.createObjectURL(file));
+      setSelectedVideo(file);
     }
   };
 
@@ -130,7 +130,7 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
         />
         {selectedVideo && (
           <VideoPreview>
-            <video src={selectedVideo} controls />
+            <video src={URL.createObjectURL(selectedVideo)} controls />
           </VideoPreview>
         )}
       </VideoUploadContainer>

@@ -62,7 +62,7 @@ const ImageLayout = styled.div`
 
 const Image = styled.img`
   display: block;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   pointer-events: none;
 `;

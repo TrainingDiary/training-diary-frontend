@@ -238,6 +238,8 @@ const SessionDetail: React.FC = () => {
     }
   }, [data]);
 
+  console.log(sessionData);
+
   useEffect(() => {
     // Fetch workout types
     const fetchWorkoutTypes = async () => {
@@ -318,7 +320,7 @@ const SessionDetail: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  const handlePhotoUpload = async (images: string[]) => {
+  const handlePhotoUpload = async (images: File[]) => {
     // Handle uploaded photos
     try {
       await traineeApi.sessionPhotoUpload(sessionId, images);
@@ -330,7 +332,7 @@ const SessionDetail: React.FC = () => {
     closeModal('photoUpload');
   };
 
-  const handleVideoUpload = async (video: string) => {
+  const handleVideoUpload = async (video: File) => {
     // Handle uploaded video
     try {
       await traineeApi.sessionVideoUpload(sessionId, video);
@@ -354,8 +356,6 @@ const SessionDetail: React.FC = () => {
   };
 
   const handleDeleteSession = async () => {
-    // TODO : 삭제 api 연동
-    // await axios.delete(`/api/sessions/${sessionId}`);
     try {
       await traineeApi.deleteSession(sessionId);
     } catch (error) {
@@ -366,7 +366,6 @@ const SessionDetail: React.FC = () => {
   };
 
   const handleConfirmDelete = () => {
-    // Show confirmation modal
     openModal('deleteSessionModal');
   };
 
