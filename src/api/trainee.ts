@@ -41,7 +41,7 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
       formData.append('image', image);
       formData.append('content', JSON.stringify(content));
 
-      return axiosInstance.post('/diets/', formData, {
+      return axiosInstance.post('/diets', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -58,10 +58,10 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
     getDietDetail: (id: number) => axiosInstance.get(`/diets/${id}/details`),
 
     addComment: (id: number, comment: string) =>
-      axiosInstance.post('/comments/', { id, comment }),
+      axiosInstance.post('/comments', { id, comment }),
 
     editComment: (id: number, comment: string) =>
-      axiosInstance.put('/comments/', { id, comment }),
+      axiosInstance.put('/comments', { id, comment }),
 
     deleteComment: (id: number) => axiosInstance.delete(`/comments/${id}`),
   };
