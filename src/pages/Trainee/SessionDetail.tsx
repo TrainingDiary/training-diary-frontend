@@ -163,8 +163,6 @@ const ImagePreview = styled.div`
 `;
 
 const VideoContainer = styled(ScrollContainer)`
-  height: 23vh;
-
   video {
     width: 90%;
     height: 100%;
@@ -175,6 +173,7 @@ const VideoContainer = styled(ScrollContainer)`
 export interface Workout {
   workoutId: number;
   workoutTypeName: string;
+  workoutTypeId: number;
   targetMuscle: string;
   remarks: string;
   weight: number;
@@ -344,7 +343,7 @@ const SessionDetail: React.FC = () => {
     closeModal('videoUpload');
   };
 
-  const handleEditSession = async () => {
+  const handleEditSession = () => {
     setFormState(sessionData);
     openModal('editSessionModal');
   };
@@ -437,7 +436,7 @@ const SessionDetail: React.FC = () => {
                   key={index}
                   onClick={() => handleImageClick(photo)}
                 >
-                  <img src={photo} alt={`자세 사진 ${index}`} />
+                  <img src={photo} alt={`자세 사진 ${index}`} loading="lazy" />
                 </ImagePreview>
               ))}
             </ScrollContainer>
