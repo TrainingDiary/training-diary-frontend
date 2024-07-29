@@ -63,6 +63,7 @@ const Contents = styled.p`
   flex: 1;
   font-size: 1.4rem;
   color: ${({ theme }) => theme.colors.gray900};
+  white-space: pre-line;
 `;
 
 const DotButton = styled.div`
@@ -345,11 +346,12 @@ const DietDetail: React.FC = () => {
         <ContentsContainer>
           <PostDate>{formatDate(dietDetail!.createdDate)}</PostDate>
           <ContentsBox>
-            <Contents
+            {/* <Contents
               dangerouslySetInnerHTML={{
                 __html: dietDetail!.content.replace(/\n/g, '<br />'),
               }}
-            />
+            /> */}
+            <Contents>{dietDetail!.content}</Contents>
             {user?.role === 'TRAINEE' && (
               <DotButton onClick={togglePostMenu}>
                 <img src={threeDots} alt="Button group: Delete options" />
