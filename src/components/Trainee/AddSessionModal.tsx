@@ -374,9 +374,13 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
       onSave(formData);
       setFormState(initialFormState);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response.status === 409) {
+        setErrorAlert('이미 존재하는 회차입니다.');
+      } else {
+        setErrorAlert('운동 기록 생성에 실패했습니다.');
+      }
       console.error('운동 기록 생성 실패:', error);
-      setErrorAlert('운동 기록 생성에 실패했습니다.');
     }
   };
 

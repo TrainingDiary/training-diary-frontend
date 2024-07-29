@@ -12,7 +12,7 @@ ${reset};
 
 
 
-//font-size base = 10px = 1rem / ex) 16px === 1.6rem 
+//font-size base = 10px = 1rem / ex) 16px === 1.6rem
 html, body{
   font-size: 10px;
   line-height: 1.5;
@@ -62,6 +62,14 @@ h1 {
 
 *::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
+}
+
+.react-datepicker__day--keyboard-selected, .react-datepicker__month-text--keyboard-selected, .react-datepicker__quarter-text--keyboard-selected, .react-datepicker__year-text--keyboard-selected{
+  background-color: transparent;
+}
+
+.react-datepicker__day--keyboard-selected:hover, .react-datepicker__month-text--keyboard-selected:hover, .react-datepicker__quarter-text--keyboard-selected:hover, .react-datepicker__year-text--keyboard-selected:hover{
+  background-color: #f0f0f0;
 }
 
 // view width 450px 이상이 되면 max-width = 450px로 고정 / 그 이하는 추후 작업하며 조절 예정

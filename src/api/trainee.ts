@@ -25,7 +25,7 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
       axiosInstance.post('trainers/trainees', inbodyData),
 
     //session
-    getSessionsList: (id: string | undefined, page: number, size: number) =>
+    getSessionsList: (id: string | undefined, page?: number, size?: number) =>
       axiosInstance.get(`workout-sessions/trainees/${id}`, {
         params: {
           page,
@@ -35,8 +35,6 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
 
     addSession: (sessionData: SessionDataType) =>
       axiosInstance.post('workout-sessions', sessionData),
-
-    detailWorkouts: (id: number) => axiosInstance.get(`/workout-types/${id}`),
 
     getSessionDetail: (id: number) =>
       axiosInstance.get(`workout-sessions/${id}`),

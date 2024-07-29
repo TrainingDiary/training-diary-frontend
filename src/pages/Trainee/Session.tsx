@@ -97,16 +97,19 @@ const Session: React.FC = () => {
   const traineeApi = CreateTraineeApi(navigate);
   const { user } = useUserStore();
   const { traineeId } = useParams<{ traineeId: string }>();
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const imageObserverRef = useRef<HTMLDivElement | null>(null);
+  const listObserverRef = useRef<HTMLDivElement | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const touchStartXRef = useRef<number | null>(null);
   const isDraggingRef = useRef(false);
   const startXRef = useRef(0);
   const scrollLeftRef = useRef(0);
   const { openModal, closeModal, isOpen } = useModals();
+  const [totalElements, setTotalElements] = useState(0);
 
   const fetchSessions = async ({ pageParam = 0 }) => {
-    const res = await traineeApi.getSessionsList(traineeId, pageParam, 20);
+    const res = await traineeApi.getSessionsList(traineeId, pageParam, 5);
+    setTotalElements(res.data.totalElements);
     return res.data;
   };
 
@@ -114,7 +117,12 @@ const Session: React.FC = () => {
     'sessions',
     fetchSessions,
     {
-      getNextPageParam: lastPage => lastPage.nextPage ?? false,
+      getNextPageParam: page => {
+        if (page.pageable.pageNumber + 1 < page.totalPages) {
+          return page.pageable.pageNumber + 1;
+        }
+        return undefined;
+      },
     }
   );
 
@@ -129,7 +137,7 @@ const Session: React.FC = () => {
   const [formState, setFormState] = useState<SessionDataType>({
     traineeId: traineeId,
     sessionDate: format(new Date(), 'yyyy-MM-dd'),
-    sessionNumber: sessions.length + 1,
+    sessionNumber: totalElements + 1,
     specialNote: '',
     workouts: [
       { workoutTypeId: 0, weight: '', speed: '', time: '', sets: '', rep: '' },
@@ -137,7 +145,7 @@ const Session: React.FC = () => {
   });
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    const imageObserver = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && hasNextPage) {
           fetchNextPage();
@@ -150,13 +158,38 @@ const Session: React.FC = () => {
       }
     );
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
+    if (imageObserverRef.current) {
+      imageObserver.observe(imageObserverRef.current);
     }
 
     return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
+      if (imageObserverRef.current) {
+        imageObserver.unobserve(imageObserverRef.current);
+      }
+    };
+  }, [hasNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    const listObserver = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      },
+      {
+        root: null,
+        rootMargin: '10px',
+        threshold: 1.0,
+      }
+    );
+
+    if (listObserverRef.current) {
+      listObserver.observe(listObserverRef.current);
+    }
+
+    return () => {
+      if (listObserverRef.current) {
+        listObserver.unobserve(listObserverRef.current);
       }
     };
   }, [hasNextPage, fetchNextPage]);
@@ -236,7 +269,7 @@ const Session: React.FC = () => {
     await refetch(); // 모달을 열기 전에 세션 목록을 다시 로드
     setFormState({
       ...formState,
-      sessionNumber: sessions.length + 1,
+      sessionNumber: totalElements + 1,
     });
     openModal('addSessionModal');
   };
@@ -251,28 +284,63 @@ const Session: React.FC = () => {
         <PhotoBox>
           <SectionTitle>자세 사진 목록</SectionTitle>
           <ImageContainer ref={imageContainerRef}>
-            {images.map((image, index) => (
-              <ImageLayout
-                key={index}
-                onClick={() => handleImageClick(image.sessionId)}
+            {images.length > 0 ? (
+              images.map((image, index) => (
+                <ImageLayout
+                  key={index}
+                  onClick={() => handleImageClick(image.sessionId)}
+                >
+                  <Image
+                    src={image.src}
+                    alt={`image ${index}`}
+                    loading="lazy"
+                  />
+                </ImageLayout>
+              ))
+            ) : (
+              <div
+                style={{
+                  fontSize: '1.4rem',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  width: '100%',
+                  minHeight: '150px',
+                  alignItems: 'center',
+                  marginLeft: '20px',
+                }}
               >
-                <Image src={image.src} alt={`image ${index}`} loading="lazy" />
-              </ImageLayout>
-            ))}
-            <div ref={observerRef} />
+                아직 자세 사진이 없습니다.
+              </div>
+            )}
+            <div ref={imageObserverRef} />
           </ImageContainer>
         </PhotoBox>
         <RecordBox>
           <SectionTitle>운동 기록 목록</SectionTitle>
           <RecordList>
-            {sessions.map((session, index) => (
-              <Link to={`${session.sessionId}`} key={index}>
-                <RecordItem>
-                  <div>{session.sessionDate}</div>
-                  <div>{session.sessionNumber}회차</div>
-                </RecordItem>
-              </Link>
-            ))}
+            {sessions.length > 0 ? (
+              sessions.map((session, index) => (
+                <Link to={`${session.sessionId}`} key={index}>
+                  <RecordItem>
+                    <div>{session.sessionDate}</div>
+                    <div>{session.sessionNumber}회차</div>
+                  </RecordItem>
+                </Link>
+              ))
+            ) : (
+              <div
+                style={{
+                  fontSize: '1.4rem',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  height: '50vh',
+                  alignItems: 'center',
+                }}
+              >
+                아직 운동 기록이 없습니다.
+              </div>
+            )}
+            <div ref={listObserverRef} />
           </RecordList>
         </RecordBox>
       </Wrapper>
