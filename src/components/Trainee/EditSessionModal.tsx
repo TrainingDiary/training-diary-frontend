@@ -185,8 +185,8 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
     workouts: [
       {
         workoutId: 0,
-        workoutTypeName: '',
         workoutTypeId: 0,
+        workoutTypeName: '',
         targetMuscle: '',
         remarks: '',
         weight: 0,

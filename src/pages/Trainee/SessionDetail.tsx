@@ -172,8 +172,8 @@ const VideoContainer = styled(ScrollContainer)`
 
 export interface Workout {
   workoutId: number;
-  workoutTypeName: string;
   workoutTypeId: number;
+  workoutTypeName: string;
   targetMuscle: string;
   remarks: string;
   weight: number;
@@ -319,11 +319,10 @@ const SessionDetail: React.FC = () => {
     return <div>Loading...</div>;
   }
 
+  // 이미지 업로드 핸들러
   const handlePhotoUpload = async (images: File[]) => {
-    // Handle uploaded photos
     try {
       await traineeApi.sessionPhotoUpload(sessionId, images);
-      console.log('이미지 업로드 성공 :', images);
       refetch();
     } catch (error) {
       console.error('운동 기록 이미지 추가 에러: ', error);
@@ -331,8 +330,8 @@ const SessionDetail: React.FC = () => {
     closeModal('photoUpload');
   };
 
+  // 동영상 업로드 핸들러
   const handleVideoUpload = async (video: File) => {
-    // Handle uploaded video
     try {
       await traineeApi.sessionVideoUpload(sessionId, video);
       console.log('동영상 업로드 성공 :', video);
