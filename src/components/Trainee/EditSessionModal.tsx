@@ -157,6 +157,7 @@ interface EditSessionModalProps {
   setFormState: React.Dispatch<React.SetStateAction<SessionDetailType | null>>;
   workoutTypes: {
     id: number;
+    workoutTypeId: number;
     name: string;
     targetMuscle: string;
     weightInputRequired: boolean;
@@ -185,7 +186,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
     workouts: [
       {
         workoutId: 0,
-        workoutTypeId: 0,
+        workoutTypeId: 0, // 초기화 시 workoutTypeId 추가
         workoutTypeName: '',
         targetMuscle: '',
         remarks: '',
@@ -236,6 +237,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
       const newWorkouts = [...formState.workouts];
       newWorkouts[index] = {
         ...newWorkouts[index],
+        workoutTypeId: selectedWorkout.id, // workoutTypeId 설정
         workoutTypeName: selectedWorkout.name,
         targetMuscle: selectedWorkout.targetMuscle,
         weight: 0,
@@ -282,7 +284,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
       for (let i = 0; i < formState.workouts.length; i++) {
         const workout = formState.workouts[i];
         const selectedWorkout = workoutTypes.find(
-          type => type.name === workout.workoutTypeName
+          type => type.id === workout.workoutTypeId
         );
         if (!selectedWorkout) {
           continue; // 운동 종류를 선택하지 않은 경우 에러 검사를 하지 않음
@@ -304,15 +306,31 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
         }
       }
 
+      // 선택된 workout 아이디가 맞다면, 업데이트
+      const updatedWorkouts = formState.workouts.map(workout => {
+        const workoutType = workoutTypes.find(
+          type =>
+            type.name === workout.workoutTypeName &&
+            type.targetMuscle === workout.targetMuscle
+        );
+        return workoutType
+          ? { ...workout, workoutTypeId: workoutType.id }
+          : workout;
+      });
+
       try {
-        await traineeApi.updateSession(formState);
+        await traineeApi.updateSession({
+          ...formState,
+          workouts: updatedWorkouts,
+        });
+        console.log('운동 기록 성공');
       } catch (error) {
         console.error('운동 기록 수정 에러: ', error);
         setErrorAlert('운동 기록 수정에 실패했습니다.');
         return;
       }
 
-      onSave(formState);
+      onSave({ ...formState, workouts: updatedWorkouts });
       setFormState(initialFormState);
       onClose();
     }
