@@ -34,8 +34,6 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
 
     addSession: (sessionData: SessionDataType) =>
       axiosInstance.post('workout-sessions', sessionData),
-
-    detailWorkouts: (id: number) => axiosInstance.get(`/workout-types/${id}`),
   };
 };
 

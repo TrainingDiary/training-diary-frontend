@@ -137,7 +137,7 @@ const Session: React.FC = () => {
   const [formState, setFormState] = useState<SessionDataType>({
     traineeId: traineeId,
     sessionDate: format(new Date(), 'yyyy-MM-dd'),
-    sessionNumber: totalElements,
+    sessionNumber: totalElements + 1,
     specialNote: '',
     workouts: [
       { workoutTypeId: 0, weight: '', speed: '', time: '', sets: '', rep: '' },
@@ -269,7 +269,7 @@ const Session: React.FC = () => {
     await refetch(); // 모달을 열기 전에 세션 목록을 다시 로드
     setFormState({
       ...formState,
-      sessionNumber: sessions.length + 1,
+      sessionNumber: totalElements + 1,
     });
     openModal('addSessionModal');
   };
@@ -284,28 +284,62 @@ const Session: React.FC = () => {
         <PhotoBox>
           <SectionTitle>자세 사진 목록</SectionTitle>
           <ImageContainer ref={imageContainerRef}>
-            {images.map((image, index) => (
-              <ImageLayout
-                key={index}
-                onClick={() => handleImageClick(image.sessionId)}
+            {images.length > 0 ? (
+              images.map((image, index) => (
+                <ImageLayout
+                  key={index}
+                  onClick={() => handleImageClick(image.sessionId)}
+                >
+                  <Image
+                    src={image.src}
+                    alt={`image ${index}`}
+                    loading="lazy"
+                  />
+                </ImageLayout>
+              ))
+            ) : (
+              <div
+                style={{
+                  fontSize: '1.4rem',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  width: '100%',
+                  minHeight: '150px',
+                  alignItems: 'center',
+                  marginLeft: '20px',
+                }}
               >
-                <Image src={image.src} alt={`image ${index}`} loading="lazy" />
-              </ImageLayout>
-            ))}
+                아직 자세 사진이 없습니다.
+              </div>
+            )}
             <div ref={imageObserverRef} />
           </ImageContainer>
         </PhotoBox>
         <RecordBox>
           <SectionTitle>운동 기록 목록</SectionTitle>
           <RecordList>
-            {sessions.map((session, index) => (
-              <Link to={`${session.sessionId}`} key={index}>
-                <RecordItem>
-                  <div>{session.sessionDate}</div>
-                  <div>{session.sessionNumber}회차</div>
-                </RecordItem>
-              </Link>
-            ))}
+            {sessions.length > 0 ? (
+              sessions.map((session, index) => (
+                <Link to={`${session.sessionId}`} key={index}>
+                  <RecordItem>
+                    <div>{session.sessionDate}</div>
+                    <div>{session.sessionNumber}회차</div>
+                  </RecordItem>
+                </Link>
+              ))
+            ) : (
+              <div
+                style={{
+                  fontSize: '1.4rem',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  height: '50vh',
+                  alignItems: 'center',
+                }}
+              >
+                아직 운동 기록이 없습니다.
+              </div>
+            )}
             <div ref={listObserverRef} />
           </RecordList>
         </RecordBox>
