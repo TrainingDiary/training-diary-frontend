@@ -8,7 +8,9 @@ import Modal from '@components/Common/Modal/Modal';
 import Button from '@components/Common/Button/Button';
 import PhotoUploadModal from '@components/Trainee/PhotoUploadModal';
 import VideoUploadModal from '@components/Trainee/VideoUploadModal';
-import EditSessionModal from '@components/Trainee/EditSessionModal';
+import EditSessionModal, {
+  SessionEditType,
+} from '@components/Trainee/EditSessionModal';
 import ImageModal from '@components/Trainee/ImageModal';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import useFetchUser from 'src/hooks/useFetchUser';
@@ -222,7 +224,7 @@ const SessionDetail: React.FC = () => {
       speedInputRequired: boolean;
     }[]
   >([]);
-  const [formState, setFormState] = useState<SessionDetailType | null>(null);
+  const [formState, setFormState] = useState<SessionEditType | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
@@ -349,12 +351,48 @@ const SessionDetail: React.FC = () => {
   };
 
   const handleEditSession = () => {
-    setFormState(sessionData);
-    openModal('editSessionModal');
+    if (sessionData) {
+      const { sessionId, sessionDate, specialNote, workouts } = sessionData;
+      setFormState({
+        sessionId,
+        sessionDate,
+        specialNote,
+        workouts: workouts.map(workout => ({
+          workoutId: workout.workoutId,
+          workoutTypeId: workout.workoutTypeId,
+          weight: workout.weight,
+          rep: workout.rep,
+          sets: workout.sets,
+          time: workout.time,
+          speed: workout.speed,
+        })),
+      });
+      openModal('editSessionModal');
+    }
   };
 
-  const handleSaveSession = (updatedSession: SessionDetailType) => {
-    setSessionData(updatedSession);
+  const handleSaveSession = (updatedSession: SessionEditType) => {
+    setSessionData(prevState =>
+      prevState
+        ? {
+            ...prevState,
+            sessionDate: updatedSession.sessionDate,
+            specialNote: updatedSession.specialNote,
+            workouts: updatedSession.workouts.map(workout => ({
+              ...workout,
+              workoutTypeName:
+                prevState.workouts.find(w => w.workoutId === workout.workoutId)
+                  ?.workoutTypeName || '',
+              targetMuscle:
+                prevState.workouts.find(w => w.workoutId === workout.workoutId)
+                  ?.targetMuscle || '',
+              remarks:
+                prevState.workouts.find(w => w.workoutId === workout.workoutId)
+                  ?.remarks || '',
+            })),
+          }
+        : null
+    );
     closeModal('editSessionModal');
     refetch();
   };
