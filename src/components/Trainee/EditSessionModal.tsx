@@ -236,7 +236,11 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
     }
   };
 
-  const handleWorkoutTypeChange = (index: number, workoutTypeId: string) => {
+  const handleWorkoutTypeChange = (
+    index: number,
+    workoutTypeId: string,
+    workoutId: number
+  ) => {
     const selectedWorkout = workoutTypes.find(
       workout => workout.id === parseInt(workoutTypeId)
     );
@@ -245,7 +249,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
       const newWorkouts = [...formState.workouts];
       newWorkouts[index] = {
         ...newWorkouts[index],
-        workoutId: formState.sessionId,
+        workoutId: workoutId, // SessionDetail에서 받아온 workoutId 사용
         workoutTypeId: selectedWorkout.id, // workoutTypeId 설정
         weight: 0,
         rep: 0,
@@ -266,7 +270,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
               workouts: [
                 ...prev.workouts,
                 {
-                  workoutId: formState.sessionId,
+                  workoutId: 0, // 새로운 운동의 workoutId를 0으로 초기화
                   workoutTypeId: 0,
                   weight: 0,
                   rep: 0,
@@ -325,7 +329,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
         }
       }
 
-      console.log(workoutTypes, formState);
+      console.log(formState);
 
       try {
         await traineeApi.updateSession(formState);
@@ -392,7 +396,11 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                     <Select
                       value={selectedWorkout ? selectedWorkout.id : ''}
                       onChange={e =>
-                        handleWorkoutTypeChange(index, e.target.value)
+                        handleWorkoutTypeChange(
+                          index,
+                          e.target.value,
+                          exercise.workoutId
+                        )
                       }
                     >
                       <option value="">운동 종류</option>
