@@ -11,15 +11,11 @@ const requestPermission = async (navigate: NavigateFunction) => {
     const permission = await Notification.requestPermission();
     const messaging = getMessaging(app);
 
-    console.log(messaging);
-
     if (permission === 'granted') {
-      console.log(import.meta.env.VITE_APP_VAPID_KEY);
       const token = await getToken(messaging, {
         vapidKey: import.meta.env.VITE_APP_VAPID_KEY,
       });
 
-      console.log(token);
       if (token) {
         await notificationApi.registerFCMToken(token);
       }
