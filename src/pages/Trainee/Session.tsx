@@ -107,7 +107,7 @@ const Session: React.FC = () => {
   const { openModal, closeModal, isOpen } = useModals();
 
   const fetchSessions = async ({ pageParam = 0 }) => {
-    const res = await traineeApi.getSessionsList(traineeId, pageParam, 5);
+    const res = await traineeApi.getSessionsList(traineeId, pageParam, 10);
     return res.data;
   };
 
@@ -124,13 +124,33 @@ const Session: React.FC = () => {
     }
   );
 
-  const sessions = data?.pages.flatMap(page => page.content) ?? [];
-  const images = sessions.flatMap((session: SessionData) =>
+  // Fetch sessions photos data
+  const [photos, setPhotos] = useState<SessionData[]>([]);
+
+  useEffect(() => {
+    if (traineeId) {
+      const fetchData = async (traineeId: string) => {
+        try {
+          const res = await traineeApi.getSessionsPhotos(traineeId, 0, 40);
+          if (res.status === 200 && res.data) {
+            setPhotos(res.data.content);
+          }
+        } catch (error) {
+          console.error('트레이니 조회 에러: ', error);
+        }
+      };
+      fetchData(traineeId);
+    }
+  }, [traineeId]);
+
+  const imagesFromPhotos = photos.flatMap((session: SessionData) =>
     session.thumbnailUrls.map((url: string) => ({
       src: url,
       sessionId: session.sessionId,
     }))
   );
+
+  const sessions = data?.pages.flatMap(page => page.content) ?? [];
 
   const [formState, setFormState] = useState<SessionDataType>({
     traineeId: traineeId,
@@ -289,8 +309,8 @@ const Session: React.FC = () => {
         <PhotoBox>
           <SectionTitle>자세 사진 목록</SectionTitle>
           <ImageContainer ref={imageContainerRef}>
-            {images.length > 0 ? (
-              images.map((image, index) => (
+            {imagesFromPhotos.length > 0 ? (
+              imagesFromPhotos.map((image, index) => (
                 <ImageLayout
                   key={index}
                   onClick={() => handleImageClick(image.sessionId)}

@@ -33,6 +33,14 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
         },
       }),
 
+    getSessionsPhotos: (id: string | undefined, page?: number, size?: number) =>
+      axiosInstance.get(`workout-sessions/trainees/${id}`, {
+        params: {
+          page,
+          size,
+        },
+      }),
+
     addSession: (sessionData: SessionDataType) =>
       axiosInstance.post('workout-sessions', sessionData),
 
