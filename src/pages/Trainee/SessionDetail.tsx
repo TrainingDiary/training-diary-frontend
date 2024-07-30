@@ -369,7 +369,8 @@ const SessionDetail: React.FC = () => {
     openModal('deleteSessionModal');
   };
 
-  const handleImageClick = (imageUrl: string) => {
+  const handleImageClick = (imageUrl: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
     setSelectedImageUrl(imageUrl);
     openModal('imageModal');
   };
@@ -471,7 +472,7 @@ const SessionDetail: React.FC = () => {
               {sessionData.photoUrls.slice(0, 10).map((photo, index) => (
                 <ImagePreview
                   key={index}
-                  onClick={() => handleImageClick(photo)}
+                  onClick={e => handleImageClick(photo, e)}
                 >
                   <img src={photo} alt={`자세 사진 ${index}`} loading="lazy" />
                 </ImagePreview>
