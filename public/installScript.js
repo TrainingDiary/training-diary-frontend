@@ -8,9 +8,10 @@ window.addEventListener('load', () => {
   }
 
   if (
-    window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: fullscreen)').matches ||
     localStorage.getItem('pwaInstalled')
   ) {
+    installBanner.style.display = 'none';
     return;
   }
 
