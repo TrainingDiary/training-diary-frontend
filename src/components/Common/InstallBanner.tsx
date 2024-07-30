@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import closeIcon from '@icons/modal/closeBtn.svg';
 
 const Wrapper = styled.div`
-  display: none;
+  display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: ${({ theme }) => theme.colors.blue500};
