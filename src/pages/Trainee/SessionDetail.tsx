@@ -224,6 +224,7 @@ const SessionDetail: React.FC = () => {
   >([]);
   const [formState, setFormState] = useState<SessionDetailType | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
 
@@ -334,13 +335,14 @@ const SessionDetail: React.FC = () => {
 
   // 동영상 업로드 핸들러
   const handleVideoUpload = async (video: File) => {
+    setUploading(true);
     try {
       await traineeApi.sessionVideoUpload(sessionId, video);
-      console.log('동영상 업로드 성공 :', video);
       refetch();
     } catch (error) {
       console.error('운동 기록 동영상 추가 에러: ', error);
     }
+    setUploading(false);
     closeModal('videoUpload');
   };
 
@@ -519,6 +521,7 @@ const SessionDetail: React.FC = () => {
         isOpen={isOpen('videoUpload')}
         onClose={() => closeModal('videoUpload')}
         onUpload={handleVideoUpload}
+        uploading={uploading}
       />
       <EditSessionModal
         isOpen={isOpen('editSessionModal')}

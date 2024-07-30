@@ -65,12 +65,14 @@ interface VideoUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onUpload: (video: File) => void;
+  uploading: boolean;
 }
 
 const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
   isOpen,
   onClose,
   onUpload,
+  uploading,
 }) => {
   const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
   const [errorAlert, setErrorAlert] = useState<string>('');
@@ -115,7 +117,7 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
       isOpen={isOpen}
       onClose={handleClose}
       onSave={handleUpload}
-      btnConfirm="업로드"
+      btnConfirm={uploading ? '업로드 중...' : '업로드'}
     >
       <VideoUploadContainer>
         <LabelWrap>
