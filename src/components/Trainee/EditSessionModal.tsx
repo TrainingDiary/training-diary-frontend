@@ -371,6 +371,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
           onChange={e =>
             handleInputChange('sessionNumber', parseInt(e.target.value))
           }
+          disabled
         />
       </FormGroup>
       <FormGroup>
