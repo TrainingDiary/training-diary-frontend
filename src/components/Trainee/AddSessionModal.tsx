@@ -435,7 +435,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
       <FormGroup>
         <Label>특이사항:</Label>
         <TextArea
-          value={formState.specialNote}
+          value={formState.specialNote || ''}
           onChange={e => handleInputChange('specialNote', e.target.value)}
         ></TextArea>
       </FormGroup>

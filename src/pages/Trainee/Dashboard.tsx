@@ -773,7 +773,7 @@ const Dashboard: React.FC = () => {
               <Label>목표 보상</Label>
               <TextArea
                 name="targetReward"
-                value={traineeInfo.targetReward}
+                value={traineeInfo.targetReward || ''}
                 readOnly={editInfo}
                 onChange={handleTextAreaChange}
                 $editMode={!editInfo}
