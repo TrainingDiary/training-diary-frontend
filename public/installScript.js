@@ -7,10 +7,12 @@ window.addEventListener('load', () => {
     return;
   }
 
-  if (
-    window.matchMedia('(display-mode: fullscreen)').matches ||
-    localStorage.getItem('pwaInstalled')
-  ) {
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone ||
+    localStorage.getItem('pwaInstalled');
+
+  if (isStandalone) {
     return;
   }
 

@@ -21,6 +21,7 @@ const Wrapper = styled.div`
 
 const Container = styled.div`
   display: flex;
+  align-items: flex-start;
 `;
 
 const BannerContent = styled.div`
