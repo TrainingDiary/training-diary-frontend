@@ -8,6 +8,7 @@ import AppRoutes from './routes';
 import GlobalStyles from './styles/globalStyles';
 import theme from './styles/theme';
 import PushMessage from '@components/Common/PushMessage';
+import InstallBanner from '@components/Common/InstallBanner';
 import { app } from './firebase/initFirebase';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
+      <InstallBanner />
       <AppRoutes />
       <ToastContainer />
     </ThemeProvider>

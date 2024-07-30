@@ -24,6 +24,8 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "cSpell.words": [
     "addbtn",
+    "appinstalled",
+    "beforeinstallprompt",
     "Cantarell",
     "chartjs",
     "datepicker",

@@ -62,7 +62,6 @@
     }
   ],
   "start_url": "/",
-  "display": "fullscreen",
-  "theme_color": "#ffffff",
+  "display": "standalone",
   "background_color": "#89DAC1"
 }
