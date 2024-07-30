@@ -151,8 +151,8 @@ const Session: React.FC = () => {
       },
       {
         root: imageContainerRef.current,
-        rootMargin: '100px',
-        threshold: 1.0,
+        rootMargin: '0px',
+        threshold: 0.1,
       }
     );
 
@@ -176,8 +176,8 @@ const Session: React.FC = () => {
       },
       {
         root: null,
-        rootMargin: '10px',
-        threshold: 1.0,
+        rootMargin: '0px',
+        threshold: 0.1,
       }
     );
 
