@@ -151,11 +151,7 @@ const Diet: React.FC = () => {
               onClick={() => onClickDiet(diet.dietId)}
               ref={diets.length === index + 1 ? loadMoreRef : null}
             >
-              <Image
-                src={diet.thumbnailUrl}
-                alt={`diet image`}
-                loading="lazy"
-              />
+              <Image src={diet.thumbnailUrl} alt="diet image" loading="lazy" />
             </ImageWrapper>
           ))}
         </Gallery>
