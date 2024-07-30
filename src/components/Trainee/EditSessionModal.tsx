@@ -128,6 +128,7 @@ const AttributeTabInput = styled.input`
   outline: none;
 `;
 
+/*
 const AddExerciseButton = styled.button`
   padding: 5px 10px;
   background-color: ${({ theme }) => theme.colors.gray900};
@@ -136,7 +137,7 @@ const AddExerciseButton = styled.button`
   border-radius: 5px;
   cursor: pointer;
 `;
-
+*/
 const RemoveExerciseButton = styled.button`
   padding: 5px 10px;
   background-color: ${({ theme }) => theme.colors.red500};
@@ -261,6 +262,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
     }
   };
 
+  /*
   const addExercise = () => {
     if (formState) {
       setFormState(prev =>
@@ -284,7 +286,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
       );
     }
   };
-
+*/
   const removeExercise = (index: number) => {
     if (formState) {
       const newWorkouts = formState.workouts.filter((_, i) => i !== index);
@@ -496,7 +498,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
               </ExerciseGroup>
             );
           })}
-          <AddExerciseButton onClick={addExercise}>운동 추가</AddExerciseButton>
+          {/* <AddExerciseButton onClick={addExercise}>운동 추가</AddExerciseButton> */}
         </WorkoutSection>
       </FormGroup>
       {errorAlert && (
