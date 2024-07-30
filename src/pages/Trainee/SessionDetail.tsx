@@ -257,6 +257,7 @@ const SessionDetail: React.FC = () => {
     }
   }, [traineeId, sessionId]);
 
+  // 가로 스크롤 구현
   const handleHorizontalScroll = (container: HTMLDivElement | null) => {
     if (!container) return;
 
@@ -320,10 +321,6 @@ const SessionDetail: React.FC = () => {
     };
   }, [imageContainerRef.current, videoContainerRef.current]);
 
-  if (!sessionData) {
-    return <div>Loading...</div>;
-  }
-
   // 이미지 업로드 핸들러
   const handlePhotoUpload = async (images: File[]) => {
     try {
@@ -377,10 +374,36 @@ const SessionDetail: React.FC = () => {
     openModal('imageModal');
   };
 
+  if (!sessionData) {
+    return (
+      <div
+        style={{
+          fontSize: '1.4rem',
+          display: 'flex',
+          justifyContent: 'center',
+          height: '50vh',
+          alignItems: 'center',
+        }}
+      >
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <SectionWrapper>
       {isLoading ? (
-        <div>Loading...</div>
+        <div
+          style={{
+            fontSize: '1.4rem',
+            display: 'flex',
+            justifyContent: 'center',
+            height: '50vh',
+            alignItems: 'center',
+          }}
+        >
+          Loading...
+        </div>
       ) : (
         <DetailWrapper>
           <Header>

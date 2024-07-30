@@ -372,6 +372,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
             handleInputChange('sessionNumber', parseInt(e.target.value))
           }
           disabled
+          style={{ cursor: 'not-allowed' }}
         />
       </FormGroup>
       <FormGroup>
