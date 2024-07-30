@@ -11,7 +11,6 @@ window.addEventListener('load', () => {
     window.matchMedia('(display-mode: fullscreen)').matches ||
     localStorage.getItem('pwaInstalled')
   ) {
-    installBanner.style.display = 'none';
     return;
   }
 
