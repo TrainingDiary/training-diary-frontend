@@ -324,12 +324,14 @@ const SessionDetail: React.FC = () => {
 
   // 이미지 업로드 핸들러
   const handlePhotoUpload = async (images: File[]) => {
+    setUploading(true);
     try {
       await traineeApi.sessionPhotoUpload(sessionId, images);
       refetch();
     } catch (error) {
       console.error('운동 기록 이미지 추가 에러: ', error);
     }
+    setUploading(false);
     closeModal('photoUpload');
   };
 
@@ -516,6 +518,7 @@ const SessionDetail: React.FC = () => {
         isOpen={isOpen('photoUpload')}
         onClose={() => closeModal('photoUpload')}
         onUpload={handlePhotoUpload}
+        uploading={uploading}
       />
       <VideoUploadModal
         isOpen={isOpen('videoUpload')}
