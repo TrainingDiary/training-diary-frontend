@@ -373,8 +373,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
           ? format(formState.sessionDate, 'yyyy-MM-dd')
           : null,
       };
-      const response = await traineeApi.addSession(formData);
-      console.log('운동 기록 생성 성공:', response.data);
+      await traineeApi.addSession(formData);
       onSave(formData);
       setFormState(initialFormState);
       onClose();
