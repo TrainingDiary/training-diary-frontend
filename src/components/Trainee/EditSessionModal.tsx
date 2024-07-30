@@ -312,7 +312,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
           type => type.id === workout.workoutTypeId
         );
         if (!selectedWorkout) {
-          continue;
+          return setErrorAlert('운동 종류를 선택해주세요.');
         }
         if (selectedWorkout.weightInputRequired && workout.weight <= 0) {
           return setErrorAlert('무게를 입력해주세요.');
