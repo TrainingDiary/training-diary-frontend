@@ -8,7 +8,9 @@ import Modal from '@components/Common/Modal/Modal';
 import Button from '@components/Common/Button/Button';
 import PhotoUploadModal from '@components/Trainee/PhotoUploadModal';
 import VideoUploadModal from '@components/Trainee/VideoUploadModal';
-import EditSessionModal from '@components/Trainee/EditSessionModal';
+import EditSessionModal, {
+  SessionEditType,
+} from '@components/Trainee/EditSessionModal';
 import ImageModal from '@components/Trainee/ImageModal';
 import { hexToRgba } from 'src/utils/hexToRgba';
 import useFetchUser from 'src/hooks/useFetchUser';
@@ -16,6 +18,7 @@ import useModals from 'src/hooks/useModals';
 import CreateTraineeApi from 'src/api/trainee';
 import CreateTrainerApi from 'src/api/trainer';
 import useUserStore from 'src/stores/userStore';
+import Alert from '@components/Common/Alert/Alert';
 
 const DetailWrapper = styled.div`
   display: flex;
@@ -222,8 +225,10 @@ const SessionDetail: React.FC = () => {
       speedInputRequired: boolean;
     }[]
   >([]);
-  const [formState, setFormState] = useState<SessionDetailType | null>(null);
+  const [formState, setFormState] = useState<SessionEditType | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [errorAlert, setErrorAlert] = useState<string>('');
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
 
@@ -323,34 +328,78 @@ const SessionDetail: React.FC = () => {
 
   // 이미지 업로드 핸들러
   const handlePhotoUpload = async (images: File[]) => {
+    setUploading(true);
     try {
       await traineeApi.sessionPhotoUpload(sessionId, images);
       refetch();
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response.status === 413) {
+        setErrorAlert('사진은 최대 10장 입니다.');
+        setUploading(false);
+        return;
+      }
       console.error('운동 기록 이미지 추가 에러: ', error);
     }
+    setUploading(false);
     closeModal('photoUpload');
   };
 
   // 동영상 업로드 핸들러
   const handleVideoUpload = async (video: File) => {
+    setUploading(true);
     try {
       await traineeApi.sessionVideoUpload(sessionId, video);
-      console.log('동영상 업로드 성공 :', video);
       refetch();
     } catch (error) {
       console.error('운동 기록 동영상 추가 에러: ', error);
     }
+    setUploading(false);
     closeModal('videoUpload');
   };
 
   const handleEditSession = () => {
-    setFormState(sessionData);
-    openModal('editSessionModal');
+    if (sessionData) {
+      const { sessionId, sessionDate, specialNote, workouts } = sessionData;
+      setFormState({
+        sessionId,
+        sessionDate,
+        specialNote,
+        workouts: workouts.map(workout => ({
+          workoutId: workout.workoutId,
+          workoutTypeId: workout.workoutTypeId,
+          weight: workout.weight,
+          rep: workout.rep,
+          sets: workout.sets,
+          time: workout.time,
+          speed: workout.speed,
+        })),
+      });
+      openModal('editSessionModal');
+    }
   };
 
-  const handleSaveSession = (updatedSession: SessionDetailType) => {
-    setSessionData(updatedSession);
+  const handleSaveSession = (updatedSession: SessionEditType) => {
+    setSessionData(prevState =>
+      prevState
+        ? {
+            ...prevState,
+            sessionDate: updatedSession.sessionDate,
+            specialNote: updatedSession.specialNote,
+            workouts: updatedSession.workouts.map(workout => ({
+              ...workout,
+              workoutTypeName:
+                prevState.workouts.find(w => w.workoutId === workout.workoutId)
+                  ?.workoutTypeName || '',
+              targetMuscle:
+                prevState.workouts.find(w => w.workoutId === workout.workoutId)
+                  ?.targetMuscle || '',
+              remarks:
+                prevState.workouts.find(w => w.workoutId === workout.workoutId)
+                  ?.remarks || '',
+            })),
+          }
+        : null
+    );
     closeModal('editSessionModal');
     refetch();
   };
@@ -374,6 +423,8 @@ const SessionDetail: React.FC = () => {
     setSelectedImageUrl(imageUrl);
     openModal('imageModal');
   };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
 
   if (!sessionData) {
     return (
@@ -514,11 +565,13 @@ const SessionDetail: React.FC = () => {
         isOpen={isOpen('photoUpload')}
         onClose={() => closeModal('photoUpload')}
         onUpload={handlePhotoUpload}
+        uploading={uploading}
       />
       <VideoUploadModal
         isOpen={isOpen('videoUpload')}
         onClose={() => closeModal('videoUpload')}
         onUpload={handleVideoUpload}
+        uploading={uploading}
       />
       <EditSessionModal
         isOpen={isOpen('editSessionModal')}
@@ -543,6 +596,9 @@ const SessionDetail: React.FC = () => {
       >
         운동 기록을 삭제하시겠습니까?
       </Modal>
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
     </SectionWrapper>
   );
 };

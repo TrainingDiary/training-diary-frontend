@@ -31,7 +31,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
     title="사진 확대"
     isOpen={isOpen}
     onClose={onClose}
-    btnConfirm="닫기"
+    btnConfirm="none"
   >
     <ImageWrapper>
       <OriginalImage src={imageUrl} alt="원본 이미지" />

@@ -91,12 +91,14 @@ interface PhotoUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onUpload: (photos: File[]) => void;
+  uploading: boolean;
 }
 
 const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({
   isOpen,
   onClose,
   onUpload,
+  uploading,
 }) => {
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [errorAlert, setErrorAlert] = useState<string>('');
@@ -116,13 +118,15 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (selectedPhotos.length === 0) {
       setErrorAlert('사진을 1장 이상 등록해주세요.');
       return;
     }
-    onUpload(selectedPhotos);
-    setSelectedPhotos([]);
+    await onUpload(selectedPhotos);
+    if (!uploading) {
+      setSelectedPhotos([]);
+    }
   };
 
   const handleClose = () => {
@@ -143,7 +147,7 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({
       isOpen={isOpen}
       onClose={handleClose}
       onSave={handleUpload}
-      btnConfirm="업로드"
+      btnConfirm={uploading ? '업로드 중...' : '업로드'}
     >
       <PhotoUploadContainer>
         <LabelWrap>

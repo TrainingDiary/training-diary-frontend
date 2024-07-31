@@ -165,9 +165,11 @@ const Modal: React.FC<ModalProps> = ({
           <Button $size={'small'} onClick={onClose}>
             취소
           </Button>
-          <Button $variant={'primary'} $size={'small'} onClick={handleSave}>
-            {btnConfirm ? btnConfirm : '추가'}
-          </Button>
+          {btnConfirm === 'none' ? null : (
+            <Button $variant={'primary'} $size={'small'} onClick={handleSave}>
+              {btnConfirm ? btnConfirm : '추가'}
+            </Button>
+          )}
         </ButtonGroup>
       </ModalContent>
     </ModalWrapper>
