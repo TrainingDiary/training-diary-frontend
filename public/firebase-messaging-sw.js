@@ -16,7 +16,7 @@ const firebaseConfig = {
   storageBucket: 'training-diary-e5a05.appspot.com',
   messagingSenderId: '628687093769',
   appId: '1:628687093769:web:bb43a2c93262e6a0c278d8',
-  measurementId: 'G-6ED7JVWWP4',
+  measurementId: 'G-WDHWRZNXYC',
 };
 
 firebase.initializeApp(firebaseConfig);
