@@ -5,7 +5,7 @@ import bgImg from '../assets/images/notPage.png'; // 이미지 파일 경로
 const NotFoundWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   height: 100dvh;
   max-width: 450px;
@@ -16,32 +16,53 @@ const NotFoundWrapper = styled.div`
   background-position: center;
   background-size: cover;
   color: ${({ theme }) => theme.colors.white};
+  padding: 0 30px 50px;
 `;
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  h1 {
-    font-size: 4rem;
-  }
+  gap: 50px;
+  width: 100%;
+  .title {
+    width: 50%;
+    margin: 0 auto;
 
-  h2 {
-    font-size: 2rem;
+    h1 {
+      font-size: 4rem;
+      border-bottom: solid 2px ${({ theme }) => theme.colors.white};
+    }
+
+    h2 {
+      font-size: 4rem;
+      font-weight: bold;
+    }
   }
 
   p {
-    font-size: 2rem;
+    font-size: 3rem;
+    font-family: 'NanumSquareBold';
+    text-align: center;
+    text-decoration: underline;
+    padding-left: 60px;
+
+    strong {
+      font-size: 5rem;
+      font-family: 'NanumSquareExtraBold';
+    }
   }
 
   button {
-    font-size: 1.2rem;
+    width: 100%;
+    font-size: 3rem;
     color: ${({ theme }) => theme.colors.main900};
-    background: white;
-    border: 1px solid ${({ theme }) => theme.colors.main900};
-    border-radius: 5px;
+    background: ${({ theme }) => theme.colors.white};
+    border: 2px solid ${({ theme }) => theme.colors.main900};
+    border-radius: 10px;
     padding: 10px 20px;
     cursor: pointer;
+    margin-top: 20px;
+    font-family: 'NanumSquareExtraBold';
   }
 `;
 
@@ -54,7 +75,10 @@ const NotFound: React.FC = () => {
           <h2>Error</h2>
         </div>
         <div>
-          <p>Oooops! Page Not Found</p>
+          <p>
+            <strong>O</strong>ooops!
+            <br /> Page Not Found
+          </p>
         </div>
         <button onClick={() => (window.location.href = '/')}>Go Home</button>
       </Wrapper>
