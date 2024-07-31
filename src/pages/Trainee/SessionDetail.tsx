@@ -1,20 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import { useQuery } from 'react-query';
 
 import { SectionWrapper } from '@components/Common/SectionWrapper';
 import Modal from '@components/Common/Modal/Modal';
 import Button from '@components/Common/Button/Button';
 import PhotoUploadModal from '@components/Trainee/PhotoUploadModal';
 import VideoUploadModal from '@components/Trainee/VideoUploadModal';
-import EditSessionModal from '@components/Trainee/EditSessionModal';
+import EditSessionModal, {
+  SessionEditType,
+} from '@components/Trainee/EditSessionModal';
+import ImageModal from '@components/Trainee/ImageModal';
 import { hexToRgba } from 'src/utils/hexToRgba';
+import useFetchUser from 'src/hooks/useFetchUser';
 import useModals from 'src/hooks/useModals';
-import {
-  sessionDetails,
-  SessionDetailType,
-} from 'src/mocks/data/workoutSessionList';
+import CreateTraineeApi from 'src/api/trainee';
+import CreateTrainerApi from 'src/api/trainer';
+import useUserStore from 'src/stores/userStore';
+import Alert from '@components/Common/Alert/Alert';
 
 const DetailWrapper = styled.div`
   display: flex;
@@ -152,6 +156,7 @@ const ImagePreview = styled.div`
   align-items: center;
   flex: 0 0 auto;
   user-select: none;
+  cursor: pointer;
 
   img {
     width: 100%;
@@ -162,8 +167,6 @@ const ImagePreview = styled.div`
 `;
 
 const VideoContainer = styled(ScrollContainer)`
-  height: 23vh;
-
   video {
     width: 90%;
     height: 100%;
@@ -171,19 +174,49 @@ const VideoContainer = styled(ScrollContainer)`
   }
 `;
 
+export interface Workout {
+  workoutId: number;
+  workoutTypeId: number;
+  workoutTypeName: string;
+  targetMuscle: string;
+  remarks: string;
+  weight: number;
+  rep: number;
+  sets: number;
+  time: number;
+  speed: number;
+}
+
+export interface SessionDetailType {
+  sessionId: number;
+  sessionDate: string;
+  sessionNumber: number;
+  specialNote: string;
+  workouts: Workout[];
+  photoUrls: string[];
+  videoUrls: string[];
+  thumbnailUrls: string[];
+}
+
 const SessionDetail: React.FC = () => {
+  useFetchUser();
+  const navigate = useNavigate();
+  const { user } = useUserStore();
+  const traineeApi = CreateTraineeApi(navigate);
+  const trainerApi = CreateTrainerApi(navigate);
   const { traineeId, sessionId } = useParams<{
     traineeId: string;
     sessionId: string;
   }>();
+  const { openModal, closeModal, isOpen } = useModals();
   const [sessionData, setSessionData] = useState<SessionDetailType | null>(
     null
   );
-  const { openModal, closeModal, isOpen } = useModals();
   const [workoutTypes, setWorkoutTypes] = useState<
     {
       id: number;
       name: string;
+      workoutTypeId: number;
       targetMuscle: string;
       weightInputRequired: boolean;
       setInputRequired: boolean;
@@ -192,30 +225,44 @@ const SessionDetail: React.FC = () => {
       speedInputRequired: boolean;
     }[]
   >([]);
-  const [formState, setFormState] = useState<SessionDetailType | null>(null);
-  const navigate = useNavigate();
-
+  const [formState, setFormState] = useState<SessionEditType | null>(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [errorAlert, setErrorAlert] = useState<string>('');
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
 
+  // useQuery 데이터 불러오기
+  const { data, isLoading, refetch } = useQuery(
+    ['sessionDetail', sessionId],
+    () => traineeApi.getSessionDetail(Number(sessionId)),
+    {
+      enabled: !!sessionId,
+    }
+  );
+
+  useEffect(() => {
+    if (data) {
+      setSessionData(data.data);
+    }
+  }, [data]);
+
   useEffect(() => {
     // Fetch workout types
-    const fetchWorkoutTypes = async () => {
-      try {
-        const response = await axios.get('/api/workout-types');
-        setWorkoutTypes(response.data);
-      } catch (error) {
-        console.error('Failed to fetch workout types', error);
-      }
-    };
-    fetchWorkoutTypes();
-
-    // Fetch session data
-    if (sessionId !== undefined) {
-      setSessionData(sessionDetails[+sessionId - 1]);
+    if (user?.role === 'TRAINER') {
+      const fetchWorkoutTypes = async () => {
+        try {
+          const res = await trainerApi.getWorkouts();
+          setWorkoutTypes(res.data.content);
+        } catch (error) {
+          console.error('운동 종류 가져오기 실패 : ', error);
+        }
+      };
+      fetchWorkoutTypes();
     }
   }, [traineeId, sessionId]);
 
+  // 가로 스크롤 구현
   const handleHorizontalScroll = (container: HTMLDivElement | null) => {
     if (!container) return;
 
@@ -279,138 +326,252 @@ const SessionDetail: React.FC = () => {
     };
   }, [imageContainerRef.current, videoContainerRef.current]);
 
-  if (!sessionData) {
-    return <div>Loading...</div>;
-  }
-
-  const handlePhotoUpload = (photos: string[]) => {
-    // Handle uploaded photos
-    console.log('Uploaded Photos:', photos);
+  // 이미지 업로드 핸들러
+  const handlePhotoUpload = async (images: File[]) => {
+    setUploading(true);
+    try {
+      await traineeApi.sessionPhotoUpload(sessionId, images);
+      refetch();
+    } catch (error: any) {
+      if (error.response.status === 413) {
+        setErrorAlert('사진은 최대 10장 입니다.');
+        setUploading(false);
+        return;
+      }
+      console.error('운동 기록 이미지 추가 에러: ', error);
+    }
+    setUploading(false);
     closeModal('photoUpload');
   };
 
-  const handleVideoUpload = (video: string) => {
-    // Handle uploaded video
-    console.log('Uploaded Video:', video);
+  // 동영상 업로드 핸들러
+  const handleVideoUpload = async (video: File) => {
+    setUploading(true);
+    try {
+      await traineeApi.sessionVideoUpload(sessionId, video);
+      refetch();
+    } catch (error) {
+      console.error('운동 기록 동영상 추가 에러: ', error);
+    }
+    setUploading(false);
     closeModal('videoUpload');
   };
 
   const handleEditSession = () => {
-    setFormState(sessionData);
-    openModal('editSessionModal');
+    if (sessionData) {
+      const { sessionId, sessionDate, specialNote, workouts } = sessionData;
+      setFormState({
+        sessionId,
+        sessionDate,
+        specialNote,
+        workouts: workouts.map(workout => ({
+          workoutId: workout.workoutId,
+          workoutTypeId: workout.workoutTypeId,
+          weight: workout.weight,
+          rep: workout.rep,
+          sets: workout.sets,
+          time: workout.time,
+          speed: workout.speed,
+        })),
+      });
+      openModal('editSessionModal');
+    }
   };
 
-  const handleSaveSession = (updatedSession: SessionDetailType) => {
-    setSessionData(updatedSession);
+  const handleSaveSession = (updatedSession: SessionEditType) => {
+    setSessionData(prevState =>
+      prevState
+        ? {
+            ...prevState,
+            sessionDate: updatedSession.sessionDate,
+            specialNote: updatedSession.specialNote,
+            workouts: updatedSession.workouts.map(workout => ({
+              ...workout,
+              workoutTypeName:
+                prevState.workouts.find(w => w.workoutId === workout.workoutId)
+                  ?.workoutTypeName || '',
+              targetMuscle:
+                prevState.workouts.find(w => w.workoutId === workout.workoutId)
+                  ?.targetMuscle || '',
+              remarks:
+                prevState.workouts.find(w => w.workoutId === workout.workoutId)
+                  ?.remarks || '',
+            })),
+          }
+        : null
+    );
     closeModal('editSessionModal');
+    refetch();
   };
 
   const handleDeleteSession = async () => {
-    // TODO : 삭제 api 연동
-    // await axios.delete(`/api/sessions/${sessionId}`);
+    try {
+      await traineeApi.deleteSession(sessionId);
+    } catch (error) {
+      console.error('운동 기록 삭제 에러: ', error);
+      return;
+    }
     navigate(`/trainee/${traineeId}/session`);
   };
 
   const handleConfirmDelete = () => {
-    // Show confirmation modal
     openModal('deleteSessionModal');
   };
 
+  const handleImageClick = (imageUrl: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
+    setSelectedImageUrl(imageUrl);
+    openModal('imageModal');
+  };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
+
+  if (!sessionData) {
+    return (
+      <div
+        style={{
+          fontSize: '1.4rem',
+          display: 'flex',
+          justifyContent: 'center',
+          height: '50vh',
+          alignItems: 'center',
+        }}
+      >
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <SectionWrapper>
-      <DetailWrapper>
-        <Header>
-          <Title>
-            {sessionData.sessionDate} / {sessionData.sessionNumber}회차
-          </Title>
-          <ButtonGroup>
-            <Button $size="small" type="button" onClick={handleEditSession}>
-              수정
-            </Button>
-            <Button $size="small" type="button" onClick={handleConfirmDelete}>
-              삭제
-            </Button>
-          </ButtonGroup>
-        </Header>
-        <Section>
-          <Label>특이 사항</Label>
-          <TextArea value={sessionData.specialNote} readOnly />
-        </Section>
-        <Section>
-          <Label>운동 종류 기록</Label>
-          {sessionData.workouts.map((workout, index) => (
-            <NoteWrap key={index}>
-              <NoteHead>
-                <p>운동명: {workout.workoutTypeName}</p>
-                <p>/</p>
-                <p>대상 근육: {workout.targetMuscle}</p>
-              </NoteHead>
-              <NoteBody>
-                {workout.weight > 0 && <p>무게: {workout.weight}kg</p>}
-                {workout.rep > 0 && <p>반복: {workout.rep}회</p>}
-                {workout.sets > 0 && <p>세트: {workout.sets}세트</p>}
-                {workout.time > 0 && <p>시간: {workout.time}초</p>}
-                {workout.speed > 0 && <p>속도: {workout.speed}m/s</p>}
-              </NoteBody>
-            </NoteWrap>
-          ))}
-        </Section>
-        <Section>
-          <ImageTitle>
-            <LabelWrap>
-              <Label>자세 사진</Label>
-              <span>사진은 최대 10장 까지 등록 가능합니다.</span>
-            </LabelWrap>
-            <Button
-              $size="small"
-              $variant="primary"
-              onClick={() => openModal('photoUpload')}
-            >
-              업로드
-            </Button>
-          </ImageTitle>
-          <ScrollContainer ref={imageContainerRef}>
-            {sessionData.photoUrls.slice(0, 10).map((photo, index) => (
-              <ImagePreview key={index}>
-                <img src={photo} alt={`자세 사진 ${index}`} />
-              </ImagePreview>
+      {isLoading ? (
+        <div
+          style={{
+            fontSize: '1.4rem',
+            display: 'flex',
+            justifyContent: 'center',
+            height: '50vh',
+            alignItems: 'center',
+          }}
+        >
+          Loading...
+        </div>
+      ) : (
+        <DetailWrapper>
+          <Header>
+            <Title>
+              {sessionData.sessionDate} / {sessionData.sessionNumber}회차
+            </Title>
+            {user?.role === 'TRAINER' ? (
+              <ButtonGroup>
+                <Button $size="small" type="button" onClick={handleEditSession}>
+                  수정
+                </Button>
+                <Button
+                  $size="small"
+                  type="button"
+                  onClick={handleConfirmDelete}
+                >
+                  삭제
+                </Button>
+              </ButtonGroup>
+            ) : null}
+          </Header>
+          <Section>
+            <Label>특이 사항</Label>
+            <TextArea value={sessionData.specialNote} readOnly />
+          </Section>
+          <Section>
+            <Label>운동 종류 기록</Label>
+            {sessionData.workouts.map((workout, index) => (
+              <NoteWrap key={index}>
+                <NoteHead>
+                  <p>운동명 : {workout.workoutTypeName}</p>
+                  <p>/</p>
+                  <p>대상 근육 : {workout.targetMuscle}</p>
+                </NoteHead>
+                <NoteBody>
+                  {workout.weight > 0 && <p>무게: {workout.weight}kg</p>}
+                  {workout.rep > 0 && <p>횟수: {workout.rep}회</p>}
+                  {workout.sets > 0 && <p>세트: {workout.sets}세트</p>}
+                  {workout.time > 0 && <p>시간: {workout.time}초</p>}
+                  {workout.speed > 0 && <p>속도: {workout.speed}m/s</p>}
+                </NoteBody>
+              </NoteWrap>
             ))}
-          </ScrollContainer>
-        </Section>
-        <Section>
-          <ImageTitle>
-            <LabelWrap>
-              <Label>운동 영상</Label>
-              <span>동영상은 최대 5개 까지 등록 가능합니다.</span>
-            </LabelWrap>
-            <Button
-              $size="small"
-              $variant="primary"
-              onClick={() => openModal('videoUpload')}
-              disabled={sessionData.videoUrls.length >= 5}
-            >
-              업로드
-            </Button>
-          </ImageTitle>
-          <VideoContainer ref={videoContainerRef}>
-            {sessionData.videoUrls.slice(0, 5).map((video, index) => (
-              <video key={index} controls>
-                <source src={video} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            ))}
-          </VideoContainer>
-        </Section>
-      </DetailWrapper>
+          </Section>
+          <Section>
+            <ImageTitle>
+              <LabelWrap>
+                <Label>자세 사진</Label>
+                {user?.role === 'TRAINER' ? (
+                  <span>사진은 최대 10장 까지 등록 가능합니다.</span>
+                ) : null}
+              </LabelWrap>
+              {user?.role === 'TRAINER' ? (
+                <Button
+                  $size="small"
+                  $variant="primary"
+                  onClick={() => openModal('photoUpload')}
+                  disabled={sessionData.photoUrls.length >= 10}
+                >
+                  업로드
+                </Button>
+              ) : null}
+            </ImageTitle>
+            <ScrollContainer ref={imageContainerRef}>
+              {sessionData.photoUrls.slice(0, 10).map((photo, index) => (
+                <ImagePreview
+                  key={index}
+                  onClick={e => handleImageClick(photo, e)}
+                >
+                  <img src={photo} alt={`자세 사진 ${index}`} loading="lazy" />
+                </ImagePreview>
+              ))}
+            </ScrollContainer>
+          </Section>
+          <Section>
+            <ImageTitle>
+              <LabelWrap>
+                <Label>운동 영상</Label>
+                {user?.role === 'TRAINER' ? (
+                  <span>동영상은 최대 5개 까지 등록 가능합니다.</span>
+                ) : null}
+              </LabelWrap>
+              {user?.role === 'TRAINER' ? (
+                <Button
+                  $size="small"
+                  $variant="primary"
+                  onClick={() => openModal('videoUpload')}
+                  disabled={sessionData.videoUrls.length >= 5}
+                >
+                  업로드
+                </Button>
+              ) : null}
+            </ImageTitle>
+            <VideoContainer ref={videoContainerRef}>
+              {sessionData.videoUrls.slice(0, 5).map((video, index) => (
+                <video key={index} controls>
+                  <source src={video} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              ))}
+            </VideoContainer>
+          </Section>
+        </DetailWrapper>
+      )}
+
       <PhotoUploadModal
         isOpen={isOpen('photoUpload')}
         onClose={() => closeModal('photoUpload')}
         onUpload={handlePhotoUpload}
+        uploading={uploading}
       />
       <VideoUploadModal
         isOpen={isOpen('videoUpload')}
         onClose={() => closeModal('videoUpload')}
         onUpload={handleVideoUpload}
+        uploading={uploading}
       />
       <EditSessionModal
         isOpen={isOpen('editSessionModal')}
@@ -419,6 +580,11 @@ const SessionDetail: React.FC = () => {
         formState={formState}
         setFormState={setFormState}
         workoutTypes={workoutTypes}
+      />
+      <ImageModal
+        isOpen={isOpen('imageModal')}
+        onClose={() => closeModal('imageModal')}
+        imageUrl={selectedImageUrl || ''}
       />
       <Modal
         title="운동 기록 삭제"
@@ -430,6 +596,9 @@ const SessionDetail: React.FC = () => {
       >
         운동 기록을 삭제하시겠습니까?
       </Modal>
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
     </SectionWrapper>
   );
 };

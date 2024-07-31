@@ -1,25 +1,6 @@
 // 타입 정의
-export interface Workout {
-  workoutId: number;
-  workoutTypeName: string;
-  targetMuscle: string;
-  remarks: string;
-  weight: number;
-  rep: number;
-  sets: number;
-  time: number;
-  speed: number;
-}
 
-export interface SessionDetailType {
-  sessionId: number;
-  sessionDate: string;
-  sessionNumber: number;
-  specialNote: string;
-  workouts: Workout[];
-  photoUrls: string[];
-  videoUrls: string[];
-}
+import { SessionDetailType } from '@pages/Trainee/SessionDetail';
 
 // 샘플 데이터
 export const sessionDetails: SessionDetailType[] = [
@@ -31,6 +12,7 @@ export const sessionDetails: SessionDetailType[] = [
     workouts: [
       {
         workoutId: 1,
+        workoutTypeId: 2,
         workoutTypeName: '벤치 프레스',
         targetMuscle: '가슴',
         remarks: '가벼운 무게로 시작',
@@ -42,6 +24,7 @@ export const sessionDetails: SessionDetailType[] = [
       },
       {
         workoutId: 2,
+        workoutTypeId: 2,
         workoutTypeName: '스쿼트',
         targetMuscle: '다리',
         remarks: '폼 체크 필요',
@@ -61,6 +44,11 @@ export const sessionDetails: SessionDetailType[] = [
       'https://example.com/video1.mp4',
       'https://example.com/video2.mp4',
     ],
+    thumbnailUrls: [
+      'https://dummyjson.com/image/360x300/282828',
+      'https://dummyjson.com/image/330x330/282828',
+      'https://dummyjson.com/image/300x250/282828',
+    ],
   },
   {
     sessionId: 2,
@@ -70,6 +58,7 @@ export const sessionDetails: SessionDetailType[] = [
     workouts: [
       {
         workoutId: 2,
+        workoutTypeId: 2,
         workoutTypeName: '스쿼트',
         targetMuscle: '다리',
         remarks: '폼 체크 필요',
@@ -82,6 +71,11 @@ export const sessionDetails: SessionDetailType[] = [
     ],
     photoUrls: ['https://example.com/photo2.jpg'],
     videoUrls: ['https://example.com/video2.mp4'],
+    thumbnailUrls: [
+      'https://dummyjson.com/image/360x300/282828',
+      'https://dummyjson.com/image/330x330/282828',
+      'https://dummyjson.com/image/300x250/282828',
+    ],
   },
   {
     sessionId: 3,
@@ -91,6 +85,7 @@ export const sessionDetails: SessionDetailType[] = [
     workouts: [
       {
         workoutId: 3,
+        workoutTypeId: 2,
         workoutTypeName: '데드리프트',
         targetMuscle: '등',
         remarks: '허리 조심',
@@ -103,5 +98,10 @@ export const sessionDetails: SessionDetailType[] = [
     ],
     photoUrls: ['https://example.com/photo3.jpg'],
     videoUrls: ['https://example.com/video3.mp4'],
+    thumbnailUrls: [
+      'https://dummyjson.com/image/360x300/282828',
+      'https://dummyjson.com/image/330x330/282828',
+      'https://dummyjson.com/image/300x250/282828',
+    ],
   },
 ];

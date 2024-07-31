@@ -90,42 +90,43 @@ const PhotoPreviewItem = styled.div`
 interface PhotoUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (photos: string[]) => void;
+  onUpload: (photos: File[]) => void;
+  uploading: boolean;
 }
 
 const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({
   isOpen,
   onClose,
   onUpload,
+  uploading,
 }) => {
-  const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
+  const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [errorAlert, setErrorAlert] = useState<string>('');
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
-      const existingPhotos = new Set(selectedPhotos);
+      const existingPhotos = new Set(selectedPhotos.map(photo => photo.name));
 
       if (files.length + selectedPhotos.length > 10) {
         setErrorAlert('사진은 최대 10장 입니다.');
         return;
       }
 
-      const newPhotos = files
-        .map(file => URL.createObjectURL(file))
-        .filter(photo => !existingPhotos.has(photo));
-
+      const newPhotos = files.filter(file => !existingPhotos.has(file.name));
       setSelectedPhotos(prevPhotos => [...prevPhotos, ...newPhotos]);
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (selectedPhotos.length === 0) {
       setErrorAlert('사진을 1장 이상 등록해주세요.');
       return;
     }
-    onUpload(selectedPhotos);
-    setSelectedPhotos([]);
+    await onUpload(selectedPhotos);
+    if (!uploading) {
+      setSelectedPhotos([]);
+    }
   };
 
   const handleClose = () => {
@@ -146,7 +147,7 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({
       isOpen={isOpen}
       onClose={handleClose}
       onSave={handleUpload}
-      btnConfirm="업로드"
+      btnConfirm={uploading ? '업로드 중...' : '업로드'}
     >
       <PhotoUploadContainer>
         <LabelWrap>
@@ -166,7 +167,10 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({
               key={index}
               onClick={() => handleDeletePhoto(index)}
             >
-              <img src={photo} alt={`선택된 사진 ${index}`} />
+              <img
+                src={URL.createObjectURL(photo)}
+                alt={`선택된 사진 ${index}`}
+              />
             </PhotoPreviewItem>
           ))}
         </PhotoPreview>

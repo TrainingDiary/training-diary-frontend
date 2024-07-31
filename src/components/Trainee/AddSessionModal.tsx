@@ -10,6 +10,7 @@ import Alert from '@components/Common/Alert/Alert';
 import { DatePickerWrapper } from './Calendar';
 import CreateTraineeApi from 'src/api/trainee';
 import CreateTrainerApi from 'src/api/trainer';
+import useUserStore from 'src/stores/userStore';
 
 const FormGroup = styled.div`
   display: flex;
@@ -206,6 +207,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
   sessionAutoNumber,
 }) => {
   const navigate = useNavigate();
+  const { user } = useUserStore();
   const traineeApi = CreateTraineeApi(navigate);
   const trainerApi = CreateTrainerApi(navigate);
   const [workoutTypes, setWorkoutTypes] = useState<
@@ -240,11 +242,13 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
 
   useEffect(() => {
     const fetchWorkoutTypes = async () => {
-      try {
-        const response = await trainerApi.getWorkouts();
-        setWorkoutTypes(response.data.content);
-      } catch (error) {
-        console.error('운동 종류 불러오기 실패:', error);
+      if (user?.role === 'TRAINER') {
+        try {
+          const response = await trainerApi.getWorkouts();
+          setWorkoutTypes(response.data.content);
+        } catch (error) {
+          console.error('운동 종류 불러오기 실패:', error);
+        }
       }
     };
     fetchWorkoutTypes();
@@ -369,8 +373,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
           ? format(formState.sessionDate, 'yyyy-MM-dd')
           : null,
       };
-      const response = await traineeApi.addSession(formData);
-      console.log('운동 기록 생성 성공:', response.data);
+      await traineeApi.addSession(formData);
       onSave(formData);
       setFormState(initialFormState);
       onClose();
@@ -432,7 +435,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
       <FormGroup>
         <Label>특이사항:</Label>
         <TextArea
-          value={formState.specialNote}
+          value={formState.specialNote || ''}
           onChange={e => handleInputChange('specialNote', e.target.value)}
         ></TextArea>
       </FormGroup>
@@ -469,7 +472,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
                       {selectedWorkout.weightInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="무게"
+                          placeholder="무게(kg)"
                           value={exercise.weight}
                           onChange={e =>
                             handleExerciseChange(
@@ -483,7 +486,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
                       {selectedWorkout.speedInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="속도"
+                          placeholder="속도(m/s)"
                           value={exercise.speed}
                           onChange={e =>
                             handleExerciseChange(index, 'speed', e.target.value)
@@ -493,7 +496,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
                       {selectedWorkout.timeInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="시간"
+                          placeholder="시간(초)"
                           value={exercise.time}
                           onChange={e =>
                             handleExerciseChange(index, 'time', e.target.value)
@@ -503,7 +506,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
                       {selectedWorkout.setInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="세트"
+                          placeholder="세트(세트)"
                           value={exercise.sets}
                           onChange={e =>
                             handleExerciseChange(index, 'sets', e.target.value)
@@ -513,7 +516,7 @@ const AddSessionModal: React.FC<AddSessionModalProps> = ({
                       {selectedWorkout.repInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="횟수"
+                          placeholder="횟수(회)"
                           value={exercise.rep}
                           onChange={e =>
                             handleExerciseChange(index, 'rep', e.target.value)

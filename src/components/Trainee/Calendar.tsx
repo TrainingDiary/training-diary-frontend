@@ -23,7 +23,7 @@ export const DatePickerWrapper = styled.div`
     font-size: 1.4rem;
     color: ${({ theme }) => theme.colors.gray900};
     width: 100%;
-    text-align: right;
+    text-align: left;
     outline: none;
     transition: border-color 0.3s;
   }

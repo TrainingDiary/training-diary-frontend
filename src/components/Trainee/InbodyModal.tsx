@@ -204,7 +204,7 @@ const InbodyModal: React.FC<InbodyModalProps> = ({
         <Input
           type="number"
           name="weight"
-          value={inbodyData.weight}
+          value={inbodyData.weight !== null ? inbodyData.weight : ''}
           onChange={handleInputChange}
         />
       </InfoItem>
@@ -213,7 +213,11 @@ const InbodyModal: React.FC<InbodyModalProps> = ({
         <Input
           type="number"
           name="bodyFatPercentage"
-          value={inbodyData.bodyFatPercentage}
+          value={
+            inbodyData.bodyFatPercentage !== null
+              ? inbodyData.bodyFatPercentage
+              : ''
+          }
           onChange={handleInputChange}
         />
       </InfoItem>
@@ -222,7 +226,11 @@ const InbodyModal: React.FC<InbodyModalProps> = ({
         <Input
           type="number"
           name="skeletalMuscleMass"
-          value={inbodyData.skeletalMuscleMass}
+          value={
+            inbodyData.skeletalMuscleMass !== null
+              ? inbodyData.skeletalMuscleMass
+              : ''
+          }
           onChange={handleInputChange}
         />
       </InfoItem>

@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useNavigate } from 'react-router-dom';
 
 import Modal from '@components/Common/Modal/Modal';
 import Alert from '@components/Common/Alert/Alert';
 import { DatePickerWrapper } from './Calendar';
-import { SessionDetailType } from 'src/mocks/data/workoutSessionList';
-import { WorkoutsType } from './AddSessionModal';
+import CreateTraineeApi from 'src/api/trainee';
 
 const FormGroup = styled.div`
   display: flex;
@@ -49,7 +49,6 @@ const Input = styled.input`
   border-radius: 5px;
   outline: none;
   width: 100%;
-  /*  */
 `;
 
 const TextArea = styled.textarea`
@@ -129,6 +128,7 @@ const AttributeTabInput = styled.input`
   outline: none;
 `;
 
+/*
 const AddExerciseButton = styled.button`
   padding: 5px 10px;
   background-color: ${({ theme }) => theme.colors.gray900};
@@ -137,7 +137,7 @@ const AddExerciseButton = styled.button`
   border-radius: 5px;
   cursor: pointer;
 `;
-
+*/
 const RemoveExerciseButton = styled.button`
   padding: 5px 10px;
   background-color: ${({ theme }) => theme.colors.red500};
@@ -150,11 +150,12 @@ const RemoveExerciseButton = styled.button`
 interface EditSessionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (session: SessionDetailType) => void;
-  formState: SessionDetailType | null;
-  setFormState: React.Dispatch<React.SetStateAction<SessionDetailType | null>>;
+  onSave: (session: SessionEditType) => void;
+  formState: SessionEditType | null;
+  setFormState: React.Dispatch<React.SetStateAction<SessionEditType | null>>;
   workoutTypes: {
     id: number;
+    workoutTypeId: number;
     name: string;
     targetMuscle: string;
     weightInputRequired: boolean;
@@ -165,6 +166,23 @@ interface EditSessionModalProps {
   }[];
 }
 
+export interface EditWorkout {
+  workoutId: number;
+  workoutTypeId: number;
+  weight: number;
+  rep: number;
+  sets: number;
+  time: number;
+  speed: number;
+}
+
+export interface SessionEditType {
+  sessionId: number;
+  sessionDate: string;
+  specialNote: string;
+  workouts: EditWorkout[];
+}
+
 const EditSessionModal: React.FC<EditSessionModalProps> = ({
   isOpen,
   onClose,
@@ -173,17 +191,16 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
   setFormState,
   workoutTypes,
 }) => {
-  const initialFormState: SessionDetailType = {
+  const navigate = useNavigate();
+  const traineeApi = CreateTraineeApi(navigate);
+  const initialFormState: SessionEditType = {
     sessionId: 0,
     sessionDate: new Date().toISOString().split('T')[0],
-    sessionNumber: 0,
     specialNote: '',
     workouts: [
       {
         workoutId: 0,
-        workoutTypeName: '',
-        targetMuscle: '',
-        remarks: '',
+        workoutTypeId: 0,
         weight: 0,
         rep: 0,
         sets: 0,
@@ -191,12 +208,10 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
         speed: 0,
       },
     ],
-    photoUrls: [],
-    videoUrls: [],
   };
 
   const handleInputChange = (
-    field: keyof SessionDetailType,
+    field: keyof SessionEditType,
     value: string | number | Date
   ) => {
     setFormState(prev => (prev ? { ...prev, [field]: value } : null));
@@ -212,7 +227,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
 
   const handleExerciseChange = (
     index: number,
-    field: keyof WorkoutsType,
+    field: keyof EditWorkout,
     value: string | number
   ) => {
     if (formState) {
@@ -222,16 +237,21 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
     }
   };
 
-  const handleWorkoutTypeChange = (index: number, workoutTypeId: string) => {
+  const handleWorkoutTypeChange = (
+    index: number,
+    workoutTypeId: string,
+    workoutId: number
+  ) => {
     const selectedWorkout = workoutTypes.find(
       workout => workout.id === parseInt(workoutTypeId)
     );
+
     if (selectedWorkout && formState) {
       const newWorkouts = [...formState.workouts];
       newWorkouts[index] = {
         ...newWorkouts[index],
-        workoutTypeName: selectedWorkout.name,
-        targetMuscle: selectedWorkout.targetMuscle,
+        workoutId: workoutId, // SessionDetail에서 받아온 workoutId 사용
+        workoutTypeId: selectedWorkout.id, // workoutTypeId 설정
         weight: 0,
         rep: 0,
         sets: 0,
@@ -242,19 +262,31 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
     }
   };
 
+  /*
   const addExercise = () => {
     if (formState) {
       setFormState(prev =>
         prev
           ? {
               ...prev,
-              workouts: [...prev.workouts, initialFormState.workouts[0]],
+              workouts: [
+                ...prev.workouts,
+                {
+                  workoutId: 0, // 새로운 운동의 workoutId를 0으로 초기화
+                  workoutTypeId: 0,
+                  weight: 0,
+                  rep: 0,
+                  sets: 0,
+                  time: 0,
+                  speed: 0,
+                },
+              ],
             }
           : null
       );
     }
   };
-
+*/
   const removeExercise = (index: number) => {
     if (formState) {
       const newWorkouts = formState.workouts.filter((_, i) => i !== index);
@@ -264,22 +296,23 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
 
   const [errorAlert, setErrorAlert] = useState<string>('');
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (formState) {
       if (!formState.sessionDate) return setErrorAlert('날짜를 입력해주세요.');
-      if (formState.sessionNumber <= 0)
-        return setErrorAlert('회차를 입력해주세요.');
       if (formState.specialNote.trim() === '')
         return setErrorAlert('특이사항을 입력해주세요.');
+      if (formState.workouts.length === 0) {
+        return setErrorAlert('운동 종류를 하나 이상 선택해주세요.');
+      }
 
       // Validate workouts
       for (let i = 0; i < formState.workouts.length; i++) {
         const workout = formState.workouts[i];
         const selectedWorkout = workoutTypes.find(
-          type => type.name === workout.workoutTypeName
+          type => type.id === workout.workoutTypeId
         );
         if (!selectedWorkout) {
-          continue; // 운동 종류를 선택하지 않은 경우 에러 검사를 하지 않음
+          return setErrorAlert('운동 종류를 선택해주세요.');
         }
         if (selectedWorkout.weightInputRequired && workout.weight <= 0) {
           return setErrorAlert('무게를 입력해주세요.');
@@ -296,6 +329,19 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
         if (selectedWorkout.speedInputRequired && workout.speed <= 0) {
           return setErrorAlert('속도를 입력해주세요.');
         }
+      }
+
+      console.log(formState);
+
+      try {
+        await traineeApi.updateSession(formState);
+        console.log('운동 기록 성공');
+      } catch (error: any) {
+        console.error('운동 기록 수정 에러: ', error);
+        if (error.response?.status === 404) {
+          setErrorAlert('운동 종류를 선택해주세요.');
+        }
+        return;
       }
 
       onSave(formState);
@@ -332,16 +378,6 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
         </DatePickerWrapper>
       </FormGroup>
       <FormGroup>
-        <Label>회차:</Label>
-        <Input
-          type="number"
-          value={formState ? formState.sessionNumber : 0}
-          onChange={e =>
-            handleInputChange('sessionNumber', parseInt(e.target.value))
-          }
-        />
-      </FormGroup>
-      <FormGroup>
         <Label>특이사항:</Label>
         <TextArea
           value={formState ? formState.specialNote : ''}
@@ -353,7 +389,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
           <Label>운동 종류 기록:</Label>
           {formState?.workouts.map((exercise, index) => {
             const selectedWorkout = workoutTypes.find(
-              workout => workout.name === exercise.workoutTypeName
+              workout => workout.id === exercise.workoutTypeId
             );
             return (
               <ExerciseGroup key={index}>
@@ -362,7 +398,11 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                     <Select
                       value={selectedWorkout ? selectedWorkout.id : ''}
                       onChange={e =>
-                        handleWorkoutTypeChange(index, e.target.value)
+                        handleWorkoutTypeChange(
+                          index,
+                          e.target.value,
+                          exercise.workoutId
+                        )
                       }
                     >
                       <option value="">운동 종류</option>
@@ -372,16 +412,20 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                         </option>
                       ))}
                     </Select>
-                    <RemoveExerciseButton onClick={() => removeExercise(index)}>
-                      삭제
-                    </RemoveExerciseButton>
+                    {formState.workouts.length > 1 && (
+                      <RemoveExerciseButton
+                        onClick={() => removeExercise(index)}
+                      >
+                        삭제
+                      </RemoveExerciseButton>
+                    )}
                   </SelectWrap>
                   {selectedWorkout && (
                     <AttributeGroup>
                       {selectedWorkout.weightInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="무게"
+                          placeholder="무게(kg)"
                           value={exercise.weight || ''}
                           onChange={e =>
                             handleExerciseChange(
@@ -395,7 +439,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                       {selectedWorkout.speedInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="속도"
+                          placeholder="속도(m/s)"
                           value={exercise.speed || ''}
                           onChange={e =>
                             handleExerciseChange(
@@ -409,7 +453,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                       {selectedWorkout.timeInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="시간"
+                          placeholder="시간(초)"
                           value={exercise.time || ''}
                           onChange={e =>
                             handleExerciseChange(
@@ -423,7 +467,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                       {selectedWorkout.setInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="세트"
+                          placeholder="세트(세트)"
                           value={exercise.sets || ''}
                           onChange={e =>
                             handleExerciseChange(
@@ -437,7 +481,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
                       {selectedWorkout.repInputRequired && (
                         <AttributeTabInput
                           type="number"
-                          placeholder="횟수"
+                          placeholder="횟수(회)"
                           value={exercise.rep || ''}
                           onChange={e =>
                             handleExerciseChange(
@@ -454,7 +498,7 @@ const EditSessionModal: React.FC<EditSessionModalProps> = ({
               </ExerciseGroup>
             );
           })}
-          <AddExerciseButton onClick={addExercise}>운동 추가</AddExerciseButton>
+          {/* <AddExerciseButton onClick={addExercise}>운동 추가</AddExerciseButton> */}
         </WorkoutSection>
       </FormGroup>
       {errorAlert && (
