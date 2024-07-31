@@ -94,10 +94,12 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (selectedVideo) {
-      onUpload(selectedVideo);
-      setSelectedVideo(null);
+      await onUpload(selectedVideo);
+      if (!uploading) {
+        setSelectedVideo(null);
+      }
     } else {
       setErrorAlert('동영상을 선택해주세요.');
     }

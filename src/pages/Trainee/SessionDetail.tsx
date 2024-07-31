@@ -18,6 +18,7 @@ import useModals from 'src/hooks/useModals';
 import CreateTraineeApi from 'src/api/trainee';
 import CreateTrainerApi from 'src/api/trainer';
 import useUserStore from 'src/stores/userStore';
+import Alert from '@components/Common/Alert/Alert';
 
 const DetailWrapper = styled.div`
   display: flex;
@@ -227,6 +228,7 @@ const SessionDetail: React.FC = () => {
   const [formState, setFormState] = useState<SessionEditType | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [errorAlert, setErrorAlert] = useState<string>('');
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
 
@@ -330,7 +332,12 @@ const SessionDetail: React.FC = () => {
     try {
       await traineeApi.sessionPhotoUpload(sessionId, images);
       refetch();
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response.status === 413) {
+        setErrorAlert('사진은 최대 10장 입니다.');
+        setUploading(false);
+        return;
+      }
       console.error('운동 기록 이미지 추가 에러: ', error);
     }
     setUploading(false);
@@ -416,6 +423,8 @@ const SessionDetail: React.FC = () => {
     setSelectedImageUrl(imageUrl);
     openModal('imageModal');
   };
+
+  const onCloseErrorAlert = () => setErrorAlert('');
 
   if (!sessionData) {
     return (
@@ -587,6 +596,9 @@ const SessionDetail: React.FC = () => {
       >
         운동 기록을 삭제하시겠습니까?
       </Modal>
+      {errorAlert && (
+        <Alert $type="error" text={errorAlert} onClose={onCloseErrorAlert} />
+      )}
     </SectionWrapper>
   );
 };

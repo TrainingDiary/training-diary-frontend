@@ -118,13 +118,15 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (selectedPhotos.length === 0) {
       setErrorAlert('사진을 1장 이상 등록해주세요.');
       return;
     }
-    onUpload(selectedPhotos);
-    setSelectedPhotos([]);
+    await onUpload(selectedPhotos);
+    if (!uploading) {
+      setSelectedPhotos([]);
+    }
   };
 
   const handleClose = () => {
