@@ -3,6 +3,7 @@ import { NavigateFunction } from 'react-router-dom';
 import { axiosInstance, createInterceptor } from './axiosInstance';
 import { AddInbodyData, TraineeInfoData } from '@pages/Trainee/Dashboard';
 import { SessionDataType } from '@components/Trainee/AddSessionModal';
+import { SessionEditType } from '@components/Trainee/EditSessionModal';
 
 let isInterceptorCreated = false;
 
@@ -32,8 +33,49 @@ const CreateTraineeApi = (navigate: NavigateFunction) => {
         },
       }),
 
+    getSessionsPhotos: (id: string | undefined, page?: number, size?: number) =>
+      axiosInstance.get(`workout-sessions/trainees/${id}`, {
+        params: {
+          page,
+          size,
+        },
+      }),
+
     addSession: (sessionData: SessionDataType) =>
       axiosInstance.post('workout-sessions', sessionData),
+
+    getSessionDetail: (id: number) =>
+      axiosInstance.get(`workout-sessions/${id}`),
+
+    updateSession: (sessionData: SessionEditType) =>
+      axiosInstance.put('workout-sessions', sessionData),
+
+    deleteSession: (id: string | undefined) =>
+      axiosInstance.delete(`workout-sessions/${id}`),
+
+    sessionPhotoUpload: (sessionId: string | undefined, images: File[]) => {
+      const formData = new FormData();
+      formData.append('sessionId', sessionId as string);
+      Array.from(images).forEach(image => {
+        formData.append('images', image);
+      });
+      return axiosInstance.put('workout-sessions/photos', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    },
+
+    sessionVideoUpload: (sessionId: string | undefined, video: File) => {
+      const formData = new FormData();
+      formData.append('sessionId', sessionId as string);
+      formData.append('video', video);
+      return axiosInstance.put('workout-sessions/videos', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    },
 
     // Diet
     addDiet: (image: File, content: string) => {

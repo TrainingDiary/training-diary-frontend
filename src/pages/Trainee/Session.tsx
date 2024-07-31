@@ -62,7 +62,7 @@ const ImageLayout = styled.div`
 
 const Image = styled.img`
   display: block;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   pointer-events: none;
 `;
@@ -105,11 +105,9 @@ const Session: React.FC = () => {
   const startXRef = useRef(0);
   const scrollLeftRef = useRef(0);
   const { openModal, closeModal, isOpen } = useModals();
-  const [totalElements, setTotalElements] = useState(0);
 
   const fetchSessions = async ({ pageParam = 0 }) => {
-    const res = await traineeApi.getSessionsList(traineeId, pageParam, 5);
-    setTotalElements(res.data.totalElements);
+    const res = await traineeApi.getSessionsList(traineeId, pageParam, 10);
     return res.data;
   };
 
@@ -126,18 +124,38 @@ const Session: React.FC = () => {
     }
   );
 
-  const sessions = data?.pages.flatMap(page => page.content) ?? [];
-  const images = sessions.flatMap((session: SessionData) =>
+  // Fetch sessions photos data
+  const [photos, setPhotos] = useState<SessionData[]>([]);
+
+  useEffect(() => {
+    if (traineeId) {
+      const fetchData = async (traineeId: string) => {
+        try {
+          const res = await traineeApi.getSessionsPhotos(traineeId, 0, 40);
+          if (res.status === 200 && res.data) {
+            setPhotos(res.data.content);
+          }
+        } catch (error) {
+          console.error('트레이니 조회 에러: ', error);
+        }
+      };
+      fetchData(traineeId);
+    }
+  }, [traineeId]);
+
+  const imagesFromPhotos = photos.flatMap((session: SessionData) =>
     session.thumbnailUrls.map((url: string) => ({
       src: url,
       sessionId: session.sessionId,
     }))
   );
 
+  const sessions = data?.pages.flatMap(page => page.content) ?? [];
+
   const [formState, setFormState] = useState<SessionDataType>({
     traineeId: traineeId,
     sessionDate: format(new Date(), 'yyyy-MM-dd'),
-    sessionNumber: totalElements + 1,
+    sessionNumber: 0,
     specialNote: '',
     workouts: [
       { workoutTypeId: 0, weight: '', speed: '', time: '', sets: '', rep: '' },
@@ -153,8 +171,8 @@ const Session: React.FC = () => {
       },
       {
         root: imageContainerRef.current,
-        rootMargin: '100px',
-        threshold: 1.0,
+        rootMargin: '0px',
+        threshold: 0.1,
       }
     );
 
@@ -178,8 +196,8 @@ const Session: React.FC = () => {
       },
       {
         root: null,
-        rootMargin: '10px',
-        threshold: 1.0,
+        rootMargin: '0px',
+        threshold: 0.1,
       }
     );
 
@@ -267,9 +285,16 @@ const Session: React.FC = () => {
 
   const handleOpenModal = async () => {
     await refetch(); // 모달을 열기 전에 세션 목록을 다시 로드
+
+    // 가장 마지막 회차 번호를 구하고, 1을 더해서 새로운 sessionNumber로 설정
+    const lastSessionNumber =
+      sessions.length > 0
+        ? Math.max(...sessions.map(session => session.sessionNumber))
+        : 0;
+
     setFormState({
       ...formState,
-      sessionNumber: totalElements + 1,
+      sessionNumber: lastSessionNumber + 1,
     });
     openModal('addSessionModal');
   };
@@ -284,8 +309,8 @@ const Session: React.FC = () => {
         <PhotoBox>
           <SectionTitle>자세 사진 목록</SectionTitle>
           <ImageContainer ref={imageContainerRef}>
-            {images.length > 0 ? (
-              images.map((image, index) => (
+            {imagesFromPhotos.length > 0 ? (
+              imagesFromPhotos.map((image, index) => (
                 <ImageLayout
                   key={index}
                   onClick={() => handleImageClick(image.sessionId)}
@@ -309,7 +334,7 @@ const Session: React.FC = () => {
                   marginLeft: '20px',
                 }}
               >
-                아직 자세 사진이 없습니다.
+                자세 사진이 없습니다.
               </div>
             )}
             <div ref={imageObserverRef} />
@@ -337,7 +362,7 @@ const Session: React.FC = () => {
                   alignItems: 'center',
                 }}
               >
-                아직 운동 기록이 없습니다.
+                운동 기록이 없습니다.
               </div>
             )}
             <div ref={listObserverRef} />
