@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import bgImg from '../assets/images/notPage.png'; // 이미지 파일 경로
 import logo from '../assets/images/main-logo.png'; // 이미지 파일 경로
 import { hexToRgba } from 'src/utils/hexToRgba';
 
@@ -13,15 +12,9 @@ const NotFoundWrapper = styled.div`
   height: 100dvh;
   max-width: 450px;
   text-align: center;
-  /* background-color: ${({ theme }) => theme.colors.gray100};
-  background-image: url(${bgImg});
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover; */
 
   background-color: ${({ theme }) => theme.colors.main100};
   color: ${({ theme }) => theme.colors.white};
-  padding: 0 30px 50px;
   position: relative;
 
   &::before {
@@ -56,7 +49,7 @@ const NotFoundWrapper = styled.div`
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 50px;
+  gap: 10px;
   width: 100%;
   align-items: center;
   z-index: 3;
@@ -93,7 +86,11 @@ const Wrapper = styled.div`
   .contents {
     display: flex;
     width: 100%;
-    justify-content: flex-end;
+    justify-content: center;
+    align-items: center;
+    padding-top: 5px;
+    border-top: dashed 2px ${({ theme }) => theme.colors.white};
+    border-bottom: dashed 2px ${({ theme }) => theme.colors.white};
 
     .logo_box {
       max-width: 150px;
@@ -105,14 +102,28 @@ const Wrapper = styled.div`
       }
     }
 
-    p {
+    .message {
       font-size: 3rem;
       font-family: 'NanumSquareBold';
       text-align: center;
+      line-height: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-shadow: 0 2px 4px
+        ${({ theme }) => hexToRgba(theme.colors.black, 0.35)};
+
+      .top {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+      }
 
       strong {
         font-size: 5rem;
         font-family: 'NanumSquareExtraBold';
+        line-height: 1.2;
       }
     }
   }
@@ -121,7 +132,7 @@ const Wrapper = styled.div`
     width: 100%;
     max-width: 280px;
     font-size: 3rem;
-    color: ${({ theme }) => theme.colors.main900};
+    color: ${({ theme }) => theme.colors.main600};
     background: ${({ theme }) => theme.colors.white};
     border: none;
     border-radius: 10px;
@@ -145,10 +156,13 @@ const NotFound: React.FC = () => {
           <p className="logo_box">
             <img src={logo} alt="logo" />
           </p>
-          <p>
-            <strong>O</strong>ooops!
-            <br /> Page Not Found
-          </p>
+          <div className="message">
+            <div className="top">
+              <strong>O</strong>
+              <p>ooops!</p>
+            </div>
+            <p>Page Not Found</p>
+          </div>
         </div>
         <button onClick={() => (window.location.href = '/')}>Go Home</button>
       </Wrapper>
