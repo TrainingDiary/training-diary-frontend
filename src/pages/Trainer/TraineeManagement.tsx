@@ -117,6 +117,15 @@ const TraineeInfo = styled.div`
   }
 `;
 
+interface TraineeDataType {
+  ptContractId: number;
+  totalSessionUpdatedAt: string;
+  totalSession: number;
+  trainerId: number;
+  traineeId: number;
+  traineeName: string;
+}
+
 const TraineeManagement: React.FC = () => {
   useFetchUser();
   const navigate = useNavigate();
@@ -148,7 +157,8 @@ const TraineeManagement: React.FC = () => {
     },
   });
 
-  const trainees = data?.pages.flatMap(page => page.content) ?? [];
+  const trainees: TraineeDataType[] =
+    data?.pages.flatMap(page => page.content) ?? [];
 
   // 필터 정렬 로직
   const handleSort = (option: string) => {
@@ -163,7 +173,7 @@ const TraineeManagement: React.FC = () => {
           fetchNextPage();
         }
       },
-      { threshold: 1.0, rootMargin: '0px' }
+      { threshold: 1.0 }
     );
 
     if (observerRef.current) {
