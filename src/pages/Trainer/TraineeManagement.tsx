@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
+import { useInfiniteQuery } from 'react-query';
 
 import addBtn from '@icons/home/addbtn.svg';
 import avatar from '@icons/home/avatar.svg';
@@ -37,10 +38,6 @@ const DropDownWrapper = styled.div`
     border: 1px solid ${({ theme }) => theme.colors.gray300};
     box-shadow: 0 1px 4px 0 ${({ theme }) => hexToRgba(theme.colors.black, 0.2)};
     font-size: 1.2rem;
-    /* background-image: url('/src/assets/icons/home/dropDownArrow.svg');
-    background-position: 97% center;
-    background-repeat: no-repeat;
-    background-size: auto; */
 
     &:focus {
       outline: none;
@@ -134,39 +131,62 @@ const TraineeManagement: React.FC = () => {
   const navigate = useNavigate();
   const trainerApi = CreateTrainerApi(navigate);
   const { openModal, closeModal, isOpen } = useModals();
-  const [isLoading, setLoading] = useState<boolean>(false);
-  const [traineeData, setTraineeData] = useState<TraineeDataType[]>([]);
   const [sortOption, setSortOption] = useState<string>('NAME');
   const [selectedTraineeId, setSelectedTraineeId] = useState<number | null>(
     null
   );
   const [errorAlert, setErrorAlert] = useState<string>('');
+  const observerRef = useRef<HTMLDivElement | null>(null);
 
   // fetchData 추가, 삭제 등 이후로 여러 사용으로 인해 분리
-  const fetchData = async (sortOption: string) => {
-    try {
-      setLoading(true);
-      const res = await trainerApi.getTrainees(sortOption, 0, 100);
-
-      if (res.status === 200 && res.data) {
-        setTraineeData(res.data.content);
-      }
-    } catch (error) {
-      console.error('트레이니 조회 에러: ', error);
-    } finally {
-      setLoading(false);
-    }
+  const fetchTrainees = async ({ pageParam = 0 }) => {
+    const res = await trainerApi.getTrainees(sortOption, pageParam, 10);
+    return res.data;
   };
 
   // 트레이니 api 연동
-  useEffect(() => {
-    fetchData(sortOption);
-  }, [sortOption]);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    refetch,
+  } = useInfiniteQuery(['trainees', sortOption], fetchTrainees, {
+    getNextPageParam: lastPage => {
+      const nextPage = lastPage.number + 1;
+      return nextPage < lastPage.totalPages ? nextPage : undefined;
+    },
+  });
+
+  const trainees = data?.pages.flatMap(page => page.content) ?? [];
 
   // 필터 정렬 로직
   const handleSort = (option: string) => {
     setSortOption(option);
+    refetch();
   };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1.0, rootMargin: '0px' }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   //추가 버튼 모달
   const handleOpenAddModal = () => {
@@ -196,7 +216,7 @@ const TraineeManagement: React.FC = () => {
     }
     try {
       await trainerApi.addTrainee(email);
-      fetchData(sortOption);
+      refetch();
       closeModal('addModal');
     } catch (error: any) {
       if (error.response.status === 409) {
@@ -215,7 +235,7 @@ const TraineeManagement: React.FC = () => {
     if (selectedTraineeId === null) return;
     try {
       await trainerApi.deleteTrainee(selectedTraineeId);
-      fetchData(sortOption);
+      refetch();
     } catch (error) {
       console.error('트레이니 삭제 에러: ', error);
     }
@@ -238,14 +258,14 @@ const TraineeManagement: React.FC = () => {
             </select>
           </DropDownWrapper>
 
-          {isLoading ? (
+          {isFetching ? (
             <div style={{ marginRight: 'auto', fontSize: '1.4rem' }}>
               트레이니 목록 로딩중...
             </div>
           ) : (
             <TraineeList>
-              {traineeData.length > 0 ? (
-                traineeData.map(trainee => (
+              {trainees.length > 0 ? (
+                trainees.map(trainee => (
                   <TraineeItem key={trainee.ptContractId}>
                     <Link to={`/trainee/${trainee.traineeId}/dashboard`}>
                       <Avatar>
