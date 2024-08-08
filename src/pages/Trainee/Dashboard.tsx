@@ -280,8 +280,6 @@ const Dashboard: React.FC = () => {
       } catch (error: any) {
         if (error.response && error.response.status === 403) {
           console.error('접근 권한이 없습니다.');
-        } else if (error.response && error.response.status === 404) {
-          navigate('/not-found');
         } else {
           console.error('트레이니 정보 조회 에러:', error);
         }
