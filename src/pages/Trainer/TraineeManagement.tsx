@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
 import { useInfiniteQuery } from 'react-query';
@@ -117,15 +117,6 @@ const TraineeInfo = styled.div`
   }
 `;
 
-interface TraineeDataType {
-  ptContractId: number;
-  totalSessionUpdatedAt: string;
-  totalSession: number;
-  trainerId: number;
-  traineeId: number;
-  traineeName: string;
-}
-
 const TraineeManagement: React.FC = () => {
   useFetchUser();
   const navigate = useNavigate();
@@ -138,13 +129,11 @@ const TraineeManagement: React.FC = () => {
   const [errorAlert, setErrorAlert] = useState<string>('');
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  // fetchData 추가, 삭제 등 이후로 여러 사용으로 인해 분리
   const fetchTrainees = async ({ pageParam = 0 }) => {
     const res = await trainerApi.getTrainees(sortOption, pageParam, 10);
     return res.data;
   };
 
-  // 트레이니 api 연동
   const {
     data,
     fetchNextPage,
@@ -258,7 +247,7 @@ const TraineeManagement: React.FC = () => {
             </select>
           </DropDownWrapper>
 
-          {isFetching ? (
+          {isFetching && !isFetchingNextPage ? (
             <div style={{ marginRight: 'auto', fontSize: '1.4rem' }}>
               트레이니 목록 로딩중...
             </div>
@@ -300,6 +289,7 @@ const TraineeManagement: React.FC = () => {
                   트레이니를 등록해주세요.
                 </li>
               )}
+              <div ref={observerRef} />
             </TraineeList>
           )}
 
