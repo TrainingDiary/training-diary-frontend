@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useQuery } from 'react-query';
+import React, { useEffect, useState, useRef } from 'react';
+import { useInfiniteQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -62,8 +62,6 @@ const WorkOutManagement: React.FC = () => {
   const [selectedWorkoutId, setSelectedWorkoutId] = useState<number | null>(
     null
   );
-  const [page] = useState(0);
-  const [size] = useState(20);
   const [formState, setFormState] = useState<
     WorkoutDataType | AddWorkoutDataType
   >({
@@ -77,16 +75,50 @@ const WorkOutManagement: React.FC = () => {
     timeInputRequired: false,
     speedInputRequired: false,
   });
+  const observerRef = useRef<HTMLDivElement | null>(null);
 
-  const { data, isLoading, refetch } = useQuery(
-    ['workouts', page, size],
-    () => trainerApi.getWorkouts(page, size),
-    {
-      keepPreviousData: true,
+  const fetchWorkouts = async ({ pageParam = 0 }) => {
+    const res = await trainerApi.getWorkouts(pageParam, 10);
+    return res.data;
+  };
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    refetch,
+  } = useInfiniteQuery(['workouts'], fetchWorkouts, {
+    getNextPageParam: lastPage => {
+      const nextPage = lastPage.number + 1;
+      return nextPage < lastPage.totalPages ? nextPage : undefined;
+    },
+  });
+
+  const workouts: WorkoutDataType[] =
+    data?.pages.flatMap(page => page.content) ?? [];
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
     }
-  );
 
-  const workouts: WorkoutDataType[] = data?.data.content || [];
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const initialFormState: AddWorkoutDataType = {
     name: '',
@@ -181,7 +213,7 @@ const WorkOutManagement: React.FC = () => {
     <SectionWrapper>
       <Wrapper>
         {workouts.length > 0 ? (
-          isLoading ? (
+          isFetching && !isFetchingNextPage ? (
             <div>운동 종류 목록 로딩중...</div>
           ) : (
             workouts.map(workout => (
@@ -206,7 +238,7 @@ const WorkOutManagement: React.FC = () => {
             운동 종류를 생성해주세요.
           </div>
         )}
-
+        <div ref={observerRef} />
         {/* Add button 추가 */}
         <AddButton onClick={handleOpenAddModal}>
           <img src={addBtn} alt="add button" />
